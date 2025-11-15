@@ -1,4 +1,4 @@
- 
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -33,11 +33,16 @@
     </div>
 </body>
 </html>
- <!-- <?php
-session_start();
-require 'db.php'; // đảm bảo file db.php cùng thư mục và có $conn kết nối MySQL
+  <!-- <?php
+ session_start();
+require 'db.php'; 
 
-if (isset($_POST['submit'])) {  // tên nút submit cần khớp với form
+if (isset($_SESSION['username'])) {
+    header("Location: index.html");//index của deli or user .... ??????
+    // header("Location: index_delivery.php");
+    exit();
+}
+if (isset($_POST['submit'])) {  
     $username = $_POST['username'];
     $password = $_POST['password'];
 
@@ -52,7 +57,8 @@ if (isset($_POST['submit'])) {  // tên nút submit cần khớp với form
     if ($res && mysqli_num_rows($res) > 0) {
         $row = mysqli_fetch_assoc($res);
         $_SESSION['username'] = $row['username'];
-        header('location: index.php');
+        header('location: index.html');
+        // header("Location: index_delivery.php");
         exit();
     } else {
         $error = 'Tên đăng nhập hoặc mật khẩu không chính xác';
