@@ -255,7 +255,7 @@ body {
 /* Featured products */
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* repeat(auto-fill, minmax(250px, 1fr)) tức là tạo ra số cột tự động dựa trên kích thước của phần tử cha, minmax(250px, 1fr) tức là kích thước tối thiểu của cột là 250px, kích thước tối đa của cột là 1fr */
     gap: 20px;
     margin-bottom: 40px;
 }
@@ -265,12 +265,12 @@ body {
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s; /* transition: transform 0.3s, box-shadow 0.3s tức là khi hover thì phần tử sẽ có hiệu ứng chuyển đổi sau 0.3 giây */
 }
 
 .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-5px); /* transform: translateY(-5px) tức là khi hover thì phần tử sẽ dịch chuyển xuống 5px */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* box-shadow: 0 4px 12px rgba(0,0,0,0.15) tức là khi hover thì phần tử sẽ có bóng */
 }
 
 .product-image {
@@ -293,7 +293,7 @@ body {
 }
 
 .product-image::after {
-    content: 'X';
+   /* content: 'X'; */
     position: absolute;
 }
 
@@ -380,8 +380,8 @@ body {
     position: relative;
 }
 
-.store-image::after {
-    content: 'X';
+.store-image::after { /* ::after là pseudo-element tức là phần tử ảo được tạo ra bởi CSS */
+  /*  content: 'X'; */
     position: absolute;
 }
 
@@ -397,7 +397,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* repeat(auto-fit, minmax(250px, 1fr)) tức là tạo ra số cột tự động dựa trên kích thước của phần tử cha, minmax(250px, 1fr) tức là kích thước tối thiểu của cột là 250px, kích thước tối đa của cột là 1fr */
     gap: 30px;
     margin-bottom: 30px;
 }
@@ -451,7 +451,8 @@ body {
 }
 
 .social-icon:hover {
-    background-color: #3ba372;
+   /* background-color: #3ba372; */
+    cursor: pointer;
 }
 
 .footer-bottom {
@@ -463,7 +464,7 @@ body {
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 768px) { /* @media (max-width: 768px) tức là khi chiều rộng của màn hình là 768px thì áp dụng style sau */
     .header-top {
         flex-wrap: wrap;
     }
