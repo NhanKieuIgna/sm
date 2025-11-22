@@ -1,67 +1,96 @@
+<?php
+session_start();
+require 'sm/dp.php'; 
+
+if (isset($_SESSION['user_id'])) {
+  
+    header("Location: delivery_index.php"); 
+    exit();
+}
+
+$error = '';
+
+if (isset($_POST['submit'])) { 
+
+    $taikhoan_nhap = $_POST['username']; 
+    $password_nhap = $_POST['password'];
+
+    // 1. CHUẨN BỊ CÂU LỆNH SQL ĐỂ TÌM TÀI KHOẢN
+    // Tìm kiếm trong cột Email HOẶC SoDienThoai HOẶC TenDangNhap
+    $sql = "SELECT ID_NguoiDung, MatKhau_Hash, VaiTro FROM nguoidung 
+            WHERE Email = ? OR SoDienThoai = ? OR TenDangNhap = ?";
+    
+    // Sử dụng Prepared Statement để an toàn hơn
+    if ($stmt = $conn->prepare($sql)) {
+        // Gán biến cho placeholder (sử dụng cùng một biến $taikhoan_nhap cho cả 3 cột)
+        $stmt->bind_param("sss", $taikhoan_nhap, $taikhoan_nhap, $taikhoan_nhap);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result && $result->num_rows == 1) {
+            $user = $result->fetch_assoc();
+            
+            // 2. XÁC MINH MẬT KHẨU
+            // So sánh mật khẩu nhập vào với MatKhau_Hash đã lưu trong CSDL
+            if (password_verify($password_nhap, $user['MatKhau_Hash'])) {
+                
+                // Đăng nhập thành công
+                $_SESSION['user_id'] = $user['ID_NguoiDung'];
+                $_SESSION['vaitro'] = $user['VaiTro'];
+                
+                // 3. CHUYỂN HƯỚNG DỰA TRÊN VAI TRÒ
+                if ($user['VaiTro'] === 'NguoiGiaoHang') {
+                    header('location: delivery_index.php');
+                } else if ($user['VaiTro'] === 'QuanTriVien') {
+                    header('location: admin/dashboard.php');
+                } else {
+                    // Mặc định cho NguoiMua/NguoiBan
+                    header('location: index.html');
+                }
+                exit();
+            } else {
+                $error = 'Mật khẩu không chính xác.';
+            }
+        } else {
+            $error = 'Tài khoản (Email/SĐT/Tên đăng nhập) không tồn tại.';
+        }
+        $stmt->close();
+    } else {
+        $error = 'Lỗi hệ thống trong quá trình chuẩn bị truy vấn.';
+    }
+}
+?>
 
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập</title>
-    <link rel="stylesheet" href="login.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng nhập</title>
+ <link rel="stylesheet" href="login.css">
 </head>
 <body>
-    <div class="login-container">
+ <div class="login-container">
 
-        <h2>Đăng nhập</h2>
-        <form action="" method="post">
-            <div class="input-box">
-                <label for="username">Tên đăng nhập</label>
-                <input type="text" id="username" name="username" placeholder="Nhập tên đăng nhập" required>
-            </div>
+ <h2>Đăng nhập</h2>
+ <form action="" method="post">
+<div class="input-box">
+<label for="username">Tài khoản (Email/SĐT)</label>
+ <input type="text" id="username" name="username" placeholder="Nhập Email hoặc SĐT" required>
+</div>
 
-            <div class="input-box">
-                <label for="password">Mật khẩu</label>
-                <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required>
-            </div>
+<div class="input-box">
+<label for="password">Mật khẩu</label>
+ <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required>
+</div>
 
-            <button type="submit" name="submit" class="btn">Đăng nhập</button>
+ <button type="submit" name="submit" class="btn">Đăng nhập</button>
 
-            <?php if (!empty($error)) : ?>
-                <p style="color:red; text-align:center;"><?= $error ?></p>
-            <?php endif; ?>
-
-            <p class="signup-text">Chưa có tài khoản? <a href="#">Đăng ký</a></p>
-        </form>
-    </div>
+ <?php if (!empty($error)) : ?>
+ <p style="color:red; text-align:center;"><?= $error ?></p>
+ <?php endif; ?>
+ <p class="signup-text">Chưa có tài khoản? <a href="dangky_deli.php">Đăng ký</a></p>
+</form>
+ </div>
 </body>
 </html>
-  <!-- <?php
- session_start();
-require 'db.php'; 
-
-if (isset($_SESSION['username'])) {
-    header("Location: index.html");//index của deli or user .... ??????
-    // header("Location: index_delivery.php");
-    exit();
-}
-if (isset($_POST['submit'])) {  
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-
-    // Tránh lỗi SQL Injection
-    $username = mysqli_real_escape_string($conn, $username);
-    $password = mysqli_real_escape_string($conn, $password);
-
-    // Kiểm tra người dùng
-    $sql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
-    $res = mysqli_query($conn, $sql);
-
-    if ($res && mysqli_num_rows($res) > 0) {
-        $row = mysqli_fetch_assoc($res);
-        $_SESSION['username'] = $row['username'];
-        header('location: index.html');
-        // header("Location: index_delivery.php");
-        exit();
-    } else {
-        $error = 'Tên đăng nhập hoặc mật khẩu không chính xác';
-    }
-}
-?> -->
