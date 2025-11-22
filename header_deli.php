@@ -8,7 +8,7 @@
         </div>
         <nav>
             <ul>
-                <li><a href="dashboard.php">Dashboard</a></li>
+                <li><a href="delivery_index.php">Trang chủ</a></li>
                 <li><a href="delivery_schedule.php">Lịch giao hàng</a></li>
                 <li><a href="hoso.php">Hồ sơ</a></li>
                 <li><a href="exit.php">Đăng xuất</a></li>
