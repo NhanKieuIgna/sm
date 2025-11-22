@@ -271,7 +271,7 @@ mysqli_stmt_close($stmt_stats);
     <main class="main">
         <div class="profile-header">
             <div class="avatar">
-                <img src="uploads/avatars/<?php echo $user['avatar']; ?>" alt="<?php echo $user['name']; ?>">
+                <img src="sm/uploads/<?php echo $user['AnhDaiDien']; ?>" alt="<?php echo $user['name']; ?>">
             </div>
             <div class="user-info">
                 <h2><?php echo $user['name']; ?></h2>
