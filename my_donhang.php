@@ -1,127 +1,358 @@
 <?php
+
+
 session_start();
+include "sm/dp.php"; 
 
-// Dữ liệu đơn hàng giả lập (thường lấy từ CSDL)
-$orders = [
-    [
-        'order_id' => 'DH001',
-        'date' => '2025-11-15',
-        'status' => 'Đã giao',
-        'customer_name' => 'Ngô Quốc Trung',
-        'phone' => '0912345678',
-        'address' => '123 Nguyễn Huệ, Quy Nhơn, Bình Định',
-        'image' => 'uploads/1699999999_delivery1.jpg'
-    ],
-    [
-        'order_id' => 'DH002',
-        'date' => '2025-11-14',
-        'status' => 'Chưa giao',
-        'customer_name' => 'Trần Văn A',
-        'phone' => '0987654321',
-        'address' => '456 Lê Lợi, Quy Nhơn, Bình Định',
-        'image' => ''
-    ],
-    [
-        'order_id' => 'DH003',
-        'date' => '2025-11-13',
-        'status' => 'Đã giao',
-        'customer_name' => 'Lê Thị B',
-        'phone' => '0911222333',
-        'address' => '789 Hùng Vương, Quy Nhơn, Bình Định',
-        'image' => 'uploads/1699999999_delivery3.jpg'
-    ],
-];
+if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
+    header("Location: login.php"); 
+    exit();
+}
+
+$driver_id = $_SESSION['user_id'];
+$orders = []; 
+$sql = "SELECT 
+            DH.ID_DonHang, DH.DiaChiGiaoHang, DH.TrangThaiDonHang,
+            N.HoTen AS TenKhachHang, 
+            DH.TongGiaTriDonHang
+        FROM danhsachdonhang AS DH
+        LEFT JOIN nguoidung AS N ON DH.ID_NguoiMua = N.ID_NguoiDung
+        WHERE DH.ID_NguoiGiaoHang = ?
+        ORDER BY FIELD(DH.TrangThaiDonHang, 'DangVanChuyen', 'ChoGiaoHang', 'DangXuLy', 'DaGiao', 'HoanThanh', 'DaHuy') ASC,
+                 DH.NgayDatHang DESC";
+
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $driver_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $orders[] = [
+            "id" => "DH" . str_pad($row['ID_DonHang'], 5, '0', STR_PAD_LEFT), 
+            "customer" => htmlspecialchars($row['TenKhachHang'] ?? 'Khách hàng ẩn danh'),
+            "address" => htmlspecialchars($row['DiaChiGiaoHang']),
+            "total_value" => number_format($row['TongGiaTriDonHang'], 0, ',', '.') . '₫', 
+            "status" => htmlspecialchars($row['TrangThaiDonHang']),
+            "raw_id" => $row['ID_DonHang'] 
+        ];
+    }
+}
+mysqli_stmt_close($stmt);
 ?>
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đơn hàng của bạn</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-            padding: 20px;
-        }
-        .container {
-            max-width: 900px;
-            margin: auto;
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            height: 600px;
-            overflow-y: auto; /* Thanh cuộn dọc */
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .order {
-            border-bottom: 1px solid #ddd;
-            padding: 15px 0;
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-        }
-        .order:last-child {
-            border-bottom: none;
-        }
-        .order img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        .order-info {
-            flex-grow: 1;
-        }
-        .order-info p {
-            margin: 5px 0;
-        }
-        .status {
-            font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 5px;
-            color: #fff;
-            display: inline-block;
-        }
-        .Đã\ giao { background-color: #28a745; }
-        .Chưa\ giao { background-color: #ffc107; color: #000; }
-        .Giao\ thất\ bại { background-color: #dc3545; }
-    </style>
-</head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Danh sách đơn hàng</title>
+    </head>
+<style>
+
+.order.da-giao .status, .order.hoan-thanh .status {
+    color: #007bff; 
+}
+.order.dang-van-chuyen .status {
+    color: #ff9800;
+}
+.order.cho-giao-hang .status {
+    color: #dc3545; 
+}
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.orders-page {
+    display: flex;
+    min-height: 100vh;
+}
+.sidebar {
+    width: 250px;
+    background-color: #fff;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+    padding-left: 10px;
+}
+
+.sidebar .logo {
+    font-size: 28px;
+    font-weight: 800;
+    color: #007bff;
+}
+
+.small {
+    font-size: 12px;
+    color: #888;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    color: #333;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.nav-item:hover, .nav-item.active {
+    background-color: #e6f0ff;
+    color: #007bff;
+}
+.main {
+    flex: 1;
+    padding: 25px 30px;
+}
+
+h2 {
+    margin-bottom: 25px;
+    color: #333;
+    font-weight: 600;
+}
+.card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.orders {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+
+.orders::-webkit-scrollbar {
+    width: 8px;
+}
+.orders::-webkit-scrollbar-track {
+    background: #f0f2f5;
+    border-radius: 4px;
+}
+.orders::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+}
+.orders::-webkit-scrollbar-thumb:hover {
+    background-color: #999;
+}
+
+
+.order {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    border-left: 5px solid #007bff; 
+    transition: all 0.3s;
+}
+
+.order:hover {
+    background-color: #e6f0ff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+.info {
+    flex-grow: 1;
+}
+
+.badge {
+    font-weight: 700;
+    color: #666;
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+.order h4 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    color: #222;
+}
+
+.order p {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.meta {
+    font-size: 13px;
+    color: #888;
+    margin-top: 5px;
+}
+
+.status {
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    font-size: 12px;
+    color: white;
+}
+.cho-giao-hang, .dang-xu-ly {
+    border-left-color: #ffc107;
+    background-color: #fffbe6;
+}
+.cho-giao-hang .status, .dang-xu-ly .status {
+    background-color: #ffc107;
+    color: #333;
+}
+
+
+.dang-van-chuyen {
+    border-left-color: #007bff;
+}
+.dang-van-chuyen .status {
+    background-color: #007bff;
+}
+
+.da-giao {
+    border-left-color: #28a745;
+}
+.da-giao .status {
+    background-color: #28a745;
+}
+
+
+.hoan-thanh {
+    border-left-color: #17a2b8;
+}
+.hoan-thanh .status {
+    background-color: #17a2b8;
+}
+
+.da-huy, .khieu-nai {
+    border-left-color: #dc3545;
+    opacity: 0.7;
+}
+.da-huy .status, .khieu-nai .status {
+    background-color: #dc3545;
+}
+
+
+.actions {
+    margin-left: 20px;
+    white-space: nowrap; }
+
+.actions .btn-ghost {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid #007bff;
+    background-color: transparent;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.actions .btn-ghost:hover {
+    background-color: #007bff;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.4);
+}
+
+
+@media (max-width: 768px) {
+    .orders-page {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .main {
+        padding: 20px 15px;
+    }
+    .order {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .actions {
+        margin-top: 10px;
+        margin-left: 0;
+        width: 100%;
+    }
+    .actions .btn-ghost {
+        width: 100%;
+        text-align: center;
+    }
+}
+</style>
+
 <body>
-    <div class="container">
-        <h2>Đơn hàng của bạn</h2>
+<?php  include "header_deli.php"; ?>
 
-        <?php if(count($orders) == 0): ?>
-            <p>Bạn chưa có đơn hàng nào.</p>
-        <?php else: ?>
-            <?php foreach($orders as $order): ?>
-                <div class="order">
-                    <?php if($order['image'] && file_exists($order['image'])): ?>
-                        <img src="<?php echo $order['image']; ?>" alt="Ảnh xác nhận">
-                    <?php else: ?>
-                        <img src="https://via.placeholder.com/100?text=Chưa+ảnh" alt="Chưa có ảnh">
-                    <?php endif; ?>
+<div class="orders-page">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo">SM</div>
+            <div>
+                <div style="font-weight:700">Trang chủ</div>
+                <div class="small">Phiên bản giao hàng</div>
+            </div>
+        </div>
+        <nav>
+            <a class="nav-item" href="delivery_index.php">🏠 Tổng quan</a>
+            <a class="nav-item" href="my_donhang.php">📦 Đơn hàng</a>
+            <a class="nav-item" href="Thongke.php">💰 Thu nhập</a>
+            <a class="nav-item" href="ls_giaohang.php">📜 Lịch sử</a>
+        </nav>
+    </aside>
 
-                    <div class="order-info">
-                        <p><strong>Mã đơn hàng:</strong> <?php echo $order['order_id']; ?></p>
-                        <p><strong>Ngày đặt:</strong> <?php echo $order['date']; ?></p>
-                        <p><strong>Tên khách hàng:</strong> <?php echo $order['customer_name']; ?></p>
-                        <p><strong>Số điện thoại:</strong> <?php echo $order['phone']; ?></p>
-                        <p><strong>Địa chỉ:</strong> <?php echo $order['address']; ?></p>
-                        <p class="status <?php echo str_replace(' ', '\\ ', $order['status']); ?>">
-                            <?php echo $order['status']; ?>
-                        </p>
+    <main class="main">
+        <h2>Danh sách đơn hàng của bạn</h2>
+
+        <div class="card">
+            <div class="orders">
+                <?php if (empty($orders)): ?>
+                    <p style="text-align: center; color: #666; padding: 20px;">🎉 Bạn chưa có đơn hàng nào được giao!</p>
+                <?php endif; ?>
+                
+                <?php foreach($orders as $order): ?>
+                <div class="order <?php echo strtolower(str_replace(" ", "-", $order['status'])); ?>">
+                    <div class="info">
+                        <div class="badge">Mã đơn: <?php echo $order['id']; ?></div>
+                        <h4>Khách: <?php echo $order['customer']; ?></h4>
+                        <p>Địa chỉ: <?php echo $order['address']; ?></p>
+                        <p style="font-weight: 600; color: #007bff;">Tổng giá trị: <?php echo $order['total_value']; ?></p>
+                        <div class="meta">
+                            Trạng thái: <span class="status"><?php echo $order['status']; ?></span>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <a href="chi_tiet_don.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xem chi tiết</a>
                     </div>
                 </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </main>
+</div>
+
+<?php  include "footer_deli.php"; ?>
 </body>
 </html>
