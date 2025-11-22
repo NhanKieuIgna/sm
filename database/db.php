@@ -2,7 +2,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$db   = "seconhand_market";
+$db   = "secondhand_market";
 
 $conn = mysqli_connect($host, $user, $pass, $db);
 if (!$conn) {
