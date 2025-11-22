@@ -1,229 +1,271 @@
-<!DOCTYPE html>
+<?php
+// Tên file: profile.php (hoặc edit_profile.php)
+
+session_start();
+include "sm/dp.php"; // Chắc chắn rằng file này chứa $conn (kết nối MySQLi)
+
+// --- 1. KIỂM TRA ĐĂNG NHẬP VÀ XÁC ĐỊNH ID ---
+if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
+    header("Location: login.php"); 
+    exit();
+}
+
+$driver_id = $_SESSION['user_id'];
+$driver = [];
+$message = ''; // Thông báo thành công hoặc lỗi
+$target_dir = "sm/uploads/"; // Đường dẫn lưu trữ ảnh (theo code của bạn)
+
+// --- 2. XỬ LÝ FORM SUBMIT (POST) ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Lấy dữ liệu từ form
+    $ho_ten = trim($_POST['ho_ten']);
+    $sdt = trim($_POST['sdt']);
+    $email = trim($_POST['email']);
+    $dia_chi = trim($_POST['dia_chi']); // Bảng nguoidung
+    $gioi_tinh = $_POST['gioi_tinh']; // Bảng hosonguoigiaohang
+    $nam_sinh = $_POST['nam_sinh']; // Bảng hosonguoigiaohang (Giả định đã thêm)
+    $bien_so_xe = trim($_POST['bien_so_xe']); // Bảng hosonguoigiaohang
+    $khu_vuc = trim($_POST['khu_vuc']); // Bảng hosonguoigiaohang
+    $old_avatar = $_POST['old_avatar'];
+
+    // Bắt đầu transaction để đảm bảo cả 2 bảng được cập nhật thành công
+    mysqli_begin_transaction($conn);
+    $success = true;
+
+    try {
+        // A. Xử lý Upload Ảnh Đại Diện (Nếu có file mới)
+        if (isset($_FILES['anh_dai_dien']) && $_FILES['anh_dai_dien']['error'] === UPLOAD_ERR_OK) {
+            $file_ext = strtolower(pathinfo($_FILES['anh_dai_dien']['name'], PATHINFO_EXTENSION));
+            $new_file_name = $driver_id . '_avatar_' . time() . '.' . $file_ext;
+            $target_file = $target_dir . $new_file_name;
+
+            if (move_uploaded_file($_FILES['anh_dai_dien']['tmp_name'], $target_file)) {
+                $avatar_name = $new_file_name;
+            } else {
+                $message = "<div style='color: red;'>Lỗi khi tải ảnh lên.</div>";
+                $success = false;
+            }
+        } else {
+            $avatar_name = $old_avatar; // Giữ lại ảnh cũ
+        }
+        
+        if ($success) {
+            // B. Cập nhật bảng nguoidung
+            $sql_update_user = "UPDATE nguoidung SET 
+                                HoTen = ?, SoDienThoai = ?, Email = ?, DiaChiGiaoHangMacDinh = ?, AnhDaiDien = ? 
+                                WHERE ID_NguoiDung = ?";
+
+            $stmt_user = mysqli_prepare($conn, $sql_update_user);
+            mysqli_stmt_bind_param($stmt_user, "sssssi", $ho_ten, $sdt, $email, $dia_chi, $avatar_name, $driver_id);
+            
+            if (!mysqli_stmt_execute($stmt_user)) {
+                throw new Exception("Lỗi cập nhật thông tin cơ bản: " . mysqli_error($conn));
+            }
+            mysqli_stmt_close($stmt_user);
+
+
+            // C. Cập nhật bảng hosonguoigiaohang (Sử dụng UPSERT)
+            $sql_upsert_profile = "INSERT INTO hosonguoigiaohang 
+                                   (ID_NguoiDung, GioiTinh, NamSinh, BienSoXe, KhuVucHoatDong)
+                                   VALUES (?, ?, ?, ?, ?)
+                                   ON DUPLICATE KEY UPDATE 
+                                   GioiTinh = VALUES(GioiTinh), 
+                                   NamSinh = VALUES(NamSinh), 
+                                   BienSoXe = VALUES(BienSoXe), 
+                                   KhuVucHoatDong = VALUES(KhuVucHoatDong)";
+            
+            $stmt_profile = mysqli_prepare($conn, $sql_upsert_profile);
+            mysqli_stmt_bind_param($stmt_profile, "isiss", $driver_id, $gioi_tinh, $nam_sinh, $bien_so_xe, $khu_vuc);
+            
+            if (!mysqli_stmt_execute($stmt_profile)) {
+                throw new Exception("Lỗi cập nhật hồ sơ giao hàng: " . mysqli_error($conn));
+            }
+            mysqli_stmt_close($stmt_profile);
+
+            mysqli_commit($conn);
+            $message = "<div style='color: green;' class='message'>Cập nhật hồ sơ thành công!</div>";
+
+        }
+    } catch (Exception $e) {
+        mysqli_rollback($conn);
+        $message = "<div style='color: red;' class='message'>Lỗi: " . $e->getMessage() . "</div>";
+    }
+}
+
+
+// --- 3. LẤY THÔNG TIN HIỆN TẠI ĐỂ HIỂN THỊ TRÊN FORM (GET) ---
+$sql = "SELECT 
+            N.HoTen, N.Email, N.SoDienThoai, N.DiaChiGiaoHangMacDinh, N.AnhDaiDien,
+            H.GioiTinh, H.NamSinh, H.BienSoXe, H.KhuVucHoatDong
+        FROM nguoidung AS N
+        LEFT JOIN hosonguoigiaohang AS H ON N.ID_NguoiDung = H.ID_NguoiDung
+        WHERE N.ID_NguoiDung = ?";
+
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $driver_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+if ($result && $row = mysqli_fetch_assoc($result)) {
+    $driver = $row;
+    $driver['AnhDaiDien'] = htmlspecialchars($row['AnhDaiDien'] ?: 'default_avatar.png');
+} else {
+    $message = "<div style='color: red;' class='message'>Không tìm thấy dữ liệu người dùng.</div>";
+}
+
+mysqli_stmt_close($stmt);
+
+?>
+<!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Hồ sơ cá nhân tài xế</title>
-  <link rel="stylesheet" href="driver-profile.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chỉnh sửa Hồ sơ</title>
 </head>
-<body>
 <style>
-    body {
-  font-family: Inter, sans-serif;
-  background: #f5f7fa;
-  margin: 0;
-  padding: 40px;
-  color: #1e293b;
+/* CSS giữ nguyên từ lần trước để đảm bảo giao diện */
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f7f6;
+    padding: 20px;
 }
-
 .container {
-  max-width: 900px;
-  margin: auto;
-  background: white;
-  padding: 30px;
-  border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-
 h2 {
-  text-align: center;
-  color: #0b6efd;
-  margin-bottom: 30px;
+    text-align: center;
+    color: #007bff;
+    margin-bottom: 25px;
 }
-
-.profile-form {
-  display: flex;
-  gap: 30px;
-  align-items: flex-start;
+.form-group {
+    margin-bottom: 20px;
 }
-
-.avatar {
-  flex: 1 1 200px;
-  text-align: center;
-}
-
-.avatar-placeholder {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  border: 3px solid #0b6efd;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f0f0f0;
-  color: #555;
-  font-weight: 600;
-  font-size: 15px;
-  margin: 0 auto 10px;
-  overflow: hidden;
-}
-
-.avatar img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-  display: block;
-}
-
-/* Ẩn chữ khi có ảnh */
-.avatar img:not([src=""]) + span { display: none; }
-
-.upload-btn {
-  background: #0b6efd;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.info {
-  flex: 2;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.row {
-  display: flex;
-  gap: 20px;
-}
-
-.col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
 label {
-  font-weight: 600;
-  margin-bottom: 5px;
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
 }
-
-input {
-  padding: 10px;
-  border: 1px solid #d0d7de;
-  border-radius: 8px;
-  font-size: 15px;
+input[type="text"], input[type="email"], select, textarea, input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
 }
-
-.buttons {
-  margin-top: 20px;
-  display: flex;
-  gap: 10px;
+.avatar-preview {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
 }
-
-.btn {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  text-align: center;
+.avatar-preview img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #007bff;
 }
-
-.btn-save {
-  background: #0b6efd;
-  color: white;
+.btn-submit {
+    background: #007bff;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+    width: 100%;
 }
-
-.btn-exit {
-  background: #ef4444;
-  color: white;
+.btn-submit:hover {
+    background: #0056b3;
 }
-
+.message {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+}
 </style>
+<body>
+
 <div class="container">
-  <header>
-    <h2>Hồ sơ cá nhân tài xế</h2>
-  </header>
+    <h2>Chỉnh sửa Hồ sơ Người giao hàng</h2>
 
-  <div class="profile-form">
+    <?php echo $message; // Hiển thị thông báo (thành công/lỗi) ?>
 
-    <!-- Avatar -->
-    <div class="avatar">
-      <div class="avatar-placeholder">
-        <?php if (!empty($driver['avatar'])): ?>
-          <img src="<?php echo htmlspecialchars($driver['avatar']); ?>" alt="Ảnh đại diện">
-        <?php else: ?>
-          <span>Ảnh đại diện</span>
-        <?php endif; ?>
-      </div>
-      <button class="upload-btn">Chọn ảnh</button>
-    </div>
+    <form method="POST" action="profile.php" enctype="multipart/form-data">
+        
+        <h3>Thông tin cá nhân cơ bản</h3>
+        
+        <div class="form-group">
+            <label>Ảnh Đại Diện</label>
+            <div class="avatar-preview">
+                <img src="<?php echo $target_dir . $driver['AnhDaiDien']; ?>" alt="Ảnh đại diện">
+                <input type="file" name="anh_dai_dien">
+                <input type="hidden" name="old_avatar" value="<?php echo $driver['AnhDaiDien']; ?>">
+            </div>
+        </div>
 
-    <!-- Form thông tin -->
-    <div class="info">
-      <div class="row">
-        <div class="col">
-          <label>Họ tên</label>
-          <input type="text" value="<?php echo htmlspecialchars($driver['name']); ?>" readonly>
+        <div class="form-group">
+            <label for="ho_ten">Họ tên</label>
+            <input type="text" id="ho_ten" name="ho_ten" value="<?php echo htmlspecialchars($driver['HoTen'] ?? ''); ?>" required>
         </div>
-        <div class="col">
-          <label>Biển số xe</label>
-          <input type="text" value="<?php echo htmlspecialchars($driver['license_plate']); ?>" readonly>
-        </div>
-      </div>
 
-      <div class="row">
-        <div class="col">
-          <label>Số điện thoại</label>
-          <input type="text" value="<?php echo htmlspecialchars($driver['phone']); ?>" readonly>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($driver['Email'] ?? ''); ?>" required>
         </div>
-        <div class="col">
-          <label>Loại xe</label>
-          <input type="text" value="<?php echo htmlspecialchars($driver['vehicle_type']); ?>" readonly>
-        </div>
-      </div>
 
-      <div class="row">
-        <div class="col">
-          <label>Địa chỉ</label>
-          <input type="text" value="<?php echo htmlspecialchars($driver['address']); ?>" readonly>
+        <div class="form-group">
+            <label for="sdt">Số điện thoại</label>
+            <input type="text" id="sdt" name="sdt" value="<?php echo htmlspecialchars($driver['SoDienThoai'] ?? ''); ?>" required>
         </div>
-        <div class="col">
-          <label>Hạng bằng lái</label>
-          <input type="text" value="<?php echo htmlspecialchars($driver['license_class']); ?>" readonly>
-        </div>
-      </div>
 
-      <div class="row">
-        <div class="col">
-          <label>Ngày sinh</label>
-          <input type="text" value="<?php echo htmlspecialchars($driver['birthdate']); ?>" readonly>
+        <div class="form-group">
+            <label for="dia_chi">Địa chỉ Mặc định (Giao/Lấy hàng)</label>
+            <textarea id="dia_chi" name="dia_chi"><?php echo htmlspecialchars($driver['DiaChiGiaoHangMacDinh'] ?? ''); ?></textarea>
         </div>
-        <div class="col">
-          <label>Khu vực hoạt động</label>
-          <input type="text" value="<?php echo htmlspecialchars($driver['region']); ?>" readonly>
+
+        <hr style="margin: 30px 0;">
+
+        <h3>Hồ sơ Giao hàng (Bảng `hosonguoigiaohang`)</h3>
+
+        <div class="form-group">
+            <label for="gioi_tinh">Giới tính</label>
+            <select id="gioi_tinh" name="gioi_tinh">
+                <option value="Nam" <?php echo ($driver['GioiTinh'] == 'Nam') ? 'selected' : ''; ?>>Nam</option>
+                <option value="Nu" <?php echo ($driver['GioiTinh'] == 'Nu') ? 'selected' : ''; ?>>Nữ</option>
+                <option value="Khac" <?php echo ($driver['GioiTinh'] == 'Khac') ? 'selected' : ''; ?>>Khác</option>
+            </select>
         </div>
-      </div>
 
-      <div class="buttons">
-        <button class="btn btn-save">Lưu</button>
-        <a href="delivery_index.php" class="btn btn-exit">Thoát</a>
-      </div>
-    </div>
+        <div class="form-group">
+            <label for="nam_sinh">Năm sinh</label>
+            <input type="number" id="nam_sinh" name="nam_sinh" value="<?php echo htmlspecialchars($driver['NamSinh'] ?? ''); ?>" min="1900" max="<?php echo date('Y') - 18; ?>">
+        </div>
+        
+        <div class="form-group">
+            <label for="bien_so_xe">Biển số xe</label>
+            <input type="text" id="bien_so_xe" name="bien_so_xe" value="<?php echo htmlspecialchars($driver['BienSoXe'] ?? ''); ?>">
+        </div>
 
-  </div>
+        <div class="form-group">
+            <label for="khu_vuc">Khu vực hoạt động</label>
+            <input type="text" id="khu_vuc" name="khu_vuc" value="<?php echo htmlspecialchars($driver['KhuVucHoatDong'] ?? ''); ?>">
+        </div>
+        
+        <button type="submit" class="btn-submit">Lưu Cập Nhật Hồ Sơ</button>
+
+    </form>
 </div>
 
 </body>
 </html>
-<!-- <?php
-session_start();
-require 'db.php';
-
-// Kiểm tra xem đã đăng nhập chưa
-if (!isset($_SESSION['driver_id'])) {
-    header("Location: login.php");
-    exit;
-}
-
-$driver_id = $_SESSION['driver_id'];
-
-// Lấy thông tin từ database
-$sql = "SELECT * FROM drivers WHERE id = $driver_id";
-$result = $conn->query($sql);
-$driver = $result->fetch_assoc();
-?> -->
