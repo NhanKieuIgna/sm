@@ -1,10 +1,12 @@
-
 <header>
-    <div class="header-container">
-        <div class="logo">
-            <a href="dashboard.php">
+    
+</header>
+<div class="header-container">
+        <div class="logo" style="display: flex;">
+            <a href="delivery_index.php">
                 <img src="sm/logo.jpg" alt="Logo" class="logo-img">
             </a>
+            <h2 style="padding-left: 5px;">Delivery-Secondhand Market</h2>
         </div>
         <nav>
             <ul>
@@ -15,26 +17,38 @@
             </ul>
         </nav>
     </div>
-</header>
-
 <style>
     header {
-        background-color: #007bff;
+        background-image: url(sm/uploads/anhnen3.0.jpg);
         color: #fff;
-        padding: 15px 0;
+        padding: 18rem 0;
         margin-bottom: 4rem;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        background-repeat: no-repeat; 
+        background-size: cover; 
+        background-position: center;
     }
-    .header-container {
-        width: 90%;
-        margin: auto;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+.header-container {
+    position: sticky; 
+    top: 0; 
+    z-index: 1000; 
+    background-color: white; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    border-radius: 10px;
+    padding: 1.5rem;
+    width: 100%;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
     .logo-img {
-        height: 50px; /* điều chỉnh kích thước ảnh */
+        height: 50px;
         width: auto;
+    }
+    .logo h2 {
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); 
     }
     nav ul {
         list-style: none;
@@ -46,9 +60,10 @@
         margin-left: 20px;
     }
     nav ul li a {
-        color: #fff;
+        color: #040202ff;
         text-decoration: none;
         font-weight: 500;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
     }
     nav ul li a:hover {
         text-decoration: underline;
