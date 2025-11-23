@@ -14,31 +14,18 @@ if (isset($_POST['submit'])) {
 
     $taikhoan_nhap = $_POST['username']; 
     $password_nhap = $_POST['password'];
-
-    // 1. CHUẨN BỊ CÂU LỆNH SQL ĐỂ TÌM TÀI KHOẢN
-    // Tìm kiếm trong cột Email HOẶC SoDienThoai HOẶC TenDangNhap
     $sql = "SELECT ID_NguoiDung, MatKhau_Hash, VaiTro FROM nguoidung 
             WHERE Email = ? OR SoDienThoai = ? OR TenDangNhap = ?";
-    
-    // Sử dụng Prepared Statement để an toàn hơn
     if ($stmt = $conn->prepare($sql)) {
-        // Gán biến cho placeholder (sử dụng cùng một biến $taikhoan_nhap cho cả 3 cột)
         $stmt->bind_param("sss", $taikhoan_nhap, $taikhoan_nhap, $taikhoan_nhap);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result && $result->num_rows == 1) {
             $user = $result->fetch_assoc();
-            
-            // 2. XÁC MINH MẬT KHẨU
-            // So sánh mật khẩu nhập vào với MatKhau_Hash đã lưu trong CSDL
             if (password_verify($password_nhap, $user['MatKhau_Hash'])) {
-                
-                // Đăng nhập thành công
                 $_SESSION['user_id'] = $user['ID_NguoiDung'];
                 $_SESSION['vaitro'] = $user['VaiTro'];
-                
-                // 3. CHUYỂN HƯỚNG DỰA TRÊN VAI TRÒ
                 if ($user['VaiTro'] === 'NguoiGiaoHang') {
                     header('location: delivery_index.php');
                 } else if ($user['VaiTro'] === 'QuanTriVien') {
