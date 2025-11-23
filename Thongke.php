@@ -1,16 +1,13 @@
 <?php
-// Bắt đầu session và kiểm tra đăng nhập/vai trò nếu cần
+
 session_start(); 
 require "sm/dp.php"; 
 
-// Dùng ID giả lập. TRONG THỰC TẾ, HÃY DÙNG ID NGƯỜI DÙNG TỪ SESSION:
-$nguoi_ban_id = 1; // Thay thế bằng $_SESSION['user_id'] sau khi xác thực
 
-$filter = $_GET['filter'] ?? 'day'; // day, week, month
+$nguoi_ban_id = 1; 
+
+$filter = $_GET['filter'] ?? 'day'; 
 $sql = "";
-
-// Lọc theo ngày hiện tại – tuần hiện tại – tháng hiện tại
-// CHỈ TÍNH DOANH THU TỪ CÁC ĐƠN ĐÃ HOÀN THÀNH (DaGiao, HoanThanh)
 if ($filter === 'day') {
     $sql = "SELECT DATE(NgayDatHang) AS time, SUM(TongGiaTriDonHang) AS revenue, COUNT(*) AS orders
             FROM danhsachdonhang
@@ -24,7 +21,7 @@ elseif ($filter === 'week') {
             FROM danhsachdonhang
             WHERE ID_NguoiBan = $nguoi_ban_id
             AND TrangThaiDonHang IN ('DaGiao', 'HoanThanh')
-            AND YEARWEEK(NgayDatHang, 1) = YEARWEEK(NOW(), 1) -- Đổi sang tuần bắt đầu từ Thứ Hai
+            AND YEARWEEK(NgayDatHang, 1) = YEARWEEK(NOW(), 1) 
             GROUP BY YEARWEEK(NgayDatHang, 1)";
 } 
 elseif ($filter === 'month') {
@@ -37,7 +34,6 @@ elseif ($filter === 'month') {
             GROUP BY DATE_FORMAT(NgayDatHang, '%Y-%m')";
 }
 
-// Thực thi truy vấn với MySQLi (giả sử $conn từ connect.php là MySQLi)
 $res = mysqli_query($conn, $sql);
 $data = $res ? mysqli_fetch_assoc($res) : false;
 ?>
@@ -56,25 +52,26 @@ $data = $res ? mysqli_fetch_assoc($res) : false;
     select, button { padding:7px 10px; margin-top:10px; }
     </style>
 </head>
+
 <style>
 body { 
-    font-family: "Segoe UI", sans-serif; /* Sử dụng font hiện đại */
-    background: #f5f7fa; /* Màu nền nhẹ */
+    font-family: "Segoe UI", sans-serif; 
+    background: #f5f7fa; 
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Căn trên một chút thay vì center hoàn toàn */
+    align-items: flex-start; 
     padding: 50px 0;
     margin: 0; 
-    min-height: 100vh; /* Đảm bảo đủ chiều cao */
+    min-height: 100vh; 
 }
 
-/* Box Thống Kê */
+
 .box { 
     background: white; 
     padding: 30px; 
-    width: 380px; /* Chiều rộng cố định */
-    border-radius: 14px; /* Góc bo tròn */
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1); /* Độ bóng rõ ràng hơn */
+    width: 380px;
+    border-radius: 14px; 
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
     border: 1px solid #eee;
 }
 
@@ -109,7 +106,6 @@ select:focus {
     border-color: #008cff;
 }
 
-/* Nút Lọc (Sử dụng style .btn tương tự như bạn đã có) */
 .filter-form button { 
     padding: 10px 15px;
     background: #008cff;
@@ -131,7 +127,7 @@ hr {
     margin: 25px 0;
 }
 
-/* Hiển thị Kết quả */
+
 .result-stat p {
     margin-bottom: 12px;
     font-size: 16px;
@@ -143,23 +139,53 @@ hr {
     min-width: 90px;
 }
 
-/* Số liệu thống kê chính */
 .stat { 
-    font-size: 26px; /* Tăng cỡ chữ */
+    font-size: 26px; 
     font-weight: 700;
-    color: #28a745; /* Màu xanh lá cho Doanh thu (tăng tính tích cực) */
+    color: #28a745; 
     display: block;
     margin-top: 5px;
 }
 .stat.orders {
-    color: #ffc107; /* Màu vàng cho Số đơn */
+    color: #ffc107;
+}
+.link-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #3b82f6;    
+    color: white;
+    font-weight: 600;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: 0.2s ease-in-out;
+}
+
+.link-button:hover {
+    background-color: #2563eb;      
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.back-btn {
+    display: inline-block;
+    padding: 8px 15px;
+    padding-top: 1px;
+    padding-bottom: 2px;
+    background: #4697ddff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+.back-btn:hover {
+    background: #005bb5;
 }
 </style>
+
 <body>
-
 <div class="box">
+     
     <h2>📊 Thống kê thu nhập</h2>
-
+    <a href="delivery_index.php" class="back-btn">Thoát</a>
     <form method="GET" class="filter-form"> <label>Chọn kiểu thống kê:</label><br>
         <select name="filter">
             <option value="day" <?= $filter=='day'?'selected':'' ?>>Theo ngày</option>
