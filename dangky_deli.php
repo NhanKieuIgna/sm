@@ -5,82 +5,61 @@ $username = "root";
 $password = ""; 
 $dbname = "secondhand_market";
 
-$tableName = "hosonguoigiaohang"; // Bảng con
-$parentTableName = "nguoidung";    // Bảng cha
+$tableName = "hosonguoigiaohang";
+$parentTableName = "nguoidung"; 
 
 $message = "";
 $message_type = "";
-
 $conn = new mysqli($servername, $username, $password, $dbname);
-
-// Kiểm tra kết nối
 if ($conn->connect_error) {
      die("Connection failed: " . $conn->connect_error);
 }
-
-// Hàm xử lý upload file (KHÔNG THAY ĐỔI)
 function handleFileUpload($fileInputName, $target_dir, $conn) {
-    // ... (logic xử lý upload file)
-$file_name = basename($_FILES[$fileInputName]["name"]);
- 
-$file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
-$new_file_name = uniqid() . "." . $file_extension; $target_file = $target_dir . $new_file_name;
+    if (!isset($_FILES[$fileInputName]) || $_FILES[$fileInputName]['error'] != UPLOAD_ERR_OK) {
+        return null; 
+    }
 
- if (move_uploaded_file($_FILES[$fileInputName]["tmp_name"], $target_file)) {
-return $conn->real_escape_string($new_file_name); 
-} else {
- return null; 
- }
+    $file_name = basename($_FILES[$fileInputName]["name"]);
+    $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
+    $new_file_name = uniqid() . "." . $file_extension; 
+    $target_file = $target_dir . $new_file_name;
+    if (move_uploaded_file($_FILES[$fileInputName]["tmp_name"], $target_file)) {
+        return $conn->real_escape_string($new_file_name); 
+    } else {
+        return null; 
+    }
 }
-
-// Xử lý khi Form được submit
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
- $hoten = $conn->real_escape_string($_POST['hoten_deli']); // Ánh xạ sang cột HoTen
- $email = $conn->real_escape_string($_POST['email_deli']); // Ánh xạ sang cột Email
- $sodt = $conn->real_escape_string($_POST['sodt']); // Ánh xạ sang cột SoDienThoai
- $matkhau = $conn->real_escape_string($_POST['matkhau']); 
- $namsinh = (int)$_POST['namsinh'];
- $gioitinh = $conn->real_escape_string($_POST['gioitinh']);
- $biensoxe = $conn->real_escape_string($_POST['biensoxe']);
- $khuvuchoatdong = $conn->real_escape_string($_POST['khuvuchoatdong']);
-
-
-$hashed_password = password_hash($matkhau, PASSWORD_DEFAULT);
-
- $target_dir = "uploads/";
-    
- if (!is_dir($target_dir)) {
- mkdir($target_dir, 0777, true);
- }
-
- $anh_cccd_truoc = handleFileUpload('anh_cccd_truoc', $target_dir, $conn);
- $anh_cccd_sau = handleFileUpload('anh_cccd_sau', $target_dir, $conn);
- $anh_banglaixe = handleFileUpload('anh_banglaixe', $target_dir, $conn);
-
- if (!$anh_cccd_truoc || !$anh_cccd_sau || !$anh_banglaixe) {
- $message = "Lỗi upload file. Vui lòng thử lại.";
-$message_type = "error";
- } else {
-        
-        // ----------------------------------------------------------
-        // BƯỚC 1: CHÈN THÔNG TIN CƠ BẢN VÀO BẢNG CHA (nguoidung)
-        // ----------------------------------------------------------
-        $vaiTro = 'NguoiGiaoHang'; // Thiết lập vai trò cố định
-        
+    $hoten = $conn->real_escape_string($_POST['hoten_deli']); 
+    $email = $conn->real_escape_string($_POST['email_deli']);
+    $sodt = $conn->real_escape_string($_POST['sodt']);
+    $matkhau = $conn->real_escape_string($_POST['matkhau']); 
+    $namsinh = (int)$_POST['namsinh'];
+    $gioitinh = $conn->real_escape_string($_POST['gioitinh']);
+    $biensoxe = $conn->real_escape_string($_POST['biensoxe']);
+    $khuvuchoatdong = $conn->real_escape_string($_POST['khuvuchoatdong']);
+    $hashed_password = password_hash($matkhau, PASSWORD_DEFAULT);
+    $target_dir = "uploads/";  
+    if (!is_dir($target_dir)) {
+        mkdir($target_dir, 0777, true);
+    }
+    $anh_daidien = handleFileUpload('anh_daidien', $target_dir, $conn); 
+    $anh_cccd_truoc = handleFileUpload('anh_cccd_truoc', $target_dir, $conn);
+    $anh_cccd_sau = handleFileUpload('anh_cccd_sau', $target_dir, $conn); 
+    $anh_banglaixe = handleFileUpload('anh_banglaixe', $target_dir, $conn); 
+    if ($anh_daidien === null || $anh_cccd_truoc === null || $anh_cccd_sau === null || $anh_banglaixe === null) {
+        $message = "Lỗi upload file hoặc thiếu một trong các file bắt buộc. Vui lòng kiểm tra lại.";
+        $message_type = "error";
+    } else {
+        $vaiTro = 'NguoiGiaoHang'; 
         $sql_parent = "INSERT INTO $parentTableName (
-                            HoTen, Email, SoDienThoai, MatKhau_Hash, VaiTro
+                            HoTen, Email, SoDienThoai, MatKhau_Hash, VaiTro, AnhDaiDien
                         ) VALUES (
-                            '$hoten', '$email', '$sodt', '$hashed_password', '$vaiTro'
+                            '$hoten', '$email', '$sodt', '$hashed_password', '$vaiTro', '$anh_daidien'
                         )";
                         
         if ($conn->query($sql_parent) === TRUE) {
-            
-            // BƯỚC 2: LẤY ID TỰ ĐỘNG TĂNG VỪA ĐƯỢC TẠO
             $ID_NguoiDung_moi = $conn->insert_id;
-
-            // ----------------------------------------------------------
-            // BƯỚC 3: CHÈN THÔNG TIN CHI TIẾT VÀO BẢNG CON (hosonguoigiaohang)
-            // ----------------------------------------------------------
             $sql_child = "INSERT INTO $tableName (
                             ID_NguoiDung, GioiTinh, NamSinh, BienSoXe, KhuVucHoatDong, 
                             Anh_CCCD_Truoc, Anh_CCCD_Sau, Anh_BangLaiXe
@@ -93,13 +72,12 @@ $message_type = "error";
                 $message = "Đăng ký thành công! Hồ sơ của bạn đang chờ xét duyệt.";
                 $message_type = "success";
             } else {
-                // Xóa bản ghi đã tạo trong bảng cha nếu chèn bảng con thất bại
+               
                 $conn->query("DELETE FROM $parentTableName WHERE ID_NguoiDung = $ID_NguoiDung_moi");
                 $message = "Lỗi chèn hồ sơ giao hàng (Bảng con): " . $conn->error;
                 $message_type = "error";
             }
         } else {
-            // Lỗi khi chèn vào bảng nguoidung (thường do trùng Email hoặc SoDienThoai)
             $message = "Lỗi đăng ký người dùng (Bảng cha). Có thể Email hoặc Số điện thoại đã tồn tại: " . $conn->error;
             $message_type = "error";
         }
@@ -107,7 +85,6 @@ $message_type = "error";
 }
 $conn->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -135,6 +112,7 @@ $conn->close();
             text-decoration: underline;
         }
         .file-input-style {
+          
             @apply w-full text-sm text-gray-500 
                    file:mr-4 file:py-2 file:px-4 
                    file:border-0 file:rounded-lg file:text-sm file:font-semibold 
@@ -145,7 +123,7 @@ $conn->close();
 <body class="flex items-center justify-center min-h-screen p-4">
 
     <div class="w-full max-w-2xl bg-white shadow-2xl rounded-xl p-8 md:p-10 border border-gray-100">
-        <h1 class="text-3xl font-extrabold text-center text-gray-800 mb-6">Đăng Ký </h1>
+        <h1 class="text-3xl font-extrabold text-center text-gray-800 mb-6">Đăng Ký</h1>
         <p class="text-center text-gray-500 mb-8">Vui lòng điền đầy đủ thông tin để hoàn tất hồ sơ của bạn.</p>
 
         <?php if ($message): ?>
@@ -161,6 +139,10 @@ $conn->close();
             <fieldset class="mb-8 border border-gray-200 rounded-lg p-6">
                 <legend class="text-lg font-semibold text-gray-700 px-2">Thông tin Cơ bản</legend>
                 
+                <div class="mb-6">
+                    <label for="anh_daidien" class="block text-sm font-medium text-gray-700 mb-2">Ảnh Đại Diện (*)</label>
+                    <input type="file" id="anh_daidien" name="anh_daidien" accept="image/*" required class="file-input-style">
+                </div>
                 <div class="mb-4">
                     <label for="hoten_deli" class="block text-sm font-medium text-gray-700 mb-1">Họ và Tên (*)</label>
                     <input type="text" id="hoten_deli" name="hoten_deli" required 
@@ -233,20 +215,21 @@ $conn->close();
             </fieldset>
 
             <fieldset class="mb-8 border border-gray-200 rounded-lg p-6">
-                <legend class="text-lg font-semibold text-gray-700 px-2">Tài liệu Xác minh</legend>
+                <legend class="text-lg font-semibold text-gray-700 px-2">Tài liệu Xác minh (*)</legend>
+                <p class="text-sm text-gray-500 mb-4">Các tài liệu này là **bắt buộc** để hoàn tất hồ sơ.</p>
 
                 <div class="mb-6">
-                    <label for="anh_cccd_truoc" class="block text-sm font-medium text-gray-700 mb-2">1. Ảnh CCCD/CMND Mặt trước (*)</label>
+                    <label for="anh_cccd_truoc" class="block text-sm font-medium text-gray-700 mb-2">1. Ảnh CCCD/CMND Mặt trước</label>
                     <input type="file" id="anh_cccd_truoc" name="anh_cccd_truoc" accept="image/*" required class="file-input-style">
                 </div>
 
                 <div class="mb-6">
-                    <label for="anh_cccd_sau" class="block text-sm font-medium text-gray-700 mb-2">2. Ảnh CCCD/CMND Mặt sau (*)</label>
+                    <label for="anh_cccd_sau" class="block text-sm font-medium text-gray-700 mb-2">2. Ảnh CCCD/CMND Mặt sau</label>
                     <input type="file" id="anh_cccd_sau" name="anh_cccd_sau" accept="image/*" required class="file-input-style">
                 </div>
 
                 <div class="mb-4">
-                    <label for="anh_banglaixe" class="block text-sm font-medium text-gray-700 mb-2">3. Ảnh Bằng lái xe (*)</label>
+                    <label for="anh_banglaixe" class="block text-sm font-medium text-gray-700 mb-2">3. Ảnh Bằng lái xe</label>
                     <input type="file" id="anh_banglaixe" name="anh_banglaixe" accept="image/*" required class="file-input-style">
                 </div>
             </fieldset>
