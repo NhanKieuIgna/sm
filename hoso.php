@@ -1,11 +1,6 @@
 <?php
-// Tên file: hoso.php
-
 session_start();
-// Đảm bảo file dp.php của bạn định nghĩa biến kết nối là $conn (MySQLi object)
 require "sm/dp.php"; 
-
-// --- 1. KIỂM TRA ĐĂNG NHẬP VÀ XÁC ĐỊNH ID ---
 if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
     header("Location: login.php"); 
     exit();
@@ -16,17 +11,9 @@ $user = [];
 $orders_count = 0;
 $revenue = '0₫';
 
-// Giả định $conn là đối tượng MySQLi đã có từ dp.php
-// (Nếu file dp.php dùng mysqli_connect, bạn cần chỉnh lại để dùng $conn thay vì $db_connection)
-// Nếu lỗi "Undefined variable $conn" xảy ra, hãy kiểm tra lại file dp.php.
-
-
-// --- 2. LẤY THÔNG TIN CÁ NHÂN (Sử dụng Prepared Statement để bảo mật) ---
 $sql_user = "SELECT ID_NguoiDung, HoTen, Email, SoDienThoai, AnhDaiDien, TrangThaiHoatDong 
              FROM nguoidung 
              WHERE ID_NguoiDung = ?";
-
-// Chuẩn bị statement
 $stmt_user = mysqli_prepare($conn, $sql_user);
 mysqli_stmt_bind_param($stmt_user, "i", $driver_id);
 mysqli_stmt_execute($stmt_user);
@@ -35,8 +22,6 @@ $res_user = mysqli_stmt_get_result($stmt_user);
 
 if ($res_user && mysqli_num_rows($res_user) > 0) {
     $user = mysqli_fetch_assoc($res_user);
-    
-    // Chuẩn hóa tên biến cho HTML
     $user['id'] = "G" . $user['ID_NguoiDung'];
     $user['name'] = htmlspecialchars($user['HoTen']);
     $user['email'] = htmlspecialchars($user['Email']);
@@ -44,14 +29,11 @@ if ($res_user && mysqli_num_rows($res_user) > 0) {
     $user['avatar'] = htmlspecialchars($user['AnhDaiDien'] ?: 'default_avatar.png'); 
     $user['status'] = htmlspecialchars($user['TrangThaiHoatDong'] ?: 'Offline'); 
 } else {
-    // Trường hợp không tìm thấy người dùng
     header("Location: logout.php"); 
     exit();
 }
 mysqli_stmt_close($stmt_user);
 
-
-// --- 3. LẤY THỐNG KÊ HIỆU SUẤT (Sử dụng Prepared Statement) ---
 $sql_stats = "SELECT 
                 COUNT(ID_DonHang) AS orders_count,
                 SUM(PhiGiaoHang) AS total_delivery_fee
@@ -80,9 +62,6 @@ mysqli_stmt_close($stmt_stats);
     <title>Hồ sơ cá nhân | <?php echo $user['name']; ?></title>
 </head>
 <style>
-    /* ---------------------------------- */
-    /* CSS TỔNG THỂ VÀ BỐ CỤC */
-    /* ---------------------------------- */
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background-color: #f0f2f5;
