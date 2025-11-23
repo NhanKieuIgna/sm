@@ -3,7 +3,7 @@
 
 session_start();
 // Đảm bảo file dp.php của bạn định nghĩa biến kết nối là $conn (MySQLi object)
-require "sm/dp.php"; 
+require_once __DIR__ . '/../../database/db.php'; 
 
 // --- 1. KIỂM TRA ĐĂNG NHẬP VÀ XÁC ĐỊNH ID ---
 if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
