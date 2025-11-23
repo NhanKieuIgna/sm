@@ -53,11 +53,12 @@
     nav ul {
         list-style: none;
         display: flex;
-        margin: 0;
+        margin-right: 5rem;
         padding: 0;
     }
     nav ul li {
         margin-left: 20px;
+
     }
     nav ul li a {
         color: #040202ff;
