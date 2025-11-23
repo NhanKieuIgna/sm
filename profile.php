@@ -1,39 +1,32 @@
 <?php
-// Tên file: profile.php (hoặc edit_profile.php)
-
 session_start();
-include "sm/dp.php"; // Chắc chắn rằng file này chứa $conn (kết nối MySQLi)
-
-// --- 1. KIỂM TRA ĐĂNG NHẬP VÀ XÁC ĐỊNH ID ---
+include "sm/dp.php";
 if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
     header("Location: login.php"); 
     exit();
 }
-
 $driver_id = $_SESSION['user_id'];
 $driver = [];
-$message = ''; // Thông báo thành công hoặc lỗi
-$target_dir = "sm/uploads/"; // Đường dẫn lưu trữ ảnh (theo code của bạn)
+$message = '';
+$target_dir = "sm/uploads/"; 
 
-// --- 2. XỬ LÝ FORM SUBMIT (POST) ---
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Lấy dữ liệu từ form
     $ho_ten = trim($_POST['ho_ten']);
     $sdt = trim($_POST['sdt']);
     $email = trim($_POST['email']);
-    $dia_chi = trim($_POST['dia_chi']); // Bảng nguoidung
-    $gioi_tinh = $_POST['gioi_tinh']; // Bảng hosonguoigiaohang
-    $nam_sinh = $_POST['nam_sinh']; // Bảng hosonguoigiaohang (Giả định đã thêm)
-    $bien_so_xe = trim($_POST['bien_so_xe']); // Bảng hosonguoigiaohang
-    $khu_vuc = trim($_POST['khu_vuc']); // Bảng hosonguoigiaohang
+    $dia_chi = trim($_POST['dia_chi']);
+    $gioi_tinh = $_POST['gioi_tinh'];
+    $nam_sinh = $_POST['nam_sinh']; 
+    $bien_so_xe = trim($_POST['bien_so_xe']); 
+    $khu_vuc = trim($_POST['khu_vuc']); 
     $old_avatar = $_POST['old_avatar'];
 
-    // Bắt đầu transaction để đảm bảo cả 2 bảng được cập nhật thành công
     mysqli_begin_transaction($conn);
     $success = true;
 
     try {
-        // A. Xử lý Upload Ảnh Đại Diện (Nếu có file mới)
+  
         if (isset($_FILES['anh_dai_dien']) && $_FILES['anh_dai_dien']['error'] === UPLOAD_ERR_OK) {
             $file_ext = strtolower(pathinfo($_FILES['anh_dai_dien']['name'], PATHINFO_EXTENSION));
             $new_file_name = $driver_id . '_avatar_' . time() . '.' . $file_ext;
@@ -46,54 +39,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $success = false;
             }
         } else {
-            $avatar_name = $old_avatar; // Giữ lại ảnh cũ
+            $avatar_name = $old_avatar;
         }
         
-        if ($success) {
-            // B. Cập nhật bảng nguoidung
-            $sql_update_user = "UPDATE nguoidung SET 
-                                HoTen = ?, SoDienThoai = ?, Email = ?, DiaChiGiaoHangMacDinh = ?, AnhDaiDien = ? 
-                                WHERE ID_NguoiDung = ?";
+            if ($success) {
+                $sql_update_user = "UPDATE nguoidung SET 
+                                    HoTen = ?, SoDienThoai = ?, Email = ?, DiaChiGiaoHangMacDinh = ?, AnhDaiDien = ? 
+                                    WHERE ID_NguoiDung = ?";
 
-            $stmt_user = mysqli_prepare($conn, $sql_update_user);
-            mysqli_stmt_bind_param($stmt_user, "sssssi", $ho_ten, $sdt, $email, $dia_chi, $avatar_name, $driver_id);
-            
-            if (!mysqli_stmt_execute($stmt_user)) {
-                throw new Exception("Lỗi cập nhật thông tin cơ bản: " . mysqli_error($conn));
+                $stmt_user = mysqli_prepare($conn, $sql_update_user);
+                mysqli_stmt_bind_param($stmt_user, "sssssi", $ho_ten, $sdt, $email, $dia_chi, $avatar_name, $driver_id);
+                
+                if (!mysqli_stmt_execute($stmt_user)) {
+                    throw new Exception("Lỗi cập nhật thông tin cơ bản: " . mysqli_error($conn));
+                }
+                mysqli_stmt_close($stmt_user);
+
+                $sql_upsert_profile = "INSERT INTO hosonguoigiaohang 
+                                    (ID_NguoiDung, GioiTinh, NamSinh, BienSoXe, KhuVucHoatDong)
+                                    VALUES (?, ?, ?, ?, ?)
+                                    ON DUPLICATE KEY UPDATE 
+                                    GioiTinh = VALUES(GioiTinh), 
+                                    NamSinh = VALUES(NamSinh), 
+                                    BienSoXe = VALUES(BienSoXe), 
+                                    KhuVucHoatDong = VALUES(KhuVucHoatDong)";
+                
+                $stmt_profile = mysqli_prepare($conn, $sql_upsert_profile);
+                mysqli_stmt_bind_param($stmt_profile, "isiss", $driver_id, $gioi_tinh, $nam_sinh, $bien_so_xe, $khu_vuc);
+                
+                if (!mysqli_stmt_execute($stmt_profile)) {
+                    throw new Exception("Lỗi cập nhật hồ sơ giao hàng: " . mysqli_error($conn));
+                }
+                mysqli_stmt_close($stmt_profile);
+
+                mysqli_commit($conn);
+                header("Location: hoso.php");
+                exit();
             }
-            mysqli_stmt_close($stmt_user);
 
-
-            // C. Cập nhật bảng hosonguoigiaohang (Sử dụng UPSERT)
-            $sql_upsert_profile = "INSERT INTO hosonguoigiaohang 
-                                   (ID_NguoiDung, GioiTinh, NamSinh, BienSoXe, KhuVucHoatDong)
-                                   VALUES (?, ?, ?, ?, ?)
-                                   ON DUPLICATE KEY UPDATE 
-                                   GioiTinh = VALUES(GioiTinh), 
-                                   NamSinh = VALUES(NamSinh), 
-                                   BienSoXe = VALUES(BienSoXe), 
-                                   KhuVucHoatDong = VALUES(KhuVucHoatDong)";
-            
-            $stmt_profile = mysqli_prepare($conn, $sql_upsert_profile);
-            mysqli_stmt_bind_param($stmt_profile, "isiss", $driver_id, $gioi_tinh, $nam_sinh, $bien_so_xe, $khu_vuc);
-            
-            if (!mysqli_stmt_execute($stmt_profile)) {
-                throw new Exception("Lỗi cập nhật hồ sơ giao hàng: " . mysqli_error($conn));
-            }
-            mysqli_stmt_close($stmt_profile);
-
-            mysqli_commit($conn);
-            $message = "<div style='color: green;' class='message'>Cập nhật hồ sơ thành công!</div>";
-
-        }
     } catch (Exception $e) {
         mysqli_rollback($conn);
         $message = "<div style='color: red;' class='message'>Lỗi: " . $e->getMessage() . "</div>";
     }
 }
-
-
-// --- 3. LẤY THÔNG TIN HIỆN TẠI ĐỂ HIỂN THỊ TRÊN FORM (GET) ---
 $sql = "SELECT 
             N.HoTen, N.Email, N.SoDienThoai, N.DiaChiGiaoHangMacDinh, N.AnhDaiDien,
             H.GioiTinh, H.NamSinh, H.BienSoXe, H.KhuVucHoatDong
@@ -124,7 +112,6 @@ mysqli_stmt_close($stmt);
     <title>Chỉnh sửa Hồ sơ</title>
 </head>
 <style>
-/* CSS giữ nguyên từ lần trước để đảm bảo giao diện */
 body {
     font-family: Arial, sans-serif;
     background: #f4f7f6;
@@ -199,7 +186,7 @@ input[type="text"], input[type="email"], select, textarea, input[type="number"] 
 <div class="container">
     <h2>Chỉnh sửa Hồ sơ Người giao hàng</h2>
 
-    <?php echo $message; // Hiển thị thông báo (thành công/lỗi) ?>
+    <?php echo $message; ?>
 
     <form method="POST" action="profile.php" enctype="multipart/form-data">
         
@@ -236,7 +223,7 @@ input[type="text"], input[type="email"], select, textarea, input[type="number"] 
 
         <hr style="margin: 30px 0;">
 
-        <h3>Hồ sơ Giao hàng (Bảng `hosonguoigiaohang`)</h3>
+        <h3>Hồ sơ Giao hàng </h3>
 
         <div class="form-group">
             <label for="gioi_tinh">Giới tính</label>
