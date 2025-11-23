@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $biensoxe = $conn->real_escape_string($_POST['biensoxe']);
     $khuvuchoatdong = $conn->real_escape_string($_POST['khuvuchoatdong']);
     $hashed_password = password_hash($matkhau, PASSWORD_DEFAULT);
-    $target_dir = "uploads/";  
+    $target_dir = "sm/uploads/";  
     if (!is_dir($target_dir)) {
         mkdir($target_dir, 0777, true);
     }
