@@ -206,6 +206,7 @@ input, select, textarea {
             <select name="loai_xe">
                 <option value="">-- Chọn --</option>
                 <option value="Xe máy" <?= ($data['LoaiXe']=="Xe máy"?"selected":"") ?>>Xe máy</option>
+                <option value="Xe máy" <?= ($data['LoaiXe']=="Xe máy"?"selected":"") ?>>Xe máy( > 175cc)</option>
                 <option value="Xe ba gác" <?= ($data['LoaiXe']=="Xe ba gác"?"selected":"") ?>>Xe ba gác</option>
                 <option value="Xe tải nhỏ" <?= ($data['LoaiXe']=="Xe tải nhỏ"?"selected":"") ?>>Xe tải nhỏ</option>
             </select>
