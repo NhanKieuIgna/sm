@@ -1,7 +1,7 @@
 <?php
 session_start();
 // Đảm bảo đường dẫn chính xác đến file kết nối
-require "sm/dp.php"; 
+require_once __DIR__ . '/../database/db.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
     header("Location: login.php"); 

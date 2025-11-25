@@ -13,9 +13,13 @@ if(isset($_POST['login'])){
     if($row){
         $_SESSION['user_id'] = $row['ID_NguoiDung'];
         $_SESSION['username'] = $row['TenDangNhap'];
-      //  $_SESSION['role'] = $row['role'];
+        $_SESSION['role'] = $row['VaiTro'];
         $_SESSION['fullname'] = $row['HoTen'];
-        header('location: index.php');
+         if($_SESSION['role'] == 'NguoiGiaoHang'){
+            header('location: shipper/delivery_index.php');
+        }else{
+            header('location: index.php');
+        }
         exit();
     } else {
         $error = 'Tên đăng nhập hoặc mật khẩu không chính xác';
