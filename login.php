@@ -31,7 +31,6 @@ if (isset($_POST['submit'])) {
                 } else if ($user['VaiTro'] === 'QuanTriVien') {
                     header('location: admin/dashboard.php');
                 } else {
-                    // Mặc định cho NguoiMua/NguoiBan
                     header('location: index.html');
                 }
                 exit();
