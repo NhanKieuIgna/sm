@@ -11,15 +11,19 @@ $sql = "SELECT
             dh.ID_DonHang AS MaDonHang,
             nd.HoTen AS TenNguoiNhan,
             dh.DiaChiGiaoHang AS DiaChiGiao,
-            nd.SoDienThoai AS SoDienThoaiNhan,
             dh.TongGiaTriDonHang AS TongTien,
+            dh.PhiGiaoHang AS PhiShip,
             dh.TrangThaiDonHang AS TrangThai,
-            dh.NgayDatHang AS ThoiGianGiao
+            dh.ThoiGianHoanThanh AS ThoiGianHoanThanh, 
+            GROUP_CONCAT(CONCAT(sp.TenSanPham, ' (x', ctdh.SoLuongMua, ')') SEPARATOR ', ') AS ChiTietSanPham 
         FROM danhsachdonhang dh
         JOIN nguoidung nd ON dh.ID_NguoiMua = nd.ID_NguoiDung
+        JOIN chitietdonhang ctdh ON dh.ID_DonHang = ctdh.ID_DonHang
+        JOIN sanpham sp ON ctdh.ID_SanPham = sp.ID_SanPham
         WHERE dh.ID_NguoiGiaoHang = ?
           AND dh.TrangThaiDonHang = 'DaGiao'
-        ORDER BY dh.NgayDatHang DESC";
+        GROUP BY dh.ID_DonHang, nd.HoTen, dh.DiaChiGiaoHang, dh.TongGiaTriDonHang, dh.TrangThaiDonHang, dh.ThoiGianHoanThanh
+        ORDER BY dh.ThoiGianHoanThanh DESC"; 
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $driverId);
@@ -40,7 +44,7 @@ body {
     padding: 20px;
 }
 .container {
-    max-width: 900px;
+    max-width: 1200px;
     margin: auto;
     background: #fff;
     padding: 20px;
@@ -56,13 +60,15 @@ h2 {
     width: 100%;
     border-collapse: collapse;
 }
+.table th, .table td {
+    padding: 10px;
+    text-align: left;
+}
 .table th {
     background: #008cff;
     color: #fff;
-    padding: 10px;
 }
 .table td {
-    padding: 10px;
     border-bottom: 1px solid #ddd;
 }
 .table tr:hover {
@@ -103,23 +109,28 @@ h2 {
             <th>Mã đơn</th>
             <th>Người nhận</th>
             <th>Địa chỉ</th>
-            <th>SĐT</th>
+            <th>Sản phẩm</th> 
+            <th>Phí giao hàng</th>
             <th>Tổng tiền</th>
             <th>Trạng thái</th>
-            <th>Ngày giao</th>
+            <th>Thời gian hoàn thành</th> 
         </tr>
 
         <?php 
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
+                // Định dạng lại trường thời gian nếu cần (ví dụ: loại bỏ giây)
+                $completionTime = $row['ThoiGianHoanThanh'] ? date("d/m/Y H:i", strtotime($row['ThoiGianHoanThanh'])) : 'Chưa hoàn thành';
+
                 echo "<tr>
                         <td>{$row['MaDonHang']}</td>
                         <td>{$row['TenNguoiNhan']}</td>
                         <td>{$row['DiaChiGiao']}</td>
-                        <td>{$row['SoDienThoaiNhan']}</td>
+                        <td>{$row['ChiTietSanPham']}</td> 
+                        <td>" . number_format($row['PhiShip']) . " đ</td>
                         <td>" . number_format($row['TongTien']) . " đ</td>
                         <td><span class='status status-ok'>Đã giao</span></td>
-                        <td>{$row['ThoiGianGiao']}</td>
+                        <td>{$completionTime}</td> 
                       </tr>";
             }
         } else {
@@ -131,3 +142,4 @@ h2 {
 
 </body>
 </html>
+
