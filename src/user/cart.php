@@ -125,7 +125,7 @@ foreach ($cart_items as $item) {
                         </div>
                         <div class="item-thumb">
                             <?php if (!empty($item['image'])): ?>
-                                <img src="<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                <img src="<?php echo"../" ?><?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
                             <?php endif; ?>
                         </div>
                         <div class="item-info">
