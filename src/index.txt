@@ -5,28 +5,18 @@ session_start();
 require_once('../database/db.php');
 
 // Lấy sản phẩm nổi bật (giới hạn 8 sản phẩm)
-$sql = "SELECT sp.*, img.URL_HinhAnh 
+$sql = "SELECT sp.*, ha.URL_HinhAnh 
         FROM sanpham sp 
-        LEFT JOIN hinhanhsanpham img ON sp.ID_SanPham = img.ID_SanPham 
+        LEFT JOIN hinhanhsanpham ha ON sp.ID_SanPham = ha.ID_SanPham 
         WHERE sp.TrangThaiDangBan = 'DangBan' 
         GROUP BY sp.ID_SanPham 
         ORDER BY sp.NgayTao DESC 
-        LIMIT 8";
+        LIMIT 7";
 $result = mysqli_query($conn, $sql);
 $featured_products = [];
 if ($result) {
     while ($row = mysqli_fetch_assoc($result)) {
         $featured_products[] = $row;
-    }
-}
-
-// Lấy danh mục
-$sql_categories = "SELECT * FROM danhmuc ORDER BY TenDanhMuc";
-$result_categories = mysqli_query($conn, $sql_categories);
-$categories = [];
-if ($result_categories) {
-    while ($row = mysqli_fetch_assoc($result_categories)) {
-        $categories[] = $row;
     }
 }
 ?>
@@ -69,24 +59,21 @@ if ($result_categories) {
             <div class="category-dropdown">
                 <button class="category-btn">Tất cả danh mục</button>
                 <div class="category-menu">
-                    <?php if (!empty($categories)): ?>
-                        <?php foreach ($categories as $category): ?>
-                            <a href="user/list-product.php?category=<?php echo $category['ID_DanhMuc']; ?>"><?php echo htmlspecialchars($category['TenDanhMuc']); ?></a>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <a href="#">Chưa có danh mục</a>
-                    <?php endif; ?>
+                    <a href="#">Sách</a>
+                    <a href="#">Xe ô tô</a>
+                    <a href="#">Làm đẹp</a>
+                    <a href="#">Thời trang nữ</a>
+                    <a href="#">Thời trang nam</a>
+                    <a href="#">Đồ cho mẹ và bé</a>
+                    <a href="#">Đồ chơi</a>
+                    <a href="#">Đồ gia dụng</a>
+                    <a href="#">Thiết bị điện tử</a>
                 </div>
             </div>
 
             <div class="search-container">
-                <form action="user/list-product.php" method="GET" style="display: flex; align-items: center; width: 100%;">
-                    <input type="text" name="search" class="search-bar" placeholder=" Tìm kiếm" id="searchInput" autocomplete="off">
-                    <button type="submit" style="background: none; border: none; cursor: pointer;">
-                        <span class="search-icon">&#x1F50E;&#xFE0E;</span>
-                    </button>
-                    <div id="searchSuggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
-                </form>
+                <input type="text" class="search-bar" placeholder=" Tìm kiếm">
+                <span class="search-icon">&#x1F50E;&#xFE0E;</span>
             </div>
 
             <div class="user-actions">
@@ -107,36 +94,13 @@ if ($result_categories) {
         </div>
 
         <div class="nav-categories">
-            <?php 
-            $displayed_categories = array_slice($categories, 0, 6); // 6 danh mục đầu tiên
-            $remaining_categories = array_slice($categories, 6); // Các danh mục còn lại
-            
-            if (!empty($displayed_categories)): 
-                foreach ($displayed_categories as $category): 
-            ?>
-                <a href="user/list-product.php?category=<?php echo $category['ID_DanhMuc']; ?>"><?php echo htmlspecialchars($category['TenDanhMuc']); ?></a>
-            <?php 
-                endforeach;
-                
-                // Hiển thị các danh mục còn lại (ẩn ban đầu)
-                if (!empty($remaining_categories)): 
-                    foreach ($remaining_categories as $category): 
-            ?>
-                <a href="user/list-product.php?category=<?php echo $category['ID_DanhMuc']; ?>" class="extra-category" style="display: none;"><?php echo htmlspecialchars($category['TenDanhMuc']); ?></a>
-            <?php 
-                    endforeach;
-                endif;
-                
-                // Nút "Tất cả danh mục" nếu có nhiều hơn 6 danh mục
-                if (!empty($remaining_categories)): 
-            ?>
-                <a href="#" id="toggleCategories" style="color: #ff6b6b; font-weight: 500;">Tất cả danh mục ▼</a>
-            <?php 
-                endif;
-            else: 
-            ?>
-                <a href="#">Chưa có danh mục</a>
-            <?php endif; ?>
+            <!-- create list category list -->
+            <a href="list-product.php">Sách</a>
+            <a href="#">Đồ cho nam</a>
+            <a href="#">Đồ cho nữ</a>
+            <a href="#">Đồ cho mẹ và bé</a>
+            <a href="#">Đồ gia dụng</a>
+            <a href="#">Đồ chơi</a>
         </div>
     </header>
 
@@ -151,8 +115,8 @@ if ($result_categories) {
             <div class="products-grid">
                 <?php if (!empty($featured_products)): ?>
                     <?php foreach ($featured_products as $product): ?>
-                        <div class="product-card">
-                            <a href="product-detail.php?id=<?php echo $product['ID_SanPham']; ?>" style="text-decoration: none; color: inherit;">
+                        <a href="product-detail.php?id=<?php echo $product['ID_SanPham']; ?>" style="text-decoration: none; color: inherit; display: block;">
+                            <div class="product-card" style="cursor: pointer;">
                                 <div class="product-image">
                                     <?php if (!empty($product['URL_HinhAnh'])): ?>
                                         <img src="<?php echo htmlspecialchars($product['URL_HinhAnh']); ?>" alt="<?php echo htmlspecialchars($product['TenSanPham']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
@@ -161,21 +125,13 @@ if ($result_categories) {
                                 <div class="product-info">
                                     <div class="product-name"><?php echo htmlspecialchars($product['TenSanPham']); ?></div>
                                     <div class="product-price"><?php echo number_format($product['Gia'], 0, ',', '.'); ?>đ</div>
-                                    <div class="product-actions" onclick="event.stopPropagation()" style="display: flex; justify-content: center; gap: 10px;">
-                                        <form method="POST" action="add-to-cart.php" style="display: inline;">
-                                            <input type="hidden" name="product_id" value="<?php echo $product['ID_SanPham']; ?>">
-                                            <input type="hidden" name="quantity" value="1">
-                                            <input type="hidden" name="action" value="add">
-                                            <input type="hidden" name="redirect" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
-                                            <button type="submit" class="btn-add-cart">thêm vào</button>
-                                        </form>
-                                        <a href="product-detail.php?id=<?php echo $product['ID_SanPham']; ?>">
-                                            <button class="btn-buy-now">mua ngay</button>
-                                        </a>
+                                    <div class="product-actions">
+                                        <button class="btn-add-cart" onclick="event.preventDefault(); event.stopPropagation(); addToCart(<?php echo $product['ID_SanPham']; ?>);">thêm vào</button>
+                                        <button class="btn-buy-now" onclick="event.preventDefault(); event.stopPropagation(); window.location.href='product-detail.php?id=<?php echo $product['ID_SanPham']; ?>';">mua ngay</button>
                                     </div>
                                 </div>
-                            </a>
-                        </div>
+                            </div>
+                        </a>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <p>Chưa có sản phẩm nổi bật</p>
@@ -272,76 +228,6 @@ if ($result_categories) {
             .catch(error => {
                 console.error('Error:', error);
                 alert('Có lỗi xảy ra khi thêm vào giỏ hàng');
-            });
-        }
-
-        // Search autocomplete functionality
-        let searchTimeout;
-        const searchInput = document.getElementById('searchInput');
-        const searchSuggestions = document.getElementById('searchSuggestions');
-
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                const query = this.value.trim();
-
-                if (query.length < 2) {
-                    searchSuggestions.style.display = 'none';
-                    return;
-                }
-
-                searchTimeout = setTimeout(() => {
-                    fetch(`search-suggestions.php?q=${encodeURIComponent(query)}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success && data.products.length > 0) {
-                                let html = '<div style="padding: 10px;">';
-                                data.products.forEach(product => {
-                                    html += `
-                                        <a href="product-detail.php?id=${product.id}" style="display: flex; align-items: center; padding: 8px; text-decoration: none; color: #333; border-bottom: 1px solid #f0f0f0;">
-                                            <img src="${product.image || 'placeholder.jpg'}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
-                                            <div style="flex: 1;">
-                                                <div style="font-weight: 500;">${product.name}</div>
-                                                <div style="color: #ff6b6b; font-size: 14px;">${product.price}</div>
-                                            </div>
-                                        </a>
-                                    `;
-                                });
-                                html += '</div>';
-                                searchSuggestions.innerHTML = html;
-                                searchSuggestions.style.display = 'block';
-                            } else {
-                                searchSuggestions.style.display = 'none';
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Search error:', error);
-                        });
-                }, 300);
-            });
-
-            // Close suggestions when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
-                    searchSuggestions.style.display = 'none';
-                }
-            });
-        }
-
-        // Toggle categories
-        const toggleBtn = document.getElementById('toggleCategories');
-        if (toggleBtn) {
-            let isExpanded = false;
-            toggleBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const extraCategories = document.querySelectorAll('.extra-category');
-                isExpanded = !isExpanded;
-                
-                extraCategories.forEach(cat => {
-                    cat.style.display = isExpanded ? 'inline-block' : 'none';
-                });
-                
-                this.textContent = isExpanded ? 'Thu gọn ▲' : 'Tất cả danh mục ▼';
             });
         }
     </script>
