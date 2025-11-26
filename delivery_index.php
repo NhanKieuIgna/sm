@@ -196,13 +196,13 @@ endif;
     </aside>
 
     <main class="main">
-        <div class="topbar">
+        <!-- <div class="topbar">
             <h2>Đơn hàng cần xử lý tại Khu vực: <?php echo htmlspecialchars($driver_region); ?></h2>
             <form class="search" method="GET">
                 <input type="text" name="search_order" placeholder="Tìm đơn hàng...">
                 <button type="submit">Tìm</button>
             </form>
-        </div>
+        </div> -->
 
         <div class="card">
             <div style="font-weight:700;margin-bottom:12px">Đơn hàng CHƯA CÓ NGƯỜI NHẬN (<?php echo count($orders_list); ?>)</div>

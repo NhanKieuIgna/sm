@@ -339,17 +339,13 @@ h2 {
                     </div>
                     <div class="actions" style="display: flex;flex-direction: column;gap: 8px;">
                         <a href="chi_tiet_don.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xem chi tiết</a>
-                        <?php 
-                        $status = $order['status'];
-                        
-                        if ($status === 'ChoGiaoHang') { ?>
-                            <a href="confirm_GH.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xác nhận nhận đơn</a>
-                        <?php
-                        } else if ($status === 'DangVanChuyen') { ?>
-                            <a href="complete_GH.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost" style="border: 1px solid #28a745; color: #28a745;">Đã giao hàng</a>
-                        <?php
-                        } 
-                        ?>
+                        <?php $status = $order['status']; ?>
+                        <?php if ($status === 'DangVanChuyen') { ?>
+                            <a href="confirm_GH.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xác nhận Hoàn thành</a>
+                        <?php } ?>
+                        <?php if ($status === 'ChoGiaoHang' or $status === 'DangXuLy' or $status === 'DangVanChuyen') { ?>
+                            <a href="HuyGiaoHang.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Hủy Đơn</a>
+                        <?php } ?>
                     </div>
                 </div>
                 <?php endforeach; ?>
