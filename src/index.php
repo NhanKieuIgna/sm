@@ -93,7 +93,7 @@ if ($result_categories) {
                 <a href="#" class="bell-icon"><img class="bell-icon-img" src="https://cdn-icons-png.flaticon.com/128/3602/3602145.png" alt="bell"></a>
                 <span>|</span>
                 <?php if(isset($_SESSION['user_id'])): ?>
-                    <span><u><a href="buyer/edit-profile.php"><?php echo $_SESSION['fullname']; ?></a></u></span>
+                    <span><u><a href="user/edit-profile.php"><?php echo $_SESSION['fullname']; ?></a></u></span>
                     <span>|</span>
                     <a href="logout.php"><u>Đăng Xuất</u></a>
                 <?php else: ?>    
