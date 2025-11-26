@@ -83,7 +83,7 @@ if ($result) {
         // Lấy tên thành phố từ DiaChiLayHang (giả sử định dạng: Số nhà, Phường, Quận, Thành phố)
         if (!empty($row['DiaChiLayHang'])) {
             $address_parts = explode(',', $row['DiaChiLayHang']);
-            // Lấy phần tử cuối cùng hoặc kế cuối làm thành phố
+            
             $city = trim(end($address_parts));
             if (!empty($city) && !in_array($city, $cities)) {
                 $cities[] = $city;
