@@ -146,7 +146,7 @@ if ($result_categories) {
         <section>
             <div class="section-header">
                 <h2 class="section-title">Sản phẩm nổi bật</h2>
-                <a href="#" class="view-all-link">xem tất cả</a>
+                <a href="user/list-product.php" class="view-all-link">xem tất cả</a>
             </div>
             <div class="products-grid">
                 <?php if (!empty($featured_products)): ?>
