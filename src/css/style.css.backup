@@ -154,34 +154,6 @@ body {
     transition: background-color 0.3s; /* transition: background-color 0.3s tức là chuyển đổi màu sắc của phần tử sau 0.3 giây */
 }
 
-/* Tăng độ ưu tiên bằng cách sử dụng container cha (.user-actions) */
-.user-actions a.btn-sell {
-    /* 1. Đảm bảo Màu nền được đặt: BỎ !important */
-    background-color: #19790c; 
-    
-    /* 2. Đảm bảo Màu chữ được đặt */
-    color: white; 
-    
-    /* 3. Thiết lập hình dạng nút */
-    display: inline-block; 
-    font-weight: bold; 
-    border-radius: 5px;
-
-    /* 4. Padding */
-    padding: 10px 20px; 
-    margin-left: 10px; 
-
-    /* Loại bỏ thuộc tính gạch chân chung */
-    text-decoration: none; 
-    
-    /* Chuyển đổi mượt mà */
-    transition: background-color 0.3s ease; 
-}
-
-.user-actions a.btn-sell:hover {
-    background-color: #17877f;
-}
-
 .user-actions a:hover {
     background-color: #f0f0f0;
 }
@@ -525,58 +497,3 @@ body {
         font-size: 12px;
     }
 }
-
-    /* 1. Đảm bảo loại bỏ các dấu chấm đầu dòng mặc định */
-.user-actions .menu,
-.user-actions .sub-menu {
-    list-style: none; /* Loại bỏ dấu chấm */
-    padding: 0;       /* Loại bỏ padding mặc định */
-    margin: 0;        /* Loại bỏ margin mặc định */
-}
-
-/* 2. Đảm bảo khối menu cha nằm ngang và không bị giãn quá mức */
-.user-actions .menu {
-    display: flex; /* Chỉ cần flex nếu có nhiều mục <li> ngang hàng, ở đây chỉ có 1 */
-    /* Quan trọng: giữ nguyên vị trí trong user-actions */
-}
-
-/* 3. Định vị menu cha (li chứa tên) */
-.user-actions .menu > li {
-    position: relative; /* Rất quan trọng cho menu con định vị tuyệt đối */
-    padding: 0;
-    margin: 0;
-}
-
-/* 4. Ẩn và định vị menu con */
-.sub-menu {
-    display: none;        /* BẮT BUỘC: Ẩn menu theo mặc định */
-    position: absolute;   /* Định vị tuyệt đối */
-    top: 100%;            /* Đặt ngay dưới cạnh dưới của mục cha */
-    right: 0;             /* Canh lề phải để menu thả xuống từ phía bên phải */
-    
-    /* Kiểu dáng */
-    background-color: white;
-    min-width: 200px; /* Kích thước tối thiểu đủ rộng */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
-    z-index: 1001;        /* Đảm bảo nó nằm trên tất cả các phần tử khác */
-}
-
-/* 5. Định kiểu các liên kết trong sub-menu */
-.sub-menu a {
-    color: #333;
-    padding: 10px 15px;
-    text-decoration: none;
-    display: block; /* Giúp các mục chiếm toàn bộ chiều rộng và dễ click */
-}
-
-/* 6. Hiệu ứng hover cho các mục con */
-.sub-menu a:hover {
-    background-color: #f0f0f0;
-}
-
-/* 7. HIỂN THỊ MENU khi rê chuột vào mục cha */
-.user-actions .menu > li:hover > .sub-menu {
-    display: block; /* Thay đổi thuộc tính display từ none sang block */
-}
-

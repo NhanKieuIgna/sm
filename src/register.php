@@ -110,6 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_card_front = '';
     $id_card_back = '';
     $driver_license = '';
+    $avatar_path = '';
     $id_card_front_path = '';
     $id_card_back_path = '';
     $driver_license_path = '';
@@ -153,6 +154,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $driver_license_path = $uploadResult['filename'];
             } else {
                 $errors[] = 'Ảnh bằng lái xe: ' . $uploadResult['error'];
+            }
+        }
+
+        // Upload avatar
+        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $uploadResult = uploadFile($_FILES['avatar'], $uploadDir);
+            if ($uploadResult['success']) {
+                $avatar_path = $uploadResult['filename'];
+            } else {
+                $errors[] = 'Ảnh đại diện: ' . $uploadResult['error'];
             }
         }
     }
@@ -263,10 +274,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errors[] = 'Vui lòng tải lên ảnh bằng lái xe';
             }
         }
+        if (empty($avatar_path)) {
+            if (!isset($_FILES['avatar']) || $_FILES['avatar']['error'] === UPLOAD_ERR_NO_FILE) {
+                $errors[] = 'Vui lòng tải lên ảnh đại diện';
+            }
+        }
     }
     
     if (empty($errors)) {
-    //    
                 // Escape all input values to prevent SQL injection
                 $full_name_escaped = mysqli_real_escape_string($conn, $full_name);
                 $email_escaped = mysqli_real_escape_string($conn, $email);
@@ -285,6 +300,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $id_card_front_escaped = mysqli_real_escape_string($conn, $id_card_front_path);
                 $id_card_back_escaped = mysqli_real_escape_string($conn, $id_card_back_path);
                 $driver_license_escaped = mysqli_real_escape_string($conn, $driver_license_path);
+                $avatar_escaped = mysqli_real_escape_string($conn, $avatar_path);
                 $vehicle_number_escaped = mysqli_real_escape_string($conn, $vehicle_number); // bien so xe
                 $vehicle_type_escaped = mysqli_real_escape_string($conn, $vehicle_type); // loai xe
                 $working_area_escaped = mysqli_real_escape_string($conn, $working_area); // khu vuc hoat dong
@@ -296,9 +312,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Build SQL query - add gender and birth_year for shippers
                 $columns = "`HoTen`, `Email`, `SoDienThoai`, `MatKhau_Hash`, `VaiTro`, `DiaChiGiaoHangMacDinh`, `NgayTao`, `TenDangNhap`";
                 $values = "'$full_name_escaped', '$email_escaped', '$phone_escaped', '$password_escaped', '$role_escaped', '$address_escaped', CURRENT_TIMESTAMP, '$username_escaped'";
-                
-                
-                
                 $sqlquery = "INSERT INTO `nguoidung` ($columns) VALUES ($values)";
                 
                 try {
@@ -308,7 +321,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                           
                            
                            // Insert vào bảng hosonguoigiaohang với ID_NguoiDung để liên kết với bảng nguoidung
-                           $shipper_query = "INSERT INTO `hosonguoigiaohang` (`ID_NguoiDung`, `GioiTinh`, `NamSinh`, `Anh_CCCD_Truoc`, `Anh_CCCD_Sau`, `Anh_BangLaiXe`, `BienSoXe`, `KhuVucHoatDong`) VALUES ($userId, '$gender_escaped', '$birth_year_escaped', '$id_card_front_escaped', '$id_card_back_escaped', '$driver_license_escaped', '$vehicle_number_escaped', '$working_area_escaped')";
+                           $shipper_query = "INSERT INTO `hosonguoigiaohang` (`ID_NguoiDung`, `GioiTinh`, `NamSinh`, `Anh_CCCD_Truoc`, `Anh_CCCD_Sau`, `Anh_BangLaiXe`, `BienSoXe`, `KhuVucHoatDong`, `AnhDaiDien`) VALUES ($userId, '$gender_escaped', '$birth_year_escaped', '$id_card_front_escaped', '$id_card_back_escaped', '$driver_license_escaped', '$vehicle_number_escaped', '$working_area_escaped', '$avatar_escaped')";
                            
                            if (!mysqli_query($conn, $shipper_query)) {
                                $error_msg = mysqli_error($conn);
@@ -602,6 +615,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="file" id="driver_license" name="driver_license" class="form-control" 
                                accept="image/jpeg,image/jpg,image/png" required>
                         <small class="form-text">Định dạng: JPG, JPEG, PNG. Kích thước tối đa: 5MB</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="avatar" class="form-label">
+                            <i class="fas fa-user-circle"></i>
+                            Ảnh đại diện
+                        </label>
+                        <input type="file" id="avatar" name="avatar" class="form-control" 
+                               accept="image/jpeg,image/jpg,image/png" required>
+                        <small class="form-text">Ảnh chân dung rõ nét để xác minh danh tính.</small>
                     </div>
                     
                     <div class="upload-section">
