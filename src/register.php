@@ -328,7 +328,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                throw new Exception('Lỗi khi lưu thông tin người giao hàng: ' . $error_msg);
                            }
                         }
-                        
+                       
+                            // Tạo bảng wishlist cho người mua mới
                         $success = 'Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.';
                         // Auto redirect to login after 3 seconds
                         header("refresh:3;url=login.php");

@@ -2,7 +2,7 @@
         <div class="footer-content">
             <div class="footer-column">
                 <div class="logo" style="margin-bottom: 15px;">
-                    <div class="logo-icon"><img src="/sm-demo/src/img/logo.jpg" alt="logo"></div>
+                    <div class="logo-icon"><img src="../img/logo.jpg" alt="logo"></div>
                     <span style="color: white;">SM</span>
                 </div>
                 <p>SM - Nền tảng mua và bán đồ cũ uy tín và có đảm bảo tại Việt Nam.</p>

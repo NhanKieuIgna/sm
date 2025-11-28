@@ -1,5 +1,20 @@
 <?php
-    require 'header.php';
+session_start();
+
+// Kết nối database
+require_once('../../database/db.php');
+// Lấy danh mục
+$sql_categories = "SELECT * FROM danhmuc ORDER BY TenDanhMuc";
+$result_categories = mysqli_query($conn, $sql_categories);
+$categories = [];
+if ($result_categories) {
+    while ($row = mysqli_fetch_assoc($result_categories)) {
+        $categories[] = $row;
+    }
+}
+?>
+<?php
+    include 'header.php';
 ?>
 
 <!DOCTYPE html>
@@ -8,10 +23,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thêm sản phẩm</title>
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="/sm-demo/src/css/add-product.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+
     <div class="title">
     <h2>Đăng bán sản phẩm</h2>
     <h3>Chắc chắn rằng bạn mô tả sản phẩm thật chính xác và đáng tin cậy!</h3>
