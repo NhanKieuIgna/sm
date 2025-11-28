@@ -38,10 +38,11 @@ if (!$order) {
 $items_query = "SELECT 
                     ctdh.*,
                     sp.TenSanPham,
-                    sp.HinhAnh,
+                    ha.URL_HinhAnh,
                     sp.MoTa
                  FROM chitietdonhang ctdh
                  JOIN sanpham sp ON ctdh.ID_SanPham = sp.ID_SanPham
+                 LEFT JOIN hinhanhsanpham ha ON sp.ID_SanPham = ha.ID_SanPham
                  WHERE ctdh.ID_DonHang = $order_id";
 
 $items_result = mysqli_query($conn, $items_query);
@@ -159,8 +160,8 @@ $status_classes = [
                 <div class="order-items-list">
                     <?php foreach ($items as $item): ?>
                         <div class="order-item-detail">
-                            <?php if (!empty($item['HinhAnh'])): ?>
-                                <img src="../uploads/<?php echo htmlspecialchars($item['HinhAnh']); ?>" 
+                            <?php if (!empty($item['URL_HinhAnh'])): ?>
+                                <img src="<?php echo "../" ?><?php echo htmlspecialchars($item['URL_HinhAnh']); ?>" 
                                      alt="<?php echo htmlspecialchars($item['TenSanPham']); ?>" 
                                      class="item-image">
                             <?php else: ?>
@@ -172,11 +173,11 @@ $status_classes = [
                                 <div class="item-name"><?php echo htmlspecialchars($item['TenSanPham']); ?></div>
                                 <div class="item-meta">
                                     Số lượng: <?php echo $item['SoLuongMua']; ?> | 
-                                    Giá: <?php echo number_format($item['GiaBan'], 0, ',', '.'); ?>₫
+                                    Giá: <?php echo number_format($item['GiaTaiThoiDiemDat'], 0, ',', '.'); ?>₫
                                 </div>
                             </div>
                             <div class="item-total">
-                                <?php echo number_format($item['GiaBan'] * $item['SoLuongMua'], 0, ',', '.'); ?>₫
+                                <?php echo number_format($item['GiaTaiThoiDiemDat'] * $item['SoLuongMua'], 0, ',', '.'); ?>₫
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -208,7 +209,7 @@ $status_classes = [
                         <?php endif; ?>
 
                         <?php if ($order['TrangThaiDonHang'] === 'HoanThanh'): ?>
-                            <a href="review.html?order_id=<?php echo $order_id; ?>" class="btn btn-primary btn-block">
+                            <a href="review.php?order_id=<?php echo $order_id; ?>" class="btn btn-primary btn-block">
                                 <i class="fas fa-star"></i>
                                 Gửi đánh giá
                             </a>

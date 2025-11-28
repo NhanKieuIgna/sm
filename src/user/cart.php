@@ -12,6 +12,7 @@ $cart_items = $_SESSION['cart'];
 foreach ($cart_items as $item) {
     $total += $item['price'] * $item['quantity'];
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -62,6 +63,8 @@ foreach ($cart_items as $item) {
                 <span>|</span>
                 <?php if(isset($_SESSION['user_id'])): ?>
                     <span><u><a href="../buyer/edit-profile.php"><?php echo $_SESSION['fullname']; ?></a></u></span>
+                    <span>|</span>
+                    <a href="my-orders.php"><u>Đơn hàng của tôi</u></a>
                     <span>|</span>
                     <a href="../logout.php"><u>Đăng Xuất</u></a>
                 <?php else: ?>
@@ -125,7 +128,7 @@ foreach ($cart_items as $item) {
                         </div>
                         <div class="item-thumb">
                             <?php if (!empty($item['image'])): ?>
-                                <img src="<?php echo"../" ?><?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                <img src="<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
                             <?php endif; ?>
                         </div>
                         <div class="item-info">
@@ -311,7 +314,8 @@ foreach ($cart_items as $item) {
         }
 
         function checkout() {
-            alert('Chức năng thanh toán đang được phát triển');
+            // Redirect to checkout page
+            window.location.href = 'checkout.php';
         }
 
         // Select all checkbox functionality

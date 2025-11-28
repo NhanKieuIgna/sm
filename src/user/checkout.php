@@ -14,7 +14,7 @@ $query_user = "SELECT * FROM nguoidung WHERE ID_NguoiDung = '$user_id'";
 $result_user = mysqli_query($conn, $query_user);
 $user = mysqli_fetch_assoc($result_user);
 
-if (!$user || $user['VaiTro'] !== 'NguoiMua') {
+if (!$user || $user['VaiTro'] !== 'NguoiMua' && $user['VaiTro'] !== 'NguoiBan') {
     header('Location: ../index.php');
     exit();
 }
@@ -55,17 +55,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        // Insert order
-        $order_date = date('Y-m-d H:i:s');
-        $order_status = 'ChoXacNhan';
+        // Get seller ID from first product (assuming all products from same seller for now)
+        $seller_id = null;
+        foreach ($cart_items as $item) {
+            $product_id = intval($item['product_id'] ?? 0);
+            if ($product_id > 0) {
+                $seller_query = "SELECT ID_NguoiBan FROM sanpham WHERE ID_SanPham = $product_id LIMIT 1";
+                $seller_result = mysqli_query($conn, $seller_query);
+                if ($seller_row = mysqli_fetch_assoc($seller_result)) {
+                    $seller_id = $seller_row['ID_NguoiBan'];
+                    break;
+                }
+            }
+        }
         
-        $insert_order = "INSERT INTO danhsachdonhang 
-                        (ID_NguoiMua, NgayDatHang, DiaChiGiaoHang, SoTienCanThu_COD, TrangThaiDonHang, GhiChu) 
-                        VALUES 
-                        ($user_id, '$order_date', '$address', $total_amount, '$order_status', '$note')";
-        
-        if (mysqli_query($conn, $insert_order)) {
-            $order_id = mysqli_insert_id($conn);
+        if (!$seller_id) {
+            $error = 'Không tìm thấy thông tin người bán';
+        } else {
+            // Insert order
+            $order_date = date('Y-m-d H:i:s');
+            $order_status = 'ChoXacNhan';
+            
+            $insert_order = "INSERT INTO danhsachdonhang 
+                            (ID_NguoiMua, ID_NguoiBan, NgayDatHang, DiaChiGiaoHang, SoTienCanThu_COD, TrangThaiDonHang, TongGiaTriDonHang, GhiChu) 
+                            VALUES 
+                            ($user_id, $seller_id, '$order_date', '$address', $total_amount, '$order_status', $total_amount, '$note')";
+            
+            if (mysqli_query($conn, $insert_order)) {
+                $order_id = mysqli_insert_id($conn);
             
             // Insert order details
             $all_success = true;
@@ -76,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 if ($product_id > 0 && $quantity > 0) {
                     $insert_detail = "INSERT INTO chitietdonhang 
-                                    (ID_DonHang, ID_SanPham, SoLuongMua, GiaBan) 
+                                    (ID_DonHang, ID_SanPham, SoLuongMua, GiaTaiThoiDiemDat) 
                                     VALUES 
                                     ($order_id, $product_id, $quantity, $price)";
                     
@@ -94,10 +111,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Redirect after 3 seconds
                 header("refresh:3;url=my-orders.php");
             } else {
-                $error = 'Có lỗi xảy ra khi lưu chi tiết đơn hàng';
+                    $error = 'Có lỗi xảy ra khi lưu chi tiết đơn hàng';
+                }
+            } else {
+                $error = 'Có lỗi xảy ra khi đặt hàng: ' . mysqli_error($conn);
             }
-        } else {
-            $error = 'Có lỗi xảy ra khi đặt hàng: ' . mysqli_error($conn);
         }
     }
 }
@@ -245,13 +263,13 @@ $cart = $_SESSION['cart'] ?? [];
 
                     <!-- Hidden cart items -->
                     <?php if (!empty($cart)): ?>
-                        <?php foreach ($cart as $index => $item): ?>
-                            <input type="hidden" name="cart_items[<?php echo $index; ?>][product_id]" 
-                                   value="<?php echo htmlspecialchars($item['product_id'] ?? ''); ?>">
-                            <input type="hidden" name="cart_items[<?php echo $index; ?>][quantity]" 
-                                   value="<?php echo htmlspecialchars($item['quantity'] ?? ''); ?>">
-                            <input type="hidden" name="cart_items[<?php echo $index; ?>][price]" 
-                                   value="<?php echo htmlspecialchars($item['price'] ?? ''); ?>">
+                        <?php foreach ($cart as $product_id => $item): ?>
+                            <input type="hidden" name="cart_items[<?php echo htmlspecialchars($product_id); ?>][product_id]" 
+                                   value="<?php echo htmlspecialchars($item['id'] ?? $product_id); ?>">
+                            <input type="hidden" name="cart_items[<?php echo htmlspecialchars($product_id); ?>][quantity]" 
+                                   value="<?php echo htmlspecialchars($item['quantity'] ?? 1); ?>">
+                            <input type="hidden" name="cart_items[<?php echo htmlspecialchars($product_id); ?>][price]" 
+                                   value="<?php echo htmlspecialchars($item['price'] ?? 0); ?>">
                         <?php endforeach; ?>
                     <?php endif; ?>
 

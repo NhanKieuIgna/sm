@@ -14,7 +14,7 @@ $query_user = "SELECT * FROM nguoidung WHERE ID_NguoiDung = '$user_id'";
 $result_user = mysqli_query($conn, $query_user);
 $user = mysqli_fetch_assoc($result_user);
 
-if (!$user || $user['VaiTro'] !== 'NguoiMua') {
+if (!$user || $user['VaiTro'] !== 'NguoiMua' && $user['VaiTro'] !== 'NguoiBan') {
     header('Location: ../index.php');
     exit();
 }
@@ -62,17 +62,18 @@ if ($orders_result) {
         // Get first product for display
         $product_query = "SELECT 
                             sp.TenSanPham,
-                            sp.HinhAnh,
+                            ha.URL_HinhAnh,
                             ctdh.SoLuongMua
                           FROM chitietdonhang ctdh
                           JOIN sanpham sp ON ctdh.ID_SanPham = sp.ID_SanPham
+                          LEFT JOIN hinhanhsanpham ha ON sp.ID_SanPham = ha.ID_SanPham
                           WHERE ctdh.ID_DonHang = {$row['ID_DonHang']}
                           LIMIT 1";
         $product_result = mysqli_query($conn, $product_query);
         if ($product_result && mysqli_num_rows($product_result) > 0) {
             $product = mysqli_fetch_assoc($product_result);
             $row['product_name'] = $product['TenSanPham'];
-            $row['product_image'] = $product['HinhAnh'];
+            $row['product_image'] = $product['URL_HinhAnh'];
             $row['first_quantity'] = $product['SoLuongMua'];
         }
         $orders[] = $row;
@@ -195,7 +196,7 @@ $status_classes = [
                         <div class="order-body">
                             <div class="order-product">
                                 <?php if (!empty($order['product_image'])): ?>
-                                    <img src="../uploads/<?php echo htmlspecialchars($order['product_image']); ?>" 
+                                    <img src="<?php echo "../" ?><?php echo htmlspecialchars($order['product_image']); ?>" 
                                          alt="<?php echo htmlspecialchars($order['product_name'] ?? 'Sản phẩm'); ?>" 
                                          class="product-image">
                                 <?php else: ?>
@@ -243,7 +244,7 @@ $status_classes = [
                             <?php endif; ?>
 
                             <?php if ($order['TrangThaiDonHang'] === 'HoanThanh'): ?>
-                                <a href="review.html?order_id=<?php echo $order['ID_DonHang']; ?>" class="btn btn-primary">
+                                <a href="review.php?order_id=<?php echo $order['ID_DonHang']; ?>" class="btn btn-primary">
                                     <i class="fas fa-star"></i>
                                     Gửi đánh giá
                                 </a>
