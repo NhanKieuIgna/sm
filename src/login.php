@@ -17,7 +17,9 @@ if(isset($_POST['login'])){
         $_SESSION['fullname'] = $row['HoTen'];
          if($_SESSION['role'] == 'NguoiGiaoHang'){
             header('location: shipper/delivery_index.php');
-        }else{
+        }elseif($_SESSION['role'] == 'QuanTriVien'){
+            header('location: admin/user.php');
+        } else {
             header('location: index.php');
         }
         exit();
