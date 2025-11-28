@@ -407,7 +407,7 @@ function build_pagination_url($page) {
                         <a href="../product-detail.php?id=<?php echo $product['ID_SanPham']; ?>" style="text-decoration: none; color: inherit;">
                             <div class="product-image">
                                 <?php if (!empty($product['URL_HinhAnh'])): ?>
-                                    <img src="<?php echo htmlspecialchars($product['URL_HinhAnh']); ?>" alt="<?php echo htmlspecialchars($product['TenSanPham']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                    <img src="<?php echo "../"?><?php echo htmlspecialchars($product['URL_HinhAnh']); ?>" alt="<?php echo htmlspecialchars($product['TenSanPham']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
                                 <?php endif; ?>
                             </div>
                             <div class="product-info">
