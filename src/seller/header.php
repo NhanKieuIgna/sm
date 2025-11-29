@@ -47,7 +47,7 @@
                         </li>
                     </ul>
                       <span>|</span>
-                    <a href="logout.php"><u>Đăng Xuất</u></a>
+                    <a href="../logout.php"><u>Đăng Xuất</u></a>
                     
                    
                 <?php elseif(isset($_SESSION['user_id'])): ?>
