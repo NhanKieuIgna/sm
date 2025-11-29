@@ -1,296 +1,427 @@
-/* Container chứa form */
-form {
-    max-width: 1100px; /* Giới hạn chiều rộng tổng thể của form */
-    margin: 20px auto;
-    padding: 30px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border: 1px solid  rgba(0, 0, 0, 0);
-}
+/* ===========================
+   Add Product Page Styling
+   Matching Project Color Scheme
+   SCOPED to avoid affecting header/footer
+   =========================== */
 
-/* Tiêu đề chính */
-h2 {
+/* Title Section */
+.title {
+    text-align: center;
+    color: #2d8659;
     margin-bottom: 30px;
-    font-size: 28px;
-    color: #333;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
+    padding: 20px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* Tiêu đề phụ (Thông tin khác, Vận chuyển) */
-h3 {
-    margin-top: 25px;
+.title h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
     margin-bottom: 10px;
     color: #2d8659;
 }
 
-/* Thiết lập bố cục Grid cho 2 cột chính */
-.form-grid {
-    display: grid;
-    /* Chia thành 2 cột, cột 1 rộng 60%, cột 2 rộng 40% */
-    grid-template-columns: 3fr 2fr; 
-    gap: 40px; /* Khoảng cách giữa 2 cột */
+.title h3 {
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #666;
 }
 
-/* Các nhóm form cơ bản */
-.form-group {
-    margin-bottom: 15px;
+/* Alert Messages */
+.alert {
+    max-width: 1200px;
+    margin: 0 auto 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #555;
-    font-size: 14px;
+.alert p {
+    margin: 5px 0;
 }
 
-input[type="text"], input[type="number"], select, textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+.alert-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+/* Form Container - More specific selector */
+form[action="process_add_product.php"] {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeInUp 0.6s ease-out;
+}
+
+form[action="process_add_product.php"] * {
     box-sizing: border-box;
-    font-size: 14px;
 }
 
-/* Bố cục hàng cho Danh mục/Số lượng và Tên sản phẩm/Giá bán */
-.row-group {
-    display: flex;
-    gap: 20px;
-}
-.input-half {
-    flex: 1;
+/* Form Sections */
+.form-section {
+    margin-bottom: 30px;
 }
 
-/* Nút tăng/giảm số lượng */
-.quantity-input-group {
+.media-upload-section {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+}
+
+.media-upload-section label:first-child {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+/* Upload Gallery Container */
+.upload-gallery-container {
     display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    min-height: 200px;
+    transition: all 0.3s ease;
+}
+
+.upload-gallery-container.empty-center {
+    justify-content: center;
     align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    overflow: hidden;
-}
-.quantity-input-group input {
-    flex: 1;
-    text-align: center;
-    border: none;
-    padding: 10px 0;
-}
-.btn-qty {
-    padding: 10px 15px;
-    background: #f0f0f0;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    color: #555;
-}
-.btn-qty:hover {
-    background: #e0e0e0;
 }
 
-/* Nút Đăng Bán (15) */
-.btn-submit {
-    background-color: #2d8659;
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 30px;
-    display: block;
-    width: 200px; /* Chiều rộng cố định cho nút */
-    text-transform: uppercase;
-}
-.btn-submit:hover {
-    background-color: #3ba372;
-}
-
-/* Media Queries cho màn hình nhỏ */
-@media (max-width: 768px) {
-    .form-grid {
-        grid-template-columns: 1fr; /* Chuyển thành 1 cột trên màn hình nhỏ */
-        gap: 0;
-    }
-}
-
-
-
-/* Container mới để giới hạn chiều rộng và căn giữa */
-.upload-wrapper {
-    /* Đặt chiều rộng tối đa mong muốn (ví dụ: 600px) */
-    max-width: 1000px; 
-    margin: 20px auto; /* Căn giữa theo chiều ngang */
-    padding: 0 20px; /* Thêm padding nếu cần */
-}
-
-/* Chỉnh sửa .upload-dropzone */
+/* Upload Dropzone */
 .upload-dropzone {
-    /* Quan trọng: Bỏ width: 100% hoặc đặt lại thành auto */
-    width: auto;
-    
-    /* Thiết lập hình dạng và kích thước */
+    width: 180px;
+    height: 180px;
+    border: 3px dashed #2d8659;
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 200px; 
-    
-    /* Viền nét đứt */
-    border: 2px dashed #ccc;
-    border-radius: 8px;
-    
-    /* ... các kiểu dáng khác ... */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
 }
 
-/* Hiệu ứng khi rê chuột vào */
 .upload-dropzone:hover {
-    border-color: #38c880; /* Màu xanh lá/xanh lục */
-}
-
-
-.upload-dropzone p {
-    font-size: 14px;
-    color: #888;
+    background: #e8f5e9;
+    border-color: #3ba372;
+    transform: scale(1.05);
 }
 
 .camera-icon {
-    font-size: 50px;
-    color: #25a487;
-    margin-bottom: 8px;
-    display: inline-block;
+    font-size: 3rem;
+    color: #2d8659;
+    margin-bottom: 10px;
 }
 
-.title {
-    max-width: 1100px;
-    margin: 10px auto 0px auto;
+.upload-dropzone p {
+    color: #2d8659;
+    font-weight: 600;
+    font-size: 0.9rem;
 }
 
-/* Container ảnh đã chọn */
-#image-preview-container {
-    display: flex;
-    flex-wrap: wrap; /* Cho phép ảnh xuống dòng */
-    gap: 10px;
-    margin-top: 15px;
-    border: 1px solid #eee; /* Có thể thêm viền khung ảnh */
-    padding: 10px;
-}
-
-/* Ảnh xem trước */
-.uploaded-preview-image {
-    width: 100px; /* Kích thước ảnh xem trước */
-    height: 100px;
-    object-fit: cover; /* Đảm bảo ảnh không bị méo */
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Container chứa tất cả các ảnh và dropzone */
-.upload-gallery-container {
-    display: flex;
-    flex-wrap: wrap; 
-    gap: 10px; 
-    padding: 10px; 
-    border: 2px dashed #ccc; 
-    border-radius: 8px;
-    min-height: 200px; 
-    align-items: center; /* Vẫn căn giữa dọc */
-    
-    /* Mặc định: Xếp sang trái */
-    justify-content: flex-start; /* GIỮ QUY TẮC NÀY */
-}
-
-/* CLASS MỚI: Chỉ dùng để căn giữa khi KHÔNG có ảnh */
-.empty-center {
-    justify-content: center; /* Tạm thời căn giữa ngang */
-}
-
-/* Dropzone (thẻ label) để thêm ảnh mới */
-.add-more-dropzone {
-    /* Đảm bảo nó có kích thước nhất quán với các ảnh */
-    width: 120px; /* Kích thước cố định của ô tải lên */
-    height: 120px; 
-    flex-shrink: 0; /* Không co lại */
-    flex-grow: 0; /* Không giãn ra */
-
-    /* Kiểu dáng riêng cho dropzone nếu bạn muốn khác biệt */
-    border: 1px dashed #ddd; /* Viền mỏng hơn cho nút tải lên */
-    background-color: #f9f9f9;
-    color: #999;
-}
-.add-more-dropzone:hover {
-    border-color: #38c880;
-    color: #38c880;
-}
-
-/* Icon trong dropzone */
-.add-more-dropzone .camera-icon {
-    font-size: 32px; /* Kích thước nhỏ hơn cho icon trong dropzone */
-    color: #bbb;
-}
-.add-more-dropzone:hover .camera-icon {
-    color: #38c880;
-}
-.add-more-dropzone p {
-    font-size: 12px;
-    color: #999;
-}
-
-/* --------- Style cho mỗi ảnh đã tải lên --------- */
+/* Uploaded Image Item */
 .uploaded-image-item {
-    position: relative; /* Để định vị nút X */
-    width: 120px; /* Kích thước của mỗi ảnh */
-    height: 120px;
-    border: 1px solid #ddd; /* Viền cho mỗi ảnh */
+    position: relative;
+    width: 180px;
+    height: 180px;
     border-radius: 8px;
-    overflow: hidden; /* Cắt ảnh nếu tràn ra ngoài khung */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.uploaded-image-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .uploaded-image-item img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Đảm bảo ảnh không bị méo */
-    display: block;
+    object-fit: cover;
 }
 
-/* Nút xóa (X) */
 .remove-image-btn {
     position: absolute;
     top: 5px;
     right: 5px;
-    background-color: rgba(0, 0, 0, 0.6); /* Nền mờ */
+    background: rgba(220, 53, 69, 0.9);
     color: white;
     border: none;
-    border-radius: 50%; /* Hình tròn */
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 1.5rem;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    line-height: 1; /* Căn giữa chữ X */
-    padding: 0;
-    z-index: 10; /* Đảm bảo nút X nằm trên ảnh */
-    opacity: 0.8;
-    transition: opacity 0.2s;
+    transition: all 0.3s ease;
+    line-height: 1;
 }
+
 .remove-image-btn:hover {
-    opacity: 1;
-    background-color: rgba(255, 0, 0, 0.7); /* Đổi màu khi hover để dễ nhìn */
+    background: #dc3545;
+    transform: scale(1.1);
 }
 
-/* Ẩn input file mặc định */
-#product-images {
-    display: none;
+/* Form Grid Layout */
+.form-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
 }
 
-/* Áp dụng cho các nhãn có class 'required' */
-.required::after {
-    content: "*"; /* Nội dung được thêm vào */
-    color: red; 
-    margin-left: 2px;
+@media (max-width: 992px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Column Styling */
+.col-left,
+.col-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.col-right {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 8px;
+}
+
+.col-right h3 {
+    color: #333;
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #2d8659;
+}
+
+/* Form Groups */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.row-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .row-group {
+        grid-template-columns: 1fr;
+    }
+}
+
+.input-half {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Labels - Scoped to form */
+form[action="process_add_product.php"] label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+form[action="process_add_product.php"] label.required::after {
+    content: " *";
+    color: #dc3545;
+}
+
+/* Input Fields - Scoped to form */
+form[action="process_add_product.php"] input[type="text"],
+form[action="process_add_product.php"] input[type="number"],
+form[action="process_add_product.php"] select,
+form[action="process_add_product.php"] textarea {
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+form[action="process_add_product.php"] input[type="text"]:focus,
+form[action="process_add_product.php"] input[type="number"]:focus,
+form[action="process_add_product.php"] select:focus,
+form[action="process_add_product.php"] textarea:focus {
+    outline: none;
+    border-color: #2d8659;
+    box-shadow: 0 0 0 3px rgba(45, 134, 89, 0.1);
+}
+
+form[action="process_add_product.php"] textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+form[action="process_add_product.php"] select {
+    cursor: pointer;
+    background: white;
+}
+
+/* Quantity Control */
+.quantity-control {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.quantity-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-input-group input {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+}
+
+.btn-qty {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #2d8659;
+    background: white;
+    color: #2d8659;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-qty:hover {
+    background: #2d8659;
+    color: white;
+    transform: scale(1.1);
+}
+
+.btn-qty:active {
+    transform: scale(0.95);
+}
+
+/* Submit Button */
+.btn-submit {
+    width: 100%;
+    padding: 16px 32px;
+    background-color: #19790c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.btn-submit:hover {
+    background-color: #17877f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    form[action="process_add_product.php"] {
+        padding: 25px;
+    }
+
+    .title h2 {
+        font-size: 2rem;
+    }
+
+    .title h3 {
+        font-size: 1rem;
+    }
+
+    .upload-dropzone,
+    .uploaded-image-item {
+        width: 150px;
+        height: 150px;
+    }
+
+    .camera-icon {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    form[action="process_add_product.php"] {
+        padding: 20px;
+    }
+
+    .upload-dropzone,
+    .uploaded-image-item {
+        width: 120px;
+        height: 120px;
+    }
+
+    .btn-submit {
+        font-size: 1rem;
+        padding: 14px 24px;
+    }
+}
+
+/* Animation for form elements */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Custom scrollbar for textarea - Scoped */
+form[action="process_add_product.php"] textarea::-webkit-scrollbar {
+    width: 8px;
+}
+
+form[action="process_add_product.php"] textarea::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+form[action="process_add_product.php"] textarea::-webkit-scrollbar-thumb {
+    background: #2d8659;
+    border-radius: 4px;
+}
+
+form[action="process_add_product.php"] textarea::-webkit-scrollbar-thumb:hover {
+    background: #3ba372;
 }
