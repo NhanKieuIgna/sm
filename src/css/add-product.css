@@ -1,0 +1,296 @@
+/* Container chứa form */
+form {
+    max-width: 1100px; /* Giới hạn chiều rộng tổng thể của form */
+    margin: 20px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid  rgba(0, 0, 0, 0);
+}
+
+/* Tiêu đề chính */
+h2 {
+    margin-bottom: 30px;
+    font-size: 28px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Tiêu đề phụ (Thông tin khác, Vận chuyển) */
+h3 {
+    margin-top: 25px;
+    margin-bottom: 10px;
+    color: #2d8659;
+}
+
+/* Thiết lập bố cục Grid cho 2 cột chính */
+.form-grid {
+    display: grid;
+    /* Chia thành 2 cột, cột 1 rộng 60%, cột 2 rộng 40% */
+    grid-template-columns: 3fr 2fr; 
+    gap: 40px; /* Khoảng cách giữa 2 cột */
+}
+
+/* Các nhóm form cơ bản */
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+    font-size: 14px;
+}
+
+input[type="text"], input[type="number"], select, textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+/* Bố cục hàng cho Danh mục/Số lượng và Tên sản phẩm/Giá bán */
+.row-group {
+    display: flex;
+    gap: 20px;
+}
+.input-half {
+    flex: 1;
+}
+
+/* Nút tăng/giảm số lượng */
+.quantity-input-group {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.quantity-input-group input {
+    flex: 1;
+    text-align: center;
+    border: none;
+    padding: 10px 0;
+}
+.btn-qty {
+    padding: 10px 15px;
+    background: #f0f0f0;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: #555;
+}
+.btn-qty:hover {
+    background: #e0e0e0;
+}
+
+/* Nút Đăng Bán (15) */
+.btn-submit {
+    background-color: #2d8659;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 30px;
+    display: block;
+    width: 200px; /* Chiều rộng cố định cho nút */
+    text-transform: uppercase;
+}
+.btn-submit:hover {
+    background-color: #3ba372;
+}
+
+/* Media Queries cho màn hình nhỏ */
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr; /* Chuyển thành 1 cột trên màn hình nhỏ */
+        gap: 0;
+    }
+}
+
+
+
+/* Container mới để giới hạn chiều rộng và căn giữa */
+.upload-wrapper {
+    /* Đặt chiều rộng tối đa mong muốn (ví dụ: 600px) */
+    max-width: 1000px; 
+    margin: 20px auto; /* Căn giữa theo chiều ngang */
+    padding: 0 20px; /* Thêm padding nếu cần */
+}
+
+/* Chỉnh sửa .upload-dropzone */
+.upload-dropzone {
+    /* Quan trọng: Bỏ width: 100% hoặc đặt lại thành auto */
+    width: auto;
+    
+    /* Thiết lập hình dạng và kích thước */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px; 
+    
+    /* Viền nét đứt */
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    
+    /* ... các kiểu dáng khác ... */
+}
+
+/* Hiệu ứng khi rê chuột vào */
+.upload-dropzone:hover {
+    border-color: #38c880; /* Màu xanh lá/xanh lục */
+}
+
+
+.upload-dropzone p {
+    font-size: 14px;
+    color: #888;
+}
+
+.camera-icon {
+    font-size: 50px;
+    color: #25a487;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+.title {
+    max-width: 1100px;
+    margin: 10px auto 0px auto;
+}
+
+/* Container ảnh đã chọn */
+#image-preview-container {
+    display: flex;
+    flex-wrap: wrap; /* Cho phép ảnh xuống dòng */
+    gap: 10px;
+    margin-top: 15px;
+    border: 1px solid #eee; /* Có thể thêm viền khung ảnh */
+    padding: 10px;
+}
+
+/* Ảnh xem trước */
+.uploaded-preview-image {
+    width: 100px; /* Kích thước ảnh xem trước */
+    height: 100px;
+    object-fit: cover; /* Đảm bảo ảnh không bị méo */
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Container chứa tất cả các ảnh và dropzone */
+.upload-gallery-container {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 10px; 
+    padding: 10px; 
+    border: 2px dashed #ccc; 
+    border-radius: 8px;
+    min-height: 200px; 
+    align-items: center; /* Vẫn căn giữa dọc */
+    
+    /* Mặc định: Xếp sang trái */
+    justify-content: flex-start; /* GIỮ QUY TẮC NÀY */
+}
+
+/* CLASS MỚI: Chỉ dùng để căn giữa khi KHÔNG có ảnh */
+.empty-center {
+    justify-content: center; /* Tạm thời căn giữa ngang */
+}
+
+/* Dropzone (thẻ label) để thêm ảnh mới */
+.add-more-dropzone {
+    /* Đảm bảo nó có kích thước nhất quán với các ảnh */
+    width: 120px; /* Kích thước cố định của ô tải lên */
+    height: 120px; 
+    flex-shrink: 0; /* Không co lại */
+    flex-grow: 0; /* Không giãn ra */
+
+    /* Kiểu dáng riêng cho dropzone nếu bạn muốn khác biệt */
+    border: 1px dashed #ddd; /* Viền mỏng hơn cho nút tải lên */
+    background-color: #f9f9f9;
+    color: #999;
+}
+.add-more-dropzone:hover {
+    border-color: #38c880;
+    color: #38c880;
+}
+
+/* Icon trong dropzone */
+.add-more-dropzone .camera-icon {
+    font-size: 32px; /* Kích thước nhỏ hơn cho icon trong dropzone */
+    color: #bbb;
+}
+.add-more-dropzone:hover .camera-icon {
+    color: #38c880;
+}
+.add-more-dropzone p {
+    font-size: 12px;
+    color: #999;
+}
+
+/* --------- Style cho mỗi ảnh đã tải lên --------- */
+.uploaded-image-item {
+    position: relative; /* Để định vị nút X */
+    width: 120px; /* Kích thước của mỗi ảnh */
+    height: 120px;
+    border: 1px solid #ddd; /* Viền cho mỗi ảnh */
+    border-radius: 8px;
+    overflow: hidden; /* Cắt ảnh nếu tràn ra ngoài khung */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.uploaded-image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Đảm bảo ảnh không bị méo */
+    display: block;
+}
+
+/* Nút xóa (X) */
+.remove-image-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(0, 0, 0, 0.6); /* Nền mờ */
+    color: white;
+    border: none;
+    border-radius: 50%; /* Hình tròn */
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    line-height: 1; /* Căn giữa chữ X */
+    padding: 0;
+    z-index: 10; /* Đảm bảo nút X nằm trên ảnh */
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+.remove-image-btn:hover {
+    opacity: 1;
+    background-color: rgba(255, 0, 0, 0.7); /* Đổi màu khi hover để dễ nhìn */
+}
+
+/* Ẩn input file mặc định */
+#product-images {
+    display: none;
+}
+
+/* Áp dụng cho các nhãn có class 'required' */
+.required::after {
+    content: "*"; /* Nội dung được thêm vào */
+    color: red; 
+    margin-left: 2px;
+}
