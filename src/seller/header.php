@@ -37,7 +37,7 @@
                     <ul class="menu">
                         <li><a href="#!"><?php echo $_SESSION['fullname']; ?></a>
                             <ul class="sub-menu">
-                                <li><a href="seller/add-product.php">Thêm sản phẩm</a></li>
+                                <li><a href="add-product.php">Thêm sản phẩm</a></li>
                                 <li><a href="">Tất cả sản phẩm</a></li>
                                 <li><a href="">Đơn bán</a></li>
                                 <li><a href="">Doanh thu</a></li>
