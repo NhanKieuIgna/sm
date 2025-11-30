@@ -29,7 +29,7 @@ if (isset($_POST['submit'])) {
                 if ($user['VaiTro'] === 'NguoiGiaoHang') {
                     header('location: delivery_index.php');
                 } else if ($user['VaiTro'] === 'QuanTriVien') {
-                    header('location: admin/dashboard.php');
+                    header('location: admin/CHBk.php');
                 } else {
                     header('location: index.html');
                 }
