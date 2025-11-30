@@ -24,7 +24,7 @@ $res_user = mysqli_stmt_get_result($stmt_user);
 
 if ($res_user && mysqli_num_rows($res_user) > 0) {
     $user = mysqli_fetch_assoc($res_user);
-    $user['id'] = "G" . $user['ID_NguoiDung'];
+    $user['id'] =  $user['ID_NguoiDung'];
     $user['name'] = htmlspecialchars($user['HoTen']);
     $user['email'] = htmlspecialchars($user['Email']);
     $user['phone'] = htmlspecialchars($user['SoDienThoai']);
@@ -281,13 +281,7 @@ a.btn:hover {
             </div>
             <div class="user-info">
                 <h2><?php echo $user['name']; ?></h2>
-                <?php 
-                    $status_color = ($user['status'] == 'Sẵn sàng') ? '#28a745' : '#ffc107'; 
-                ?>
-                <p>ID: <?php echo $user['id']; ?> • 
-                    <span class="status" style="color:<?php echo $status_color; ?>">
-                        <?php echo $user['status']; ?>
-                    </span>
+                <p>ID: <?php echo $user['id']; ?>
                 </p>
                 <p>Email: <?php echo $user['email']; ?></p>
                 <p>Phone: <?php echo $user['phone']; ?></p>
