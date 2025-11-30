@@ -1,11 +1,11 @@
 <?php
 session_start();
-require "sm/dp.php"; 
+require_once __DIR__ . '/../../database/db.php'; 
 
-if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
-    header("Location: login.php"); 
-    exit();
-}
+// if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
+//     header("Location: login.php"); 
+//     exit();
+// }
 
 $driver_id = $_SESSION['user_id'];
 $driver_name = "";
@@ -14,7 +14,7 @@ $driver_region = "";
 $total_orders = 0;
 $total_cod_amount = 0.00;
 $sql_profile = "SELECT 
-                    nd.HoTen, nd.AnhDaiDien, hgh.KhuVucHoatDong 
+                    nd.HoTen, hgh.AnhDaiDien, hgh.KhuVucHoatDong 
                 FROM nguoidung nd
                 JOIN hosonguoigiaohang hgh ON nd.ID_NguoiDung = hgh.ID_NguoiDung
                 WHERE nd.ID_NguoiDung = $driver_id";
@@ -191,7 +191,7 @@ endif;
             <a class="nav-item" href="my_donhang.php">📦 Đơn hàng của bạn</a>
             <a class="nav-item" href="Thongke.php">💰 Thu nhập</a>
             <a class="nav-item" href="ls_giaohang.php">📜 Lịch sử</a>
-            <a class="nav-item" href="logout.php" style="color: #dc3545;">➡️ Đăng xuất</a>
+            <a class="nav-item" href="../logout.php" style="color: #dc3545;">➡️ Đăng xuất</a>
         </nav>
     </aside>
 

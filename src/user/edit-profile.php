@@ -19,8 +19,8 @@ if (!$user) {
     exit();
 }
 
-// Check if user is a buyer
-if ($user['VaiTro'] !== 'NguoiMua') {
+// Check if user is a buyer and/or seller
+if ($user['VaiTro'] !== 'NguoiMua' && $user['VaiTro'] !== 'NguoiBan') {
     header('Location: ../index.php');
     exit();
 }

@@ -1,10 +1,10 @@
 <?php
 session_start();
-require "sm/dp.php"; 
-if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
-    header("Location: login.php"); 
-    exit();
-}
+require_once __DIR__ . '/../../database/db.php';
+// if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
+//     header("Location: login.php"); 
+//     exit();
+// }
 
 $driver_id = $_SESSION['user_id'];
 $user = [];
@@ -13,9 +13,9 @@ $revenue = '0₫';
 $avg_rating = '5.0'; // Default value
 
 // --- USER INFO FETCH ---
-$sql_user = "SELECT ID_NguoiDung, HoTen, Email, SoDienThoai, AnhDaiDien, TrangThaiHoatDong 
-             FROM nguoidung 
-             WHERE ID_NguoiDung = ?";
+$sql_user = "SELECT j.HoTen, j.Email, j.SoDienThoai, h.AnhDaiDien
+             FROM nguoidung j left join hosonguoigiaohang h ON j.ID_NguoiDung = h.ID_NguoiDung
+             WHERE j.ID_NguoiDung = ?";
 $stmt_user = mysqli_prepare($conn, $sql_user);
 mysqli_stmt_bind_param($stmt_user, "i", $driver_id);
 mysqli_stmt_execute($stmt_user);
@@ -24,12 +24,12 @@ $res_user = mysqli_stmt_get_result($stmt_user);
 
 if ($res_user && mysqli_num_rows($res_user) > 0) {
     $user = mysqli_fetch_assoc($res_user);
-    $user['id'] = "G" . $user['ID_NguoiDung'];
+   // $user['id'] = "G" . $user['ID_NguoiDung'];
     $user['name'] = htmlspecialchars($user['HoTen']);
     $user['email'] = htmlspecialchars($user['Email']);
     $user['phone'] = htmlspecialchars($user['SoDienThoai']);
     $user['avatar'] = htmlspecialchars($user['AnhDaiDien'] ?: 'default_avatar.png'); 
-    $user['status'] = htmlspecialchars($user['TrangThaiHoatDong'] ?: 'Offline'); 
+ //   $user['status'] = htmlspecialchars($user['TrangThaiHoatDong'] ?: 'Offline'); 
 } else {
     header("Location: logout.php"); 
     exit();
@@ -37,7 +37,7 @@ if ($res_user && mysqli_num_rows($res_user) > 0) {
 mysqli_stmt_close($stmt_user);
 $sql_stats = "SELECT 
                  COUNT(ID_DonHang) AS orders_count,
-                 SUM(PhiGiaoHang) AS total_delivery_fee
+                 SUM(SoTienCanThu_COD) AS total_delivery_fee
               FROM danhsachdonhang 
               WHERE ID_NguoiGiaoHang = ? 
               AND TrangThaiDonHang IN ('DaGiao', 'HoanThanh')"; // Corrected logic
@@ -267,7 +267,7 @@ a.btn:hover {
             <a class="nav-item" href="ls_giaohang.php">📜 Lịch sử</a>
              <a class="nav-item" href="XemTTCN.php">👤 Thông tin cá nhân</a>
             <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;"> 
-            <a class="nav-item" href="exit.php" style="color: #dc3545; font-weight: 600;">
+            <a class="nav-item" href="../logout.php" style="color: #dc3545; font-weight: 600;">
                  Đăng xuất
             </a>
             <a style="color: #dc3545;font-weight: 600;" class="nav-item" href="XoaTk.php" >Xóa Tài Khoản</a>
@@ -282,11 +282,11 @@ a.btn:hover {
             <div class="user-info">
                 <h2><?php echo $user['name']; ?></h2>
                 <?php 
-                    $status_color = ($user['status'] == 'Sẵn sàng') ? '#28a745' : '#ffc107'; 
+                  //  $status_color = ($user['status'] == 'Sẵn sàng') ? '#28a745' : '#ffc107'; 
                 ?>
-                <p>ID: <?php echo $user['id']; ?> • 
-                    <span class="status" style="color:<?php echo $status_color; ?>">
-                        <?php echo $user['status']; ?>
+                <p>ID: <?php echo $_SESSION['user_id']; ?> 
+                    <span class="status" style="color:<?php //echo $status_color; ?>">
+                        <?php //echo $user['status']; ?>
                     </span>
                 </p>
                 <p>Email: <?php echo $user['email']; ?></p>

@@ -1,19 +1,19 @@
 <?php
 
 session_start();
-include "sm/dp.php"; 
+require_once __DIR__ . '/../../database/db.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
-    header("Location: login.php"); 
-    exit();
-}
+// if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
+//     header("Location: login.php"); 
+//     exit();
+// }
 
 $driver_id = $_SESSION['user_id'];
 $orders = []; 
 $sql = "SELECT 
             DH.ID_DonHang, DH.DiaChiGiaoHang, DH.TrangThaiDonHang,
             N.HoTen AS TenKhachHang, 
-            DH.TongGiaTriDonHang,DH.PhiGiaoHang
+            DH.TongGiaTriDonHang,DH.SoTienCanThu_COD
         FROM danhsachdonhang AS DH
         LEFT JOIN nguoidung AS N ON DH.ID_NguoiMua = N.ID_NguoiDung
         WHERE DH.ID_NguoiGiaoHang = ?
@@ -33,7 +33,7 @@ if ($result) {
             "address" => htmlspecialchars($row['DiaChiGiaoHang']),
             "total_value" => number_format($row['TongGiaTriDonHang'], 0, ',', '.') . '₫', 
             "status" => htmlspecialchars($row['TrangThaiDonHang']),
-            "raw_id" => $row['ID_DonHang'] ,"pgh" => number_format($row['PhiGiaoHang'], 0, ',', '.') . '₫' 
+            "raw_id" => $row['ID_DonHang'] ,"pgh" => number_format($row['SoTienCanThu_COD'], 0, ',', '.') . '₫' 
         ];
     }
 }

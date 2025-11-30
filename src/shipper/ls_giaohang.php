@@ -1,6 +1,6 @@
 <?php
 session_start();
-include "sm/dp.php"; 
+require_once __DIR__ . '/../../database/db.php';
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
@@ -12,7 +12,7 @@ $sql = "SELECT
             nd.HoTen AS TenNguoiNhan,
             dh.DiaChiGiaoHang AS DiaChiGiao,
             dh.TongGiaTriDonHang AS TongTien,
-            dh.PhiGiaoHang AS PhiShip,
+            dh.SoTienCanThu_COD AS PhiShip,
             dh.TrangThaiDonHang AS TrangThai,
             dh.ThoiGianHoanThanh AS ThoiGianHoanThanh, 
             GROUP_CONCAT(CONCAT(sp.TenSanPham, ' (x', ctdh.SoLuongMua, ')') SEPARATOR ', ') AS ChiTietSanPham 

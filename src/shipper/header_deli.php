@@ -12,7 +12,7 @@
             <ul>
                 <li><a href="delivery_index.php">Trang chủ</a></li>
                 <li><a href="hoso.php">Hồ sơ</a></li>
-                <li><a href="exit.php">Đăng xuất</a></li>
+                <li><a href="../logout.php">Đăng xuất</a></li>
             </ul>
         </nav>
     </div>

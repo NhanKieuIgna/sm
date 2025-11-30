@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Nov 26, 2025 at 02:29 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- Máy chủ: 127.0.0.1:3306
+-- Thời gian đã tạo: Th10 15, 2025 lúc 10:52 AM
+-- Phiên bản máy phục vụ: 9.1.0
+-- Phiên bản PHP: 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `secondhand_market`
+-- Cơ sở dữ liệu: `secondhand_market`
 --
 
 -- --------------------------------------------------------
@@ -27,13 +27,17 @@ SET time_zone = "+00:00";
 -- Table structure for table `chitietdonhang`
 --
 
-CREATE TABLE `chitietdonhang` (
-  `ID_ChiTiet` int(11) NOT NULL,
-  `ID_DonHang` int(11) NOT NULL,
-  `ID_SanPham` int(11) NOT NULL,
-  `SoLuongMua` int(11) NOT NULL,
-  `GiaTaiThoiDiemDat` decimal(10,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `chitietdonhang`;
+CREATE TABLE IF NOT EXISTS `chitietdonhang` (
+  `ID_ChiTiet` int NOT NULL AUTO_INCREMENT,
+  `ID_DonHang` int NOT NULL,
+  `ID_SanPham` int NOT NULL,
+  `SoLuongMua` int NOT NULL,
+  `GiaTaiThoiDiemDat` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`ID_ChiTiet`),
+  KEY `ID_DonHang` (`ID_DonHang`),
+  KEY `ID_SanPham` (`ID_SanPham`)
+) ;
 
 -- --------------------------------------------------------
 
@@ -41,15 +45,20 @@ CREATE TABLE `chitietdonhang` (
 -- Table structure for table `danhgia_nhanxet`
 --
 
-CREATE TABLE `danhgia_nhanxet` (
-  `ID_DanhGia` int(11) NOT NULL,
-  `ID_DonHang` int(11) NOT NULL,
-  `ID_NguoiDanhGia` int(11) NOT NULL,
-  `ID_NguoiDuocDanhGia` int(11) NOT NULL,
-  `SoSao` int(11) NOT NULL,
-  `NhanXet` text CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci DEFAULT NULL,
-  `NgayDanhGia` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+DROP TABLE IF EXISTS `danhgia_nhanxet`;
+CREATE TABLE IF NOT EXISTS `danhgia_nhanxet` (
+  `ID_DanhGia` int NOT NULL AUTO_INCREMENT,
+  `ID_DonHang` int NOT NULL,
+  `ID_NguoiDanhGia` int NOT NULL,
+  `ID_NguoiDuocDanhGia` int NOT NULL,
+  `SoSao` int NOT NULL,
+  `NhanXet` text COLLATE utf8mb4_vietnamese_ci,
+  `NgayDanhGia` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ID_DanhGia`),
+  UNIQUE KEY `ID_DonHang` (`ID_DonHang`),
+  KEY `ID_NguoiDanhGia` (`ID_NguoiDanhGia`),
+  KEY `ID_NguoiDuocDanhGia` (`ID_NguoiDuocDanhGia`)
+) ;
 
 -- --------------------------------------------------------
 
@@ -57,9 +66,12 @@ CREATE TABLE `danhgia_nhanxet` (
 -- Table structure for table `danhmuc`
 --
 
-CREATE TABLE `danhmuc` (
-  `ID_DanhMuc` int(11) NOT NULL,
-  `TenDanhMuc` varchar(100) NOT NULL
+DROP TABLE IF EXISTS `danhmuc`;
+CREATE TABLE IF NOT EXISTS `danhmuc` (
+  `ID_DanhMuc` int NOT NULL AUTO_INCREMENT,
+  `TenDanhMuc` varchar(100) COLLATE utf8mb4_vietnamese_ci NOT NULL,
+  PRIMARY KEY (`ID_DanhMuc`),
+  UNIQUE KEY `TenDanhMuc` (`TenDanhMuc`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_vietnamese_ci;
 
 -- --------------------------------------------------------
@@ -68,21 +80,24 @@ CREATE TABLE `danhmuc` (
 -- Table structure for table `danhsachdonhang`
 --
 
-CREATE TABLE `danhsachdonhang` (
-  `ID_DonHang` int(11) NOT NULL,
-  `ID_NguoiMua` int(11) NOT NULL,
-  `ID_NguoiBan` int(11) NOT NULL,
-  `ID_NguoiGiaoHang` int(11) DEFAULT NULL,
-  `NgayDatHang` datetime DEFAULT current_timestamp(),
-  `TrangThaiDonHang` enum('ChoXacNhan','ChoGiaoHang','DangXuLy','DangVanChuyen','DaGiao','HoanThanh','DaHuy','KhieuNai') NOT NULL,
-  `DiaChiGiaoHang` text NOT NULL,
-  `PhuongThucVanChuyen` varchar(50) DEFAULT NULL,
-  `PhuongThucThanhToan` varchar(50) DEFAULT NULL,
-  `PhiGiaoHang` decimal(10,2) DEFAULT 0.00,
+DROP TABLE IF EXISTS `danhsachdonhang`;
+CREATE TABLE IF NOT EXISTS `danhsachdonhang` (
+  `ID_DonHang` int NOT NULL AUTO_INCREMENT,
+  `ID_NguoiMua` int NOT NULL,
+  `ID_NguoiBan` int NOT NULL,
+  `ID_NguoiGiaoHang` int DEFAULT NULL,
+  `NgayDatHang` datetime DEFAULT CURRENT_TIMESTAMP,
+  `TrangThaiDonHang` enum('ChoXacNhan','ChoGiaoHang','DangXuLy','DangVanChuyen','DaGiao','HoanThanh','DaHuy','KhieuNai') COLLATE utf8mb4_vietnamese_ci NOT NULL,
+  `DiaChiGiaoHang` text COLLATE utf8mb4_vietnamese_ci NOT NULL,
+  `PhuongThucVanChuyen` varchar(50) COLLATE utf8mb4_vietnamese_ci DEFAULT NULL,
+  `PhuongThucThanhToan` varchar(50) COLLATE utf8mb4_vietnamese_ci DEFAULT NULL,
   `TongGiaTriDonHang` decimal(10,2) NOT NULL,
-  `LyDoHuy` text DEFAULT NULL,
-  `SoTienCanThu_COD` decimal(10,2) DEFAULT 0.00,
-  `ThoiGianHoanThanh` datetime NOT NULL
+  `LyDoHuy` text COLLATE utf8mb4_vietnamese_ci,
+  `SoTienCanThu_COD` decimal(10,2) DEFAULT '0.00',
+  PRIMARY KEY (`ID_DonHang`),
+  KEY `ID_NguoiMua` (`ID_NguoiMua`),
+  KEY `ID_NguoiBan` (`ID_NguoiBan`),
+  KEY `ID_NguoiGiaoHang` (`ID_NguoiGiaoHang`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_vietnamese_ci;
 
 -- --------------------------------------------------------
@@ -91,10 +106,13 @@ CREATE TABLE `danhsachdonhang` (
 -- Table structure for table `hinhanhsanpham`
 --
 
-CREATE TABLE `hinhanhsanpham` (
-  `ID_HinhAnh` int(11) NOT NULL,
-  `ID_SanPham` int(11) NOT NULL,
-  `URL_HinhAnh` varchar(255) NOT NULL
+DROP TABLE IF EXISTS `hinhanhsanpham`;
+CREATE TABLE IF NOT EXISTS `hinhanhsanpham` (
+  `ID_HinhAnh` int NOT NULL AUTO_INCREMENT,
+  `ID_SanPham` int NOT NULL,
+  `URL_HinhAnh` varchar(255) COLLATE utf8mb4_vietnamese_ci NOT NULL,
+  PRIMARY KEY (`ID_HinhAnh`),
+  KEY `ID_SanPham` (`ID_SanPham`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_vietnamese_ci;
 
 -- --------------------------------------------------------
@@ -103,17 +121,18 @@ CREATE TABLE `hinhanhsanpham` (
 -- Table structure for table `hosonguoigiaohang`
 --
 
-CREATE TABLE `hosonguoigiaohang` (
-  `ID_NguoiDung` int(11) NOT NULL,
-  `GioiTinh` enum('Nam','Nu','Khac') DEFAULT NULL,
-  `NamSinh` int(11) DEFAULT NULL,
-  `Anh_CCCD_Truoc` varchar(255) DEFAULT NULL,
-  `Anh_CCCD_Sau` varchar(255) DEFAULT NULL,
-  `Anh_BangLaiXe` varchar(255) DEFAULT NULL,
-  `BienSoXe` varchar(20) DEFAULT NULL,
-  `KhuVucHoatDong` varchar(100) DEFAULT NULL,
-  `DiemDanhGiaTrungBinh` decimal(2,1) DEFAULT 5.0,
-  `loaixe` text NOT NULL
+DROP TABLE IF EXISTS `hosonguoigiaohang`;
+CREATE TABLE IF NOT EXISTS `hosonguoigiaohang` (
+  `ID_NguoiDung` int NOT NULL,
+  `GioiTinh` enum('Nam','Nu','Khac') COLLATE utf8mb4_vietnamese_ci DEFAULT NULL,
+  `NamSinh` int DEFAULT NULL,
+  `Anh_CCCD_Truoc` varchar(255) COLLATE utf8mb4_vietnamese_ci DEFAULT NULL,
+  `Anh_CCCD_Sau` varchar(255) COLLATE utf8mb4_vietnamese_ci DEFAULT NULL,
+  `Anh_BangLaiXe` varchar(255) COLLATE utf8mb4_vietnamese_ci DEFAULT NULL,
+  `BienSoXe` varchar(20) COLLATE utf8mb4_vietnamese_ci DEFAULT NULL,
+  `KhuVucHoatDong` varchar(100) COLLATE utf8mb4_vietnamese_ci DEFAULT NULL,
+  `DiemDanhGiaTrungBinh` decimal(2,1) DEFAULT '5.0',
+  PRIMARY KEY (`ID_NguoiDung`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_vietnamese_ci;
 
 --
@@ -136,15 +155,19 @@ INSERT INTO `hosonguoigiaohang` (`ID_NguoiDung`, `GioiTinh`, `NamSinh`, `Anh_CCC
 -- Table structure for table `khieunai`
 --
 
-CREATE TABLE `khieunai` (
-  `ID_KhieuNai` int(11) NOT NULL,
-  `ID_DonHang` int(11) NOT NULL,
-  `ID_NguoiBaoCao` int(11) NOT NULL,
-  `LoaiSuCo` varchar(100) NOT NULL,
-  `MoTaChiTiet` text DEFAULT NULL,
-  `PhanHoi_NguoiBan` text DEFAULT NULL,
-  `TrangThaiXuLy` enum('HoanTien','DoiSanPham','TuChoi','DangXuLy') DEFAULT 'DangXuLy',
-  `NgayKhieuNai` datetime DEFAULT current_timestamp()
+DROP TABLE IF EXISTS `khieunai`;
+CREATE TABLE IF NOT EXISTS `khieunai` (
+  `ID_KhieuNai` int NOT NULL AUTO_INCREMENT,
+  `ID_DonHang` int NOT NULL,
+  `ID_NguoiBaoCao` int NOT NULL,
+  `LoaiSuCo` varchar(100) COLLATE utf8mb4_vietnamese_ci NOT NULL,
+  `MoTaChiTiet` text COLLATE utf8mb4_vietnamese_ci,
+  `PhanHoi_NguoiBan` text COLLATE utf8mb4_vietnamese_ci,
+  `TrangThaiXuLy` enum('HoanTien','DoiSanPham','TuChoi','DangXuLy') COLLATE utf8mb4_vietnamese_ci DEFAULT 'DangXuLy',
+  `NgayKhieuNai` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ID_KhieuNai`),
+  KEY `ID_DonHang` (`ID_DonHang`),
+  KEY `ID_NguoiBaoCao` (`ID_NguoiBaoCao`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_vietnamese_ci;
 
 -- --------------------------------------------------------
@@ -153,12 +176,15 @@ CREATE TABLE `khieunai` (
 -- Table structure for table `lichsutrangthai`
 --
 
-CREATE TABLE `lichsutrangthai` (
-  `ID_LichSu` int(11) NOT NULL,
-  `ID_DonHang` int(11) NOT NULL,
-  `TrangThaiMoi` varchar(50) NOT NULL,
-  `ThoiGianCapNhat` datetime DEFAULT current_timestamp(),
-  `GhiChu` text DEFAULT NULL
+DROP TABLE IF EXISTS `lichsutrangthai`;
+CREATE TABLE IF NOT EXISTS `lichsutrangthai` (
+  `ID_LichSu` int NOT NULL AUTO_INCREMENT,
+  `ID_DonHang` int NOT NULL,
+  `TrangThaiMoi` varchar(50) COLLATE utf8mb4_vietnamese_ci NOT NULL,
+  `ThoiGianCapNhat` datetime DEFAULT CURRENT_TIMESTAMP,
+  `GhiChu` text COLLATE utf8mb4_vietnamese_ci,
+  PRIMARY KEY (`ID_LichSu`),
+  KEY `ID_DonHang` (`ID_DonHang`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_vietnamese_ci;
 
 -- --------------------------------------------------------
@@ -167,18 +193,22 @@ CREATE TABLE `lichsutrangthai` (
 -- Table structure for table `nguoidung`
 --
 
-CREATE TABLE `nguoidung` (
-  `ID_NguoiDung` int(11) NOT NULL,
-  `HoTen` varchar(100) NOT NULL,
-  `Email` varchar(100) NOT NULL,
-  `SoDienThoai` varchar(15) NOT NULL,
-  `AnhDaiDien` varchar(255) DEFAULT 'default_avatar.png',
-  `MatKhau_Hash` varchar(255) NOT NULL,
-  `VaiTro` enum('NguoiMua','NguoiBan','NguoiGiaoHang','QuanTriVien') NOT NULL,
-  `TrangThaiHoatDong` tinyint(1) DEFAULT 1,
-  `DiaChiGiaoHangMacDinh` text DEFAULT NULL,
-  `NgayTao` datetime DEFAULT current_timestamp(),
-  `TenDangNhap` varchar(50) DEFAULT NULL
+DROP TABLE IF EXISTS `nguoidung`;
+CREATE TABLE IF NOT EXISTS `nguoidung` (
+  `ID_NguoiDung` int NOT NULL AUTO_INCREMENT,
+  `HoTen` varchar(100) COLLATE utf8mb4_vietnamese_ci NOT NULL,
+  `Email` varchar(100) COLLATE utf8mb4_vietnamese_ci NOT NULL,
+  `SoDienThoai` varchar(15) COLLATE utf8mb4_vietnamese_ci NOT NULL,
+  `MatKhau_Hash` varchar(255) COLLATE utf8mb4_vietnamese_ci NOT NULL,
+  `VaiTro` enum('NguoiMua','NguoiBan','NguoiGiaoHang','QuanTriVien') COLLATE utf8mb4_vietnamese_ci NOT NULL,
+  `TrangThaiHoatDong` tinyint(1) DEFAULT '1',
+  `DiaChiGiaoHangMacDinh` text COLLATE utf8mb4_vietnamese_ci,
+  `NgayTao` datetime DEFAULT CURRENT_TIMESTAMP,
+  `TenDangNhap` varchar(50) COLLATE utf8mb4_vietnamese_ci DEFAULT NULL,
+  PRIMARY KEY (`ID_NguoiDung`),
+  UNIQUE KEY `Email` (`Email`),
+  UNIQUE KEY `SoDienThoai` (`SoDienThoai`),
+  UNIQUE KEY `TenDangNhap` (`TenDangNhap`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_vietnamese_ci;
 
 --
@@ -201,20 +231,24 @@ INSERT INTO `nguoidung` (`ID_NguoiDung`, `HoTen`, `Email`, `SoDienThoai`, `AnhDa
 -- Table structure for table `sanpham`
 --
 
-CREATE TABLE `sanpham` (
-  `ID_SanPham` int(11) NOT NULL,
-  `ID_NguoiBan` int(11) NOT NULL,
-  `TenSanPham` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `MoTa` text CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci DEFAULT NULL,
+DROP TABLE IF EXISTS `sanpham`;
+CREATE TABLE IF NOT EXISTS `sanpham` (
+  `ID_SanPham` int NOT NULL AUTO_INCREMENT,
+  `ID_NguoiBan` int NOT NULL,
+  `TenSanPham` varchar(255) COLLATE utf8mb4_vietnamese_ci NOT NULL,
+  `MoTa` text COLLATE utf8mb4_vietnamese_ci,
   `Gia` decimal(10,2) NOT NULL,
-  `TinhTrang` enum('Moi','NhuMoi','Tot','TrungBinh','Kem') CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci NOT NULL,
-  `SoLuong` int(11) DEFAULT 1,
-  `DiaChiLayHang` text CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci DEFAULT NULL,
-  `KichThuoc` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci DEFAULT NULL,
-  `ID_DanhMuc` int(11) DEFAULT NULL,
-  `TrangThaiDangBan` enum('ChoDuyet','DangBan','DaBan','BiGoBo') CHARACTER SET utf8mb4 COLLATE utf8mb4_vietnamese_ci DEFAULT 'ChoDuyet',
-  `NgayTao` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `TinhTrang` enum('Moi','NhuMoi','Tot','TrungBinh','Kem') COLLATE utf8mb4_vietnamese_ci NOT NULL,
+  `SoLuong` int DEFAULT '1',
+  `DiaChiLayHang` text COLLATE utf8mb4_vietnamese_ci,
+  `KichThuoc` varchar(50) COLLATE utf8mb4_vietnamese_ci DEFAULT NULL,
+  `ID_DanhMuc` int DEFAULT NULL,
+  `TrangThaiDangBan` enum('ChoDuyet','DangBan','DaBan','BiGoBo') COLLATE utf8mb4_vietnamese_ci DEFAULT 'ChoDuyet',
+  `NgayTao` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ID_SanPham`),
+  KEY `ID_NguoiBan` (`ID_NguoiBan`),
+  KEY `ID_DanhMuc` (`ID_DanhMuc`)
+) ;
 
 -- --------------------------------------------------------
 
@@ -222,14 +256,17 @@ CREATE TABLE `sanpham` (
 -- Table structure for table `thongkedoanhthu`
 --
 
-CREATE TABLE `thongkedoanhthu` (
-  `ID_ThongKe` int(11) NOT NULL,
-  `ID_NguoiBan` int(11) NOT NULL,
-  `LoaiThoiGian` enum('Ngay','Thang','Nam') NOT NULL,
-  `GiaTriThoiGian` varchar(10) NOT NULL,
-  `TongDoanhThu` decimal(10,2) DEFAULT 0.00,
-  `TienThucNhan` decimal(10,2) DEFAULT 0.00,
-  `GiaTriMat_HuyHoan` decimal(10,2) DEFAULT 0.00
+DROP TABLE IF EXISTS `thongkedoanhthu`;
+CREATE TABLE IF NOT EXISTS `thongkedoanhthu` (
+  `ID_ThongKe` int NOT NULL AUTO_INCREMENT,
+  `ID_NguoiBan` int NOT NULL,
+  `LoaiThoiGian` enum('Ngay','Thang','Nam') COLLATE utf8mb4_vietnamese_ci NOT NULL,
+  `GiaTriThoiGian` varchar(10) COLLATE utf8mb4_vietnamese_ci NOT NULL,
+  `TongDoanhThu` decimal(10,2) DEFAULT '0.00',
+  `TienThucNhan` decimal(10,2) DEFAULT '0.00',
+  `GiaTriMat_HuyHoan` decimal(10,2) DEFAULT '0.00',
+  PRIMARY KEY (`ID_ThongKe`),
+  KEY `ID_NguoiBan` (`ID_NguoiBan`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_vietnamese_ci;
 
 --

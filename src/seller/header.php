@@ -1,3 +1,47 @@
+<?php
+session_start();
+// Kết nối db
+require_once('../../database/db.php');
+// Lấy danh mục
+$sql_categories = "SELECT * FROM danhmuc ORDER BY TenDanhMuc";
+$result_categories = mysqli_query($conn, $sql_categories);
+$categories = [];
+if ($result_categories) {
+    while ($row = mysqli_fetch_assoc($result_categories)) {
+        $categories[] = $row;
+    }
+}
+
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm sản phẩm</title>
+    <link rel="stylesheet" href="../css/add-product.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Browser bar simulation -->
+    <div class="browser-bar">
+        <div class="browser-nav">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <span>SM - Nền tảng mua bán các loại đồ cũ trực tuyến</span>
+        <span style="margin-left: auto;">https://www.sm.vn</span>
+    </div>
+
+    <!-- Promotional banner -->
+    <div class="promo-banner">
+        <p>Nền tảng mua đồ cũ vì một trái đất xanh hơn!</p>
+        <p>Cam kết hoàn tiền 100% nếu sản phẩm không đúng mô tả!</p>
+    </div>
     <!-- Header -->
     <header class="header">
         <div class="header-top">
@@ -37,17 +81,16 @@
                     <ul class="menu">
                         <li><a href="#!"><?php echo $_SESSION['fullname']; ?></a>
                             <ul class="sub-menu">
-                                <li><a href="seller/add-product.php">Thêm sản phẩm</a></li>
+                                <li><a href="add-product.php">Thêm sản phẩm</a></li>
                                 <li><a href="">Tất cả sản phẩm</a></li>
                                 <li><a href="">Đơn bán</a></li>
                                 <li><a href="">Doanh thu</a></li>
                                 <li><a href="">Hồ sơ shop</a></li>
-                                <li><a href="">Chỉnh sửa hồ sơ</a></li>
                             </ul>   
                         </li>
                     </ul>
                       <span>|</span>
-                    <a href="logout.php"><u>Đăng Xuất</u></a>
+                    <a href="../logout.php"><u>Đăng Xuất</u></a>
                     
                    
                 <?php elseif(isset($_SESSION['user_id'])): ?>

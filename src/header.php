@@ -42,7 +42,7 @@
                                 <li><a href="">Đơn bán</a></li>
                                 <li><a href="">Doanh thu</a></li>
                                 <li><a href="">Hồ sơ shop</a></li>
-                                <li><a href="">Chỉnh sửa hồ sơ</a></li>
+                                <li><a href="user/edit-profile.php">Chỉnh sửa hồ sơ</a></li>
                             </ul>   
                         </li>
                     </ul>

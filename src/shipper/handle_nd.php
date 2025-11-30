@@ -1,13 +1,13 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../database/db.php';
 
-require "sm/dp.php"; 
 
 
-if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
-    header("Location: login.php");
-    exit();
-}
+// if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
+//     header("Location: login.php");
+//     exit();
+// }
 
 $driver_id = $_SESSION['user_id'];
 $order_id = $_POST['order_id'] ?? null;
