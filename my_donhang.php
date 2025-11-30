@@ -338,9 +338,9 @@ h2 {
                         </div>
                     </div>
                     <div class="actions" style="display: flex;flex-direction: column;gap: 8px;">
-                        <a href="chi_tiet_don.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xem chi tiết</a>
+                        <a href="chi_tiet_don.php?order=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xem chi tiết</a>
                         <?php $status = $order['status']; ?>
-                        <?php if ($status === 'DangVanChuyen') { ?>
+                        <?php if ($status === 'DangVanChuyen' or $status === 'ChoGiaoHang') { ?>
                             <a href="confirm_GH.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xác nhận Hoàn thành</a>
                         <?php } ?>
                         <?php if ($status === 'ChoGiaoHang' or $status === 'DangXuLy' or $status === 'DangVanChuyen') { ?>
