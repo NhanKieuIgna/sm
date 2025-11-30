@@ -168,7 +168,7 @@ endif;
             <div style="font-weight:700; margin-top:5px;">
                 <?php echo htmlspecialchars($driver_name); ?>
             </div>
-            <div class="small">ID: G<?php echo $driver_id; ?> • Online</div>
+            <div class="small">ID: <?php echo $driver_id; ?> • Online</div>
             <div style="margin-top:8px;">
                 <span class="pill">Khu vực: <strong><?php echo htmlspecialchars($driver_region); ?></strong></span>
                 <span class="pill">Trạng thái: <strong>Sẵn sàng</strong></span>
