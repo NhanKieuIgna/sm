@@ -12,7 +12,7 @@ $sql = "SELECT
             nd.HoTen AS TenNguoiNhan,
             dh.DiaChiGiaoHang AS DiaChiGiao,
             dh.TongGiaTriDonHang AS TongTien,
-            dh.SoTienCanThu_COD AS PhiShip,
+            dh.PhiGiaoHang AS PhiShip,
             dh.TrangThaiDonHang AS TrangThai,
             dh.ThoiGianHoanThanh AS ThoiGianHoanThanh, 
             GROUP_CONCAT(CONCAT(sp.TenSanPham, ' (x', ctdh.SoLuongMua, ')') SEPARATOR ', ') AS ChiTietSanPham 
@@ -21,9 +21,9 @@ $sql = "SELECT
         JOIN chitietdonhang ctdh ON dh.ID_DonHang = ctdh.ID_DonHang
         JOIN sanpham sp ON ctdh.ID_SanPham = sp.ID_SanPham
         WHERE dh.ID_NguoiGiaoHang = ?
-          AND dh.TrangThaiDonHang = 'DaGiao'
+          AND dh.TrangThaiDonHang IN ('DaGiao', 'DaHuy', 'HoanThanh')
         GROUP BY dh.ID_DonHang, nd.HoTen, dh.DiaChiGiaoHang, dh.TongGiaTriDonHang, dh.TrangThaiDonHang, dh.ThoiGianHoanThanh
-        ORDER BY dh.ThoiGianHoanThanh DESC"; 
+        ORDER BY dh.ThoiGianHoanThanh DESC";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $driverId);
@@ -129,12 +129,12 @@ h2 {
                         <td>{$row['ChiTietSanPham']}</td> 
                         <td>" . number_format($row['PhiShip']) . " đ</td>
                         <td>" . number_format($row['TongTien']) . " đ</td>
-                        <td><span class='status status-ok'>Đã giao</span></td>
+                        <td>{$row['TrangThai']}</td>
                         <td>{$completionTime}</td> 
                       </tr>";
             }
         } else {
-            echo "<tr><td colspan='7' style='text-align:center;'>Không có đơn hàng nào đã giao.</td></tr>";
+            echo "<tr><td colspan='8' style='text-align:center;'>Không có đơn hàng nào đã giao.</td></tr>";
         }
         ?>
     </table>
