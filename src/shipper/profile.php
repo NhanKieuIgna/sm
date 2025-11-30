@@ -1,10 +1,10 @@
 <?php
 session_start();
-include "sm/dp.php";
-if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
-    header("Location: login.php");
-    exit();
-}
+require_once __DIR__ . '/../../database/db.php';
+// if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
+//     header("Location: login.php");
+//     exit();
+// }
 $driver_id = $_SESSION['user_id'];
 $message = "";
 $target_dir = "sm/uploads/";
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: profile.php?update=success");
     exit();
 }
-$sql = "SELECT n.HoTen, n.Email, n.SoDienThoai, n.DiaChiGiaoHangMacDinh, n.AnhDaiDien,
+$sql = "SELECT n.HoTen, n.Email, n.SoDienThoai, n.DiaChiGiaoHangMacDinh, h.AnhDaiDien,
                h.GioiTinh, h.NamSinh, h.BienSoXe, h.KhuVucHoatDong, h.LoaiXe
         FROM nguoidung n
         LEFT JOIN hosonguoigiaohang h ON n.ID_NguoiDung = h.ID_NguoiDung

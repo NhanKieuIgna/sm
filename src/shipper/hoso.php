@@ -267,7 +267,7 @@ a.btn:hover {
             <a class="nav-item" href="ls_giaohang.php">📜 Lịch sử</a>
              <a class="nav-item" href="XemTTCN.php">👤 Thông tin cá nhân</a>
             <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;"> 
-            <a class="nav-item" href="exit.php" style="color: #dc3545; font-weight: 600;">
+            <a class="nav-item" href="../logout.php" style="color: #dc3545; font-weight: 600;">
                  Đăng xuất
             </a>
             <a style="color: #dc3545;font-weight: 600;" class="nav-item" href="XoaTk.php" >Xóa Tài Khoản</a>
@@ -284,7 +284,7 @@ a.btn:hover {
                 <?php 
                   //  $status_color = ($user['status'] == 'Sẵn sàng') ? '#28a745' : '#ffc107'; 
                 ?>
-                <p>ID: <?php $_SESSION['user_id']; ?> • 
+                <p>ID: <?php echo $_SESSION['user_id']; ?> 
                     <span class="status" style="color:<?php //echo $status_color; ?>">
                         <?php //echo $user['status']; ?>
                     </span>
