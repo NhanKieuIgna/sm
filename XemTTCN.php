@@ -151,7 +151,6 @@ function display_field($label, $value, $emoji = '') {
                 echo "<p><strong>Họ Tên:</strong> <span>" . htmlspecialchars($user_data['HoTen']) . "</span></p>";
                 echo "<p><strong>📧 Email:</strong> <span>" . htmlspecialchars($user_data['Email']) . "</span></p>";
                 echo "<p><strong>📞 Số điện thoại:</strong> <span>" . htmlspecialchars($user_data['SoDienThoai']) . "</span></p>";
-                display_field('Tên đăng nhập', $user_data['TenDangNhap'], '👤');
                 display_field('Ngày tham gia', date('d/m/Y', strtotime($user_data['NgayTao'])), '🗓️');
             ?>
         </div>
