@@ -21,8 +21,8 @@ if ($result_categories) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thêm sản phẩm</title>
-    <link rel="stylesheet" href="/sm-demo_4/src/css/add-product.css">
-    <link rel="stylesheet" href="/sm-demo_4/src/css/style.css">
+    <link rel="stylesheet" href="../css/add-product.css">
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -81,7 +81,7 @@ if ($result_categories) {
                     <ul class="menu">
                         <li><a href="#!"><?php echo $_SESSION['fullname']; ?></a>
                             <ul class="sub-menu">
-                                <li><a href="seller/add-product.php">Thêm sản phẩm</a></li>
+                                <li><a href="add-product.php">Thêm sản phẩm</a></li>
                                 <li><a href="">Tất cả sản phẩm</a></li>
                                 <li><a href="">Đơn bán</a></li>
                                 <li><a href="">Doanh thu</a></li>

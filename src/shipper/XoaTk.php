@@ -1,10 +1,10 @@
 <?php
 session_start();
-require "sm/dp.php"; 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
+require_once __DIR__ . '/../../database/db.php';
+// if (!isset($_SESSION['user_id'])) {
+//     header("Location: login.php");
+//     exit();
+// }
 
 $user_id = $_SESSION['user_id'];
 $error = '';

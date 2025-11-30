@@ -191,7 +191,7 @@ endif;
             <a class="nav-item" href="my_donhang.php">📦 Đơn hàng của bạn</a>
             <a class="nav-item" href="Thongke.php">💰 Thu nhập</a>
             <a class="nav-item" href="ls_giaohang.php">📜 Lịch sử</a>
-            <a class="nav-item" href="logout.php" style="color: #dc3545;">➡️ Đăng xuất</a>
+            <a class="nav-item" href="../logout.php" style="color: #dc3545;">➡️ Đăng xuất</a>
         </nav>
     </aside>
 

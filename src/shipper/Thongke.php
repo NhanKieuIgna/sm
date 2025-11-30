@@ -1,11 +1,11 @@
 <?php
 
 session_start(); 
-require "sm/dp.php"; 
-if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
-    header("Location: login.php"); 
-    exit();
-}
+require_once __DIR__ . '/../../database/db.php';
+// if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
+//     header("Location: login.php"); 
+//     exit();
+// }
 
 $driver_id = $_SESSION['user_id'];
 $filter = $_GET['filter'] ?? 'day'; 
@@ -36,7 +36,7 @@ if (empty($error)) {
 
     $sql = "SELECT 
                 $select_time, 
-                SUM(PhiGiaoHang) AS income, 
+                SUM(SoTienCanThu_COD) AS income, 
                 COUNT(*) AS completed_orders,
                 IFNULL(SUM(SoTienCanThu_COD), 0) AS total_cod_collected
             FROM danhsachdonhang
