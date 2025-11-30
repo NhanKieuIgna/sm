@@ -134,7 +134,7 @@ h2 {
                       </tr>";
             }
         } else {
-            echo "<tr><td colspan='7' style='text-align:center;'>Không có đơn hàng nào đã giao.</td></tr>";
+            echo "<tr><td colspan='8' style='text-align:center;'>Không có đơn hàng nào đã giao.</td></tr>";
         }
         ?>
     </table>
