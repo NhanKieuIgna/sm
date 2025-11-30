@@ -377,6 +377,23 @@ while ($row = mysqli_fetch_assoc($result_similar)) {
             font-weight: bold;
             color: #ff6b6b;
         }
+         .btn-view-shop {
+            padding: 10px 24px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: inline-block;
+        }
+
+        .btn-view-shop:hover {
+            background: #ff5252;
+        }
 
         @media (max-width: 768px) {
             .product-detail-main {
@@ -507,6 +524,9 @@ while ($row = mysqli_fetch_assoc($result_similar)) {
                     <div class="seller-phone">📞 <?php echo htmlspecialchars($product['SoDienThoai']); ?></div>
                     <?php endif; ?>
                 </div>
+                 <a href="shop-detail.php?id=<?php echo $product['ID_NguoiBan']; ?>" class="btn-view-shop">
+                    Xem Shop
+                </a>
             </div>
         </div>
 
