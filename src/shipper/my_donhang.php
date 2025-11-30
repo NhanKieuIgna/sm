@@ -13,7 +13,11 @@ $orders = [];
 $sql = "SELECT 
             DH.ID_DonHang, DH.DiaChiGiaoHang, DH.TrangThaiDonHang,
             N.HoTen AS TenKhachHang, 
+<<<<<<< HEAD:src/shipper/my_donhang.php
             DH.TongGiaTriDonHang,DH.SoTienCanThu_COD
+=======
+            DH.TongGiaTriDonHang,DH.PhiGiaoHang
+>>>>>>> origin/Trung/deli:my_donhang.php
         FROM danhsachdonhang AS DH
         LEFT JOIN nguoidung AS N ON DH.ID_NguoiMua = N.ID_NguoiDung
         WHERE DH.ID_NguoiGiaoHang = ?
@@ -33,7 +37,11 @@ if ($result) {
             "address" => htmlspecialchars($row['DiaChiGiaoHang']),
             "total_value" => number_format($row['TongGiaTriDonHang'], 0, ',', '.') . '₫', 
             "status" => htmlspecialchars($row['TrangThaiDonHang']),
+<<<<<<< HEAD:src/shipper/my_donhang.php
             "raw_id" => $row['ID_DonHang'] ,"pgh" => number_format($row['SoTienCanThu_COD'], 0, ',', '.') . '₫' 
+=======
+            "raw_id" => $row['ID_DonHang'] ,"pgh" => number_format($row['PhiGiaoHang'], 0, ',', '.') . '₫' 
+>>>>>>> origin/Trung/deli:my_donhang.php
         ];
     }
 }
@@ -338,9 +346,15 @@ h2 {
                         </div>
                     </div>
                     <div class="actions" style="display: flex;flex-direction: column;gap: 8px;">
+<<<<<<< HEAD:src/shipper/my_donhang.php
                         <a href="chi_tiet_don.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xem chi tiết</a>
                         <?php $status = $order['status']; ?>
                         <?php if ($status === 'DangVanChuyen') { ?>
+=======
+                        <a href="chi_tiet_don.php?order=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xem chi tiết</a>
+                        <?php $status = $order['status']; ?>
+                        <?php if ($status === 'DangVanChuyen' or $status === 'ChoGiaoHang') { ?>
+>>>>>>> origin/Trung/deli:my_donhang.php
                             <a href="confirm_GH.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xác nhận Hoàn thành</a>
                         <?php } ?>
                         <?php if ($status === 'ChoGiaoHang' or $status === 'DangXuLy' or $status === 'DangVanChuyen') { ?>

@@ -1,0 +1,218 @@
+/* -------------------------------------------------------
+   RESET + GLOBAL
+--------------------------------------------------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f0fdf4; /* xanh lá nhạt cực nhẹ */
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app {
+  display: flex;
+  height: 100%;
+}
+
+/* -------------------------------------------------------
+   SIDEBAR
+--------------------------------------------------------- */
+.sidebar {
+  width: 260px;
+  background: #0f172a; /* xanh đen sang trọng */
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 8px rgba(0,0,0,0.15);
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  background: #34d399; /* xanh lá chủ đạo */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  border-radius: 12px;
+  font-size: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 0;
+  border-bottom: 1px solid #334155;
+  margin-bottom: 20px;
+}
+
+.profile .avatar {
+  width: 42px;
+  height: 42px;
+  background: #34d399;
+  border-radius: 50%;
+  display: flex;
+  font-size: 22px;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu a {
+  display: block;
+  padding: 12px;
+  text-decoration: none;
+  color: #e2e8f0;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+.menu a:hover {
+  background: #34d399;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------
+   MAIN
+--------------------------------------------------------- */
+.main {
+  flex: 1;
+  padding: 25px;
+  overflow-y: auto;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.search input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #a7f3d0;
+  outline: none;
+}
+
+.btn {
+  padding: 8px 14px;
+  border: none;
+  background: #d1fae5;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  border-left: 5px solid #34d399;
+}
+
+/* -------------------------------------------------------
+   ORDERS LIST (CÓ SCROLL)
+--------------------------------------------------------- */
+.orders {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* Custom Scrollbar */
+.orders::-webkit-scrollbar {
+  width: 6px;
+}
+
+.orders::-webkit-scrollbar-thumb {
+  background: #34d399;
+  border-radius: 8px;
+}
+
+.orders::-webkit-scrollbar-track {
+  background: #e7fceee1;
+}
+
+/* -------------------------------------------------------
+   EACH ORDER
+--------------------------------------------------------- */
+.order {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  margin-bottom: 14px;
+  background: #ecfdf5;
+  border-radius: 10px;
+  border-left: 6px solid #10b981; /* xanh lá đậm hơn */
+  transition: 0.2s;
+}
+
+.order:hover {
+  background: #d1fae5;
+  transform: translateX(4px);
+}
+
+.badge {
+  background: #10b981;
+  padding: 4px 10px;
+  color: white;
+  font-size: 13px;
+  border-radius: 6px;
+  margin-bottom: 5px;
+}
+
+.meta {
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* BUTTON TYPES */
+.btn-primary {
+  background: #10b981;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #059669;
+}
+
+.btn-success {
+  background: #34d399;
+  color: #064e3b;
+}
+
+.btn-success:hover {
+  background: #6ee7b7;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.btn-ghost:hover {
+  background: #a7f3d0;
+}
