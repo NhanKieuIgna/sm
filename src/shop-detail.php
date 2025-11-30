@@ -49,6 +49,15 @@ $products = [];
 while ($row = mysqli_fetch_assoc($result_products)) {
     $products[] = $row;
 }
+// Lấy danh mục
+$sql_categories = "SELECT * FROM danhmuc ORDER BY TenDanhMuc";
+$result_categories = mysqli_query($conn, $sql_categories);
+$categories = [];
+if ($result_categories) {
+    while ($row = mysqli_fetch_assoc($result_categories)) {
+        $categories[] = $row;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -305,59 +314,9 @@ while ($row = mysqli_fetch_assoc($result_products)) {
     </div>
 
     <!-- Header -->
-    <header class="header">
-        <div class="header-top">
-            <a href="index.php" class="logo">
-                <div class="logo-icon"><img src="./img/logo.jpg" alt="logo"></div>
-            </a>
-            
-            <div class="category-dropdown">
-                <button class="category-btn">Tất cả danh mục</button>
-                <div class="category-menu">
-                    <a href="#">Sách</a>
-                    <a href="#">Xe ô tô</a>
-                    <a href="#">Làm đẹp</a>
-                    <a href="#">Thời trang nữ</a>
-                    <a href="#">Thời trang nam</a>
-                    <a href="#">Đồ cho mẹ và bé</a>
-                    <a href="#">Đồ chơi</a>
-                    <a href="#">Đồ gia dụng</a>
-                    <a href="#">Thiết bị điện tử</a>
-                </div>
-            </div>
+   <?php include 'header.php'; ?>
 
-            <div class="search-container">
-                <input type="text" class="search-bar" placeholder=" Tìm kiếm">
-                <span class="search-icon">&#x1F50E;&#xFE0E;</span>
-            </div>
-
-            <div class="user-actions">
-                <a href="#" class="bell-icon"><img class="bell-icon-img" src="https://cdn-icons-png.flaticon.com/128/3602/3602145.png" alt="bell"></a>
-                <span>|</span>
-                <?php if(isset($_SESSION['user_id'])): ?>
-                    <span><u><a href="buyer/edit-profile.php"><?php echo $_SESSION['fullname']; ?></a></u></span>
-                    <span>|</span>
-                    <a href="logout.php"><u>Đăng Xuất</u></a>
-                <?php else: ?>    
-                <a href="/baitaplvn_sm/src/login.php"><u>Đăng nhập</u></a>
-                <span>|</span>
-                <a href="/baitaplvn_sm/src/register.php"><u>Đăng ký</u></a>
-                <?php endif; ?>
-                <span>|</span>
-                <a href="user/cart.php" class="cart-icon"><img class="cart-icon-img" src="https://cdn-icons-png.flaticon.com/128/1170/1170678.png" alt="cart"></a>
-            </div>
-        </div>
-
-        <div class="nav-categories">
-            <a href="index.php">Trang chủ</a>
-            <a href="#">Sách</a>
-            <a href="#">Đồ cho nam</a>
-            <a href="#">Đồ cho nữ</a>
-            <a href="#">Đồ cho mẹ và bé</a>
-            <a href="#">Đồ gia dụng</a>
-            <a href="#">Đồ chơi</a>
-        </div>
-    </header>
+    
 
     <!-- Main content -->
     <div class="shop-container">
