@@ -209,6 +209,7 @@ while ($row = mysqli_fetch_assoc($result_products)) {
             text-overflow: ellipsis;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             line-height: 1.4;
             min-height: 40px;
