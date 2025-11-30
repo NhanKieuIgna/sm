@@ -1,6 +1,6 @@
 <?php
 session_start();
-require "sm/dp.php"; // File kết nối database
+require_once __DIR__ . '/../../database/db.php';
 
 // 1. Kiểm tra đăng nhập
 if (!isset($_SESSION['user_id'])) {
