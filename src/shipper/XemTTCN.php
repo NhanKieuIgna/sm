@@ -1,12 +1,12 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../database/db.php';
+require "sm/dp.php"; // File kết nối database
 
-// // 1. Kiểm tra đăng nhập
-// if (!isset($_SESSION['user_id'])) {
-//     header("Location: login.php");
-//     exit();
-// }
+// 1. Kiểm tra đăng nhập
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
 
 $user_id = $_SESSION['user_id'];
 $user_data = [];
@@ -14,8 +14,8 @@ $error = '';
 
 // 2. Truy vấn dữ liệu từ cả hai bảng 'nguoidung' và 'hosonguoigiaohang'
 $sql = "SELECT 
-            nd.ID_NguoiDung, nd.TenDangNhap, nd.HoTen, nd.Email, nd.SoDienThoai, hsg.AnhDaiDien, nd.VaiTro, nd.TrangThaiHoatDong, nd.NgayTao,
-            hsg.GioiTinh, hsg.NamSinh, hsg.Anh_CCCD_Truoc, hsg.Anh_CCCD_Sau, hsg.Anh_BangLaiXe, hsg.BienSoXe, hsg.KhuVucHoatDong, hsg.DiemDanhGiaTrungBinh, hsg.LoaiXe
+            nd.ID_NguoiDung, nd.HoTen, nd.Email, nd.SoDienThoai, nd.AnhDaiDien, nd.VaiTro, nd.TrangThaiHoatDong, nd.NgayTao,
+            hsg.GioiTinh, hsg.NamSinh, hsg.Anh_CCCD_Truoc, hsg.Anh_CCCD_Sau, hsg.Anh_BangLaiXe, hsg.BienSoXe, hsg.KhuVucHoatDong, hsg.DiemDanhGiaTrungBinh, hsg.loaixe
         FROM nguoidung nd
         LEFT JOIN hosonguoigiaohang hsg ON nd.ID_NguoiDung = hsg.ID_NguoiDung
         WHERE nd.ID_NguoiDung = ?";
@@ -151,7 +151,6 @@ function display_field($label, $value, $emoji = '') {
                 echo "<p><strong>Họ Tên:</strong> <span>" . htmlspecialchars($user_data['HoTen']) . "</span></p>";
                 echo "<p><strong>📧 Email:</strong> <span>" . htmlspecialchars($user_data['Email']) . "</span></p>";
                 echo "<p><strong>📞 Số điện thoại:</strong> <span>" . htmlspecialchars($user_data['SoDienThoai']) . "</span></p>";
-                display_field('Tên đăng nhập', $user_data['TenDangNhap'], '👤');
                 display_field('Ngày tham gia', date('d/m/Y', strtotime($user_data['NgayTao'])), '🗓️');
             ?>
         </div>
@@ -163,7 +162,7 @@ function display_field($label, $value, $emoji = '') {
                 <?php
                     display_field('Giới tính', $user_data['GioiTinh'], '🚻');
                     display_field('Năm sinh', $user_data['NamSinh'], '🎂');
-                    display_field('Loại xe', $user_data['LoaiXe'], '🏍️');
+                    display_field('Loại xe', $user_data['loaixe'], '🏍️');
                     display_field('Biển số xe', $user_data['BienSoXe'], '🔢');
                     display_field('Khu vực hoạt động', $user_data['KhuVucHoatDong'], '🗺️');
                     display_field('Đánh giá TB', $user_data['DiemDanhGiaTrungBinh'], '⭐'); 
