@@ -7,71 +7,127 @@ $dbname = "secondhand_market";
 
 $message = null;
 $message_class = '';
-$image_path = '';
 $order_id = isset($_GET['id']) ? (string)$_GET['id'] : null;
+
+// Kiểm tra MDH
 if (!$order_id && !isset($_POST['order_id'])) {
     die("Lỗi: Không tìm thấy Mã Đơn Hàng.");
 }
 
+// Xử lý POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $order_id = $_POST['order_id'] ?? $order_id;
     $delivery_status = $_POST['delivery_status'] ?? '';
+    $failure_reason = $_POST['failure_reason'] ?? '';
+
+    $image_path = ''; 
     $upload_success = false;
-    $upload_dir = "sm/uploads/";
-    if (!is_dir($upload_dir)) {
-        mkdir($upload_dir, 0777, true);
-    }
+    $proceed_to_db_update = false;
+
+    $is_delivered_successfully = ($delivery_status === 'DaGiao');
+    $is_delivery_failed = ($delivery_status === 'GiaoThatBai');
     
-    if (isset($_FILES['delivery_image']) && $_FILES['delivery_image']['error'] == 0) {
-        $file_tmp = $_FILES['delivery_image']['tmp_name'];
-        $file_name = basename($_FILES['delivery_image']['name']);
-        
-        $target_file = $upload_dir . time() . "_" . uniqid() . "_" . $file_name; 
-        
-        $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
-        $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-        
-        if (in_array($file_ext, $allowed_types)) {
-            if (move_uploaded_file($file_tmp, $target_file)) {
-                $image_path = $target_file;
-                $upload_success = true;
-                try {
-                    $conn = new PDO("mysql:host=$servername;dbname=$dbname;charset=utf8mb4", $username, $password);
-                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $db_status = $delivery_status; 
 
-                    // Cập nhật: Thêm cột ThoiGianHoanThanh = NOW()
-                    $sql_update = "UPDATE danhsachdonhang SET TrangThaiDonHang = :status, AnhXacNhanGiaoHang = :image_path, ThoiGianHoanThanh = NOW() WHERE ID_DonHang = :id";
-                    $stmt = $conn->prepare($sql_update);
-                    
-                    $stmt->bindParam(':status', $delivery_status);
-                    $stmt->bindParam(':image_path', $image_path);
-                    $stmt->bindParam(':id', $order_id, PDO::PARAM_STR); 
-                    
-                    $stmt->execute();
-                    
-                    $message = "Xác nhận giao hàng **(#" . htmlspecialchars($order_id) . ")** thành công! Trạng thái: " . htmlspecialchars($delivery_status);
-                    $message_class = 'success';
-                
-                } catch (PDOException $e) {
-                    $message = "Lỗi CSDL khi cập nhật đơn hàng: " . $e->getMessage();
+    // --- Xử lý tải lên ảnh cho trường hợp 'DaGiao' ---
+    if ($is_delivered_successfully) {
+        $upload_dir = "sm/uploads/";
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
+        
+        if (isset($_FILES['delivery_image']) && $_FILES['delivery_image']['error'] == 0) {
+            $file_tmp = $_FILES['delivery_image']['tmp_name'];
+            $file_name = basename($_FILES['delivery_image']['name']);
+            $target_file = $upload_dir . time() . "_" . uniqid() . "_" . $file_name; 
+            
+            $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
+            $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+            
+            if (in_array($file_ext, $allowed_types)) {
+                if (move_uploaded_file($file_tmp, $target_file)) {
+                    $image_path = $target_file;
+                    $upload_success = true;
+                    $proceed_to_db_update = true;
+                    $db_status = 'DaGiao'; 
+                } else {
+                    $message = "Lỗi không xác định khi tải lên ảnh.";
                     $message_class = 'error';
-                    if (file_exists($image_path)) {
-                        unlink($image_path);
-                        $image_path = '';
-                    }
                 }
-
             } else {
-                $message = "Lỗi không xác định khi tải lên ảnh.";
+                $message = "Chỉ cho phép file ảnh: jpg, jpeg, png, gif.";
                 $message_class = 'error';
             }
         } else {
-            $message = "Chỉ cho phép file ảnh: jpg, jpeg, png, gif.";
+            $message = "Bạn chưa chọn ảnh xác nhận giao hàng cho trạng thái **Đã giao thành công**.";
+            $message_class = 'error';
+        }
+    } 
+    // --- Xử lý cho trường hợp 'GiaoThatBai' -> Chuyển thành 'DaHuy' ---
+    elseif ($is_delivery_failed) {
+        if (!empty(trim($failure_reason))) {
+            $db_status = 'DaHuy'; // Đặt trạng thái DB là DaHuy
+            $image_path = NULL; // Không có ảnh xác nhận
+            $proceed_to_db_update = true;
+        } else {
+            $message = "Bạn phải cung cấp **Lý do thất bại** khi chọn trạng thái Giao thất bại.";
             $message_class = 'error';
         }
     } else {
-        $message = "Bạn chưa chọn ảnh hoặc có lỗi trong quá trình tải lên.";
+        $message = "Trạng thái giao hàng không hợp lệ.";
         $message_class = 'error';
+    }
+
+
+    // --- Cập nhật CSDL ---
+    if ($proceed_to_db_update) {
+        try {
+            $conn = new PDO("mysql:host=$servername;dbname=$dbname;charset=utf8mb4", $username, $password);
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // CÂU TRUY VẤN MỚI: KHÔNG CÓ ID_NguoiGiaoHang trong câu lệnh UPDATE
+            $sql_update = "UPDATE danhsachdonhang 
+                           SET TrangThaiDonHang = :status, 
+                               AnhXacNhanGiaoHang = :image_path, 
+                               LyDoHuy = :reason,
+                               ThoiGianHoanThanh = NOW() 
+                           WHERE ID_DonHang = :id";
+            
+            $stmt = $conn->prepare($sql_update);
+            
+            $stmt->bindParam(':status', $db_status);
+            $stmt->bindParam(':id', $order_id, PDO::PARAM_STR); 
+            
+            // Khai báo biến NULL để ràng buộc chính xác kiểu dữ liệu NULL
+            $null_value = null;
+
+            if ($is_delivered_successfully) {
+                // Thành công: lưu ảnh, LyDoHuy = NULL
+                $stmt->bindParam(':image_path', $image_path);
+                $stmt->bindParam(':reason', $null_value, PDO::PARAM_NULL);
+            } elseif ($is_delivery_failed) {
+                // Thất bại/Hủy: LyDoHuy = lý do, AnhXacNhanGiaoHang = NULL
+                $stmt->bindParam(':image_path', $null_value, PDO::PARAM_NULL);
+                $stmt->bindParam(':reason', $failure_reason); 
+            }
+            
+            $stmt->execute();
+            
+            $status_display = ($is_delivered_successfully) ? 'Đã giao thành công' : 'Đã hủy do giao thất bại';
+            $message = "Cập nhật đơn hàng **(#" . htmlspecialchars($order_id) . ")** thành công! Trạng thái: **" . $status_display . "**";
+            if ($is_delivery_failed) {
+                 $message .= "<br>Lý do thất bại đã được lưu vào cột **LyDoHuy**.";
+            } 
+            $message .= "<br>Thông tin Người giao hàng (`ID_NguoiGiaoHang`) được **giữ nguyên**.";
+            $message_class = 'success';
+        
+        } catch (PDOException $e) {
+            $message = "Lỗi CSDL khi cập nhật đơn hàng: " . $e->getMessage();
+            $message_class = 'error';
+            if ($is_delivered_successfully && $upload_success && file_exists($image_path)) {
+                unlink($image_path);
+            }
+        }
     }
 } 
 ?>
@@ -81,6 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <title>Xác nhận giao hàng</title>
     <style>
+        /* CSS giữ nguyên */
         body {
             font-family: Arial, sans-serif;
             background-color: #f7f7f7;
@@ -106,13 +163,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             margin-bottom: 5px;
             font-weight: bold;
         }
-        input[type=text], select, input[type=file] {
+        input[type=text], select, input[type=file], textarea {
             width: 100%;
             padding: 10px;
             margin: 8px 0 15px;
             border: 1px solid #ccc;
             border-radius: 5px;
             box-sizing: border-box; 
+        }
+        textarea {
+            resize: vertical;
         }
         button {
             width: 100%;
@@ -155,6 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         .success { background-color: #d4edda; color: #155724; }
         .error { background-color: #f8d7da; color: #721c24; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -172,20 +233,54 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($order_id); ?>">
             
             <label for="delivery_status">Trạng thái giao hàng:</label>
-            <select id="delivery_status" name="delivery_status" required>
-                <option value="DaGiao">Đã giao thành công</option>
+            <select id="delivery_status" name="delivery_status" required onchange="toggleFields()">
+                <option value="DaGiao" selected>Đã giao thành công</option>
                 <option value="GiaoThatBai">Giao thất bại</option>
             </select>
 
-            <label for="delivery_image">Ảnh xác nhận giao hàng:</label>
-            <input type="file" id="delivery_image" name="delivery_image" accept="image/*" required>
+            <div id="image_field">
+                <label for="delivery_image">Ảnh xác nhận giao hàng:</label>
+                <input type="file" id="delivery_image" name="delivery_image" accept="image/*" required>
+            </div>
+            
+            <div id="reason_field" class="hidden">
+                <label for="failure_reason">Lý do thất bại (Sẽ lưu vào LyDoHuy):</label>
+                <textarea id="failure_reason" name="failure_reason" rows="3" maxlength="255"></textarea>
+            </div>
 
-            <button type="submit">Cập nhật trạng thái & Tải ảnh</button>
-        </form>       
-    <p style="text-align: center;">
-        <a href="my_donhang.php" class="btn-back"> Quay lại trang Đơn hàng</a>
-    </p>
+            <button type="submit">Cập nhật trạng thái</button>
+        </form> 
+        
+        <p style="text-align: center;">
+            <a href="my_donhang.php" class="btn-back"> Quay lại trang Đơn hàng</a>
+        </p>
     </div>
+
+    <script>
+        function toggleFields() {
+            const status = document.getElementById('delivery_status').value;
+            const imageField = document.getElementById('image_field');
+            const imageInput = document.getElementById('delivery_image');
+            const reasonField = document.getElementById('reason_field');
+            const reasonInput = document.getElementById('failure_reason');
+
+            if (status === 'DaGiao') {
+                imageField.classList.remove('hidden');
+                imageInput.setAttribute('required', 'required'); 
+                
+                reasonField.classList.add('hidden');
+                reasonInput.removeAttribute('required'); 
+            } else if (status === 'GiaoThatBai') {
+                imageField.classList.add('hidden');
+                imageInput.removeAttribute('required'); 
+                imageInput.value = ''; 
+
+                reasonField.classList.remove('hidden');
+                reasonInput.setAttribute('required', 'required'); 
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', toggleFields);
+    </script>
 </body>
 </html>
-
