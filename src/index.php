@@ -97,9 +97,9 @@ if ($result_categories) {
                     <span>|</span>
                     <a href="logout.php"><u>Đăng Xuất</u></a>
                 <?php else: ?>    
-                <a href="/baitaplvn_sm/src/login.php"><u>Đăng nhập</u></a>
+                <a href="login.php"><u>Đăng nhập</u></a>
                 <span>|</span>
-                <a href="/baitaplvn_sm/src/register.php"><u>Đăng ký</u></a>
+                <a href="register.php"><u>Đăng ký</u></a>
                 <?php endif; ?>
                 <span>|</span>
                 <a href="user/cart.php" class="cart-icon"><img class="cart-icon-img" src="https://cdn-icons-png.flaticon.com/128/1170/1170678.png" alt="cart"></a>

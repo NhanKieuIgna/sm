@@ -31,7 +31,7 @@ function is_active($name, $current) {
 
         <div class="form-inline my-2 my-lg-0">
             <span class="mr-3 text-muted">Xin chào, <?= htmlspecialchars($displayName) ?></span>
-            <a class="btn btn-outline-secondary btn-sm" href="logout.php">Đăng xuất</a>
+            <a class="btn btn-outline-secondary btn-sm" href="../logout.php">Đăng xuất</a>
         </div>
     </div>
 </nav>
