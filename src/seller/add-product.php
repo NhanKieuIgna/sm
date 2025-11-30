@@ -1,39 +1,70 @@
 <?php
-session_start();
+    require_once 'header.php'; 
 
-// Kết nối database
-require_once('../../database/db.php');
-// Lấy danh mục
-$sql_categories = "SELECT * FROM danhmuc ORDER BY TenDanhMuc";
-$result_categories = mysqli_query($conn, $sql_categories);
-$categories = [];
-if ($result_categories) {
-    while ($row = mysqli_fetch_assoc($result_categories)) {
-        $categories[] = $row;
+    if(isset($_POST['a-product'])) {
+        $id_nguoiban = $_SESSION['user_id'];
+        $ten_sp      = mysqli_real_escape_string($conn, $_POST['name']);
+        $id_danhmuc  = $_POST['category'];
+        $soluong     = $_POST['quantity'];
+        $gia         = $_POST['price']; 
+        $tinhtrang   = $_POST['condition'];
+        $mota        = mysqli_real_escape_string($conn, $_POST['description']);
+        $mausac      = mysqli_real_escape_string($conn, $_POST['color']);
+        $thuonghieu  = mysqli_real_escape_string($conn, $_POST['brand']);
+        $kichthuoc   = mysqli_real_escape_string($conn, $_POST['size']);
+        $diachi      = mysqli_real_escape_string($conn, $_POST['pickup_address']);
+        
+        $sql = "INSERT INTO sanpham (ID_NguoiBan, TenSanPham, MoTa, Gia, TinhTrang, SoLuong, DiaChiLayHang, KichThuoc, ID_DanhMuc, TrangThaiDangBan, MauSac, ThuongHieu, NgayTao) 
+                VALUES ('$id_nguoiban', '$ten_sp', '$mota', '$gia', '$tinhtrang', '$soluong', '$diachi', '$kichthuoc', '$id_danhmuc', 'ChoDuyet', '$mausac', '$thuonghieu', NOW())";
+
+ if (mysqli_query($conn, $sql)) {
+            $id_sp = mysqli_insert_id($conn); // Lấy ID vừa tạo
+
+            $target_dir = "../img/";
+            // Kiểm tra và tạo thư mục nếu chưa có(tránh lỗi nếu lỡ tay xóa thư mục)
+            if (!file_exists($target_dir)) {
+                mkdir($target_dir, 0777, true);
+            }
+
+            $files = $_FILES['product_images'];
+
+            // Duyệt qua từng file
+            if (isset($files['name']) && is_array($files['name'])) {
+                for ($i = 0; $i < count($files['name']); $i++) {
+                    
+                    // Kiểm tra có tên file và không có lỗi upload
+                    if (!empty($files['name'][$i]) && $files['error'][$i] == 0) {
+                        
+                        // Đặt tên file: time_sốthứtự_tênfile (thêm $i để tránh trùng nếu up nhiều ảnh cùng lúc)
+                        $filename = time() . "_" . $i . "_" . basename($files['name'][$i]);
+                        $target_file = $target_dir . $filename;
+                        
+                        // Kiểm tra chỉ khi di chuyển file thành công mới lưu vào DB
+                        if (move_uploaded_file($files['tmp_name'][$i], $target_file)) {
+                            
+                            // Lưu đường dẫn vào DB
+                            $db_url = "../img/" . $filename;
+                            
+                            // Insert vào bảng hinhanhsanpham
+                            $sql_img = "INSERT INTO hinhanhsanpham (ID_SanPham, URL_HinhAnh) VALUES ('$id_sp', '$db_url')";
+                            mysqli_query($conn, $sql_img);
+                        }
+                    }
+                }
+            }
+
+            echo "<script>alert('Đăng bán thành công!'); window.location.href='add-product.php';</script>";
+        } else {
+            echo "<script>alert('Lỗi SQL: " . mysqli_error($conn) . "');</script>";
+        }
     }
-}
 ?>
-<?php
-    include 'header.php';
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thêm sản phẩm</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/add-product.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
 
     <div class="title">
     <h2>Đăng bán sản phẩm</h2>
     <h3>Chắc chắn rằng bạn mô tả sản phẩm thật chính xác và đáng tin cậy!</h3>
     </div>
-    <form action="process_add_product.php" method="POST" enctype="multipart/form-data">
+    <form action="<?php echo $_SERVER['PHP_SELF']?>" method="POST" enctype="multipart/form-data">
     
 
     <div class="form-section media-upload-section">
@@ -57,7 +88,13 @@ if ($result_categories) {
                     <label for="category" class="required">Danh mục</label>
                     <select id="category" name="category">
                         <option>Danh mục</option>
-                        <option>Quần áo</option>
+                        <?php 
+                        if (!empty($categories)) {
+                            foreach ($categories as $cat) {
+                                echo '<option value="'.$cat['ID_DanhMuc'].'">'.$cat['TenDanhMuc'].'</option>';
+                            }
+                        }
+                        ?>
                     </select>
                 </div>
                 <div class="input-half quantity-control">
@@ -77,7 +114,7 @@ if ($result_categories) {
                 </div>
                 <div class="input-half">
                     <label for="price" class="required">Giá bán</label>
-                    <input type="text" id="price" name="price" value="20.000 VNĐ">
+                    <input type="number" id="price" name="price" value="20000">
                 </div>
             </div>
             
@@ -122,62 +159,55 @@ if ($result_categories) {
         </div>
     </div>
 
-    <button type="submit" class="btn-submit">Đăng bán</button>
+    <button type="submit" class="btn-submit" name="a-product">Đăng bán</button>
 </form>
-<?php
-    require 'footer.php';
-?>
 
 <script>
- document.addEventListener('DOMContentLoaded', function() {
-    // 1. Lấy các phần tử cần thiết
+document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('product-images');
     const imageGalleryContainer = document.getElementById('image-gallery-container');
     const addMoreDropzone = document.querySelector('.add-more-dropzone');
     
-    // Khởi tạo biến đếm để theo dõi số lượng ảnh đã tải
-    let imageItemCount = 0; 
-    
-    // Hàm cập nhật trạng thái container (căn giữa/xếp gọn)
-    function updateContainerState() {
-        // Đếm số lượng ảnh đã được chèn vào container (ngoại trừ dropzone)
-        const currentImages = imageGalleryContainer.querySelectorAll('.uploaded-image-item').length;
-        imageItemCount = currentImages;
+    // Tạo thùng chứa ảo để chứa các file
+    const dataTransfer = new DataTransfer();
 
-        if (imageItemCount === 0) {
-            // Khi không có ảnh: Căn giữa
+    function updateContainerState() {
+        const currentImages = imageGalleryContainer.querySelectorAll('.uploaded-image-item').length;
+        if (currentImages === 0) {
             imageGalleryContainer.classList.add('empty-center');
         } else {
-            // Khi đã có ảnh: Xếp gọn sang trái
             imageGalleryContainer.classList.remove('empty-center');
         }
     }
 
-    // Hàm xử lý tải lên (như cũ, nhưng gọi updateContainerState)
     function handleFileSelection(event) {
         const files = event.target.files;
-        if (files.length === 0) {
-            // Nếu người dùng đóng hộp thoại mà không chọn file, vẫn cập nhật trạng thái
-            updateContainerState(); 
-            return;
-        }
+        if (files.length === 0) return;
 
         for (const file of files) {
             if (file.type.startsWith('image/')) {
+                // Thêm file ảnh vào thùng chứa ảo
+                dataTransfer.items.add(file);
+
+                // Tạo ảnh xem trước
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const imageItem = createPreviewElement(e.target.result, file.name);
+                    // Truyền thêm đối tượng 'file' vào để sau này biết mà xóa
+                    const imageItem = createPreviewElement(e.target.result, file.name, file);
                     imageGalleryContainer.insertBefore(imageItem, addMoreDropzone);
-                    updateContainerState(); // Cập nhật ngay sau khi ảnh được thêm
+                    updateContainerState();
                 };
                 reader.readAsDataURL(file);
             }
         }
-        event.target.value = ''; // Reset input
+
+        // 3. CẬP NHẬT LẠI INPUT BẰNG DANH SÁCH FILE TRONG THÙNG CHỨA
+        // Đây là bước quan trọng nhất để PHP nhận được tất cả ảnh
+        fileInput.files = dataTransfer.files;
     }
     
-    // Hàm tạo phần tử xem trước và nút xóa (phần quan trọng nhất)
-    function createPreviewElement(src, fileName) {
+    // Thêm tham số 'fileObj' để biết chính xác file nào cần xóa
+    function createPreviewElement(src, fileName, fileObj) {
         const imageItem = document.createElement('div');
         imageItem.classList.add('uploaded-image-item');
         
@@ -188,10 +218,31 @@ if ($result_categories) {
         const removeBtn = document.createElement('button');
         removeBtn.classList.add('remove-image-btn');
         removeBtn.innerHTML = '&times;'; 
+        removeBtn.type = "button"; // Quan trọng: chặn submit form
 
         removeBtn.addEventListener('click', function() {
-            imageItem.remove(); // Xóa ảnh
-            updateContainerState(); // Cập nhật trạng thái sau khi xóa
+            // Xóa giao diện
+            imageItem.remove(); 
+            updateContainerState();
+
+            // XỬ LÝ XÓA FILE KHỎI THÙNG CHỨA ẢO
+            // Tạo một thùng mới
+            const newDataTransfer = new DataTransfer();
+            
+            // Duyệt qua thùng cũ, giữ lại những file KHÔNG phải là file đang xóa
+            for (let i = 0; i < dataTransfer.files.length; i++) {
+                const file = dataTransfer.files[i];
+                if (file !== fileObj) {
+                    newDataTransfer.items.add(file);
+                }
+            }
+            
+            // Cập nhật lại thùng chứa chính và Input
+            dataTransfer.items.clear();
+            for (let i = 0; i < newDataTransfer.files.length; i++) {
+                dataTransfer.items.add(newDataTransfer.files[i]);
+            }
+            fileInput.files = dataTransfer.files;
         });
 
         imageItem.appendChild(img);
@@ -199,14 +250,13 @@ if ($result_categories) {
         return imageItem;
     }
 
-    // Gán sự kiện cho input và dropzone
     if (fileInput && imageGalleryContainer && addMoreDropzone) {
         fileInput.addEventListener('change', handleFileSelection);
-
-        // Khởi tạo trạng thái ban đầu (nên là center)
         updateContainerState(); 
     }
 });
 </script>
-</body>
-</html>
+
+<?php
+    require 'footer.php';
+?>
