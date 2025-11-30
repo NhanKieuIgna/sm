@@ -1,6 +1,6 @@
 <?php
 session_start();
-require "sm/dp.php"; 
+require "sm/dp.php";
 
 if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
     header("Location: login.php"); 
