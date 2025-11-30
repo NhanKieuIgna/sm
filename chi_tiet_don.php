@@ -4,7 +4,7 @@ $servername = "localhost";
 $username = "root";
 $password = ""; 
 $dbname = "secondhand_market";
-$order_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$order_id = isset($_GET['order']) ? (int)$_GET['order'] : 0;
 
 if ($order_id === 0) {
     header("Location: delivery_index.php");
