@@ -1,10 +1,10 @@
 <?php
 session_start();
-require "sm/dp.php"; 
-if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
-    header("Location: login.php"); 
-    exit();
-}
+require_once __DIR__ . '/../../database/db.php';
+// if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
+//     header("Location: login.php"); 
+//     exit();
+// }
 
 $driver_id = $_SESSION['user_id'];
 $user = [];
@@ -291,7 +291,7 @@ a.btn:hover {
         
         <div class="profile-stats">
             <div class="stat">
-                <div class="label">Tổng đơn đã giao</div>
+                <div class="label">Tổng đơn đã giao thành công</div>
                 <div class="value" style="color:#007bff;"><?php echo $orders_count; ?></div>
             </div>
             <div class="stat">
