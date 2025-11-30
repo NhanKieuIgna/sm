@@ -1,23 +1,20 @@
 <?php
 
+
 session_start();
 require_once __DIR__ . '/../../database/db.php';
 
-// if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
-//     header("Location: login.php"); 
-//     exit();
-// }
+if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
+    header("Location: login.php"); 
+    exit();
+}
 
 $driver_id = $_SESSION['user_id'];
 $orders = []; 
 $sql = "SELECT 
             DH.ID_DonHang, DH.DiaChiGiaoHang, DH.TrangThaiDonHang,
             N.HoTen AS TenKhachHang, 
-<<<<<<< HEAD:src/shipper/my_donhang.php
-            DH.TongGiaTriDonHang,DH.SoTienCanThu_COD
-=======
-            DH.TongGiaTriDonHang,DH.PhiGiaoHang
->>>>>>> origin/Trung/deli:my_donhang.php
+            DH.TongGiaTriDonHang
         FROM danhsachdonhang AS DH
         LEFT JOIN nguoidung AS N ON DH.ID_NguoiMua = N.ID_NguoiDung
         WHERE DH.ID_NguoiGiaoHang = ?
@@ -32,16 +29,12 @@ $result = mysqli_stmt_get_result($stmt);
 if ($result) {
     while ($row = mysqli_fetch_assoc($result)) {
         $orders[] = [
-            "id" => "DH - " . str_pad($row['ID_DonHang'], 5, '0', STR_PAD_LEFT), 
+            "id" => "DH" . str_pad($row['ID_DonHang'], 5, '0', STR_PAD_LEFT), 
             "customer" => htmlspecialchars($row['TenKhachHang'] ?? 'Khách hàng ẩn danh'),
             "address" => htmlspecialchars($row['DiaChiGiaoHang']),
             "total_value" => number_format($row['TongGiaTriDonHang'], 0, ',', '.') . '₫', 
             "status" => htmlspecialchars($row['TrangThaiDonHang']),
-<<<<<<< HEAD:src/shipper/my_donhang.php
-            "raw_id" => $row['ID_DonHang'] ,"pgh" => number_format($row['SoTienCanThu_COD'], 0, ',', '.') . '₫' 
-=======
-            "raw_id" => $row['ID_DonHang'] ,"pgh" => number_format($row['PhiGiaoHang'], 0, ',', '.') . '₫' 
->>>>>>> origin/Trung/deli:my_donhang.php
+            "raw_id" => $row['ID_DonHang'] 
         ];
     }
 }
@@ -146,6 +139,7 @@ h2 {
     padding-right: 5px;
 }
 
+
 .orders::-webkit-scrollbar {
     width: 8px;
 }
@@ -160,6 +154,7 @@ h2 {
 .orders::-webkit-scrollbar-thumb:hover {
     background-color: #999;
 }
+
 
 .order {
     display: flex;
@@ -224,6 +219,7 @@ h2 {
     color: #333;
 }
 
+
 .dang-van-chuyen {
     border-left-color: #007bff;
 }
@@ -237,6 +233,7 @@ h2 {
 .da-giao .status {
     background-color: #28a745;
 }
+
 
 .hoan-thanh {
     border-left-color: #17a2b8;
@@ -252,6 +249,7 @@ h2 {
 .da-huy .status, .khieu-nai .status {
     background-color: #dc3545;
 }
+
 
 .actions {
     margin-left: 20px;
@@ -274,6 +272,7 @@ h2 {
     color: #fff;
     box-shadow: 0 2px 6px rgba(0, 123, 255, 0.4);
 }
+
 
 @media (max-width: 768px) {
     .orders-page {
@@ -338,28 +337,14 @@ h2 {
                     <div class="info">
                         <div class="badge">Mã đơn: <?php echo $order['id']; ?></div>
                         <h4>Khách: <?php echo $order['customer']; ?></h4>
-                        <p>Địa chỉ giao hàng: <?php echo $order['address']; ?></p>
-                        <p style="font-weight: 600; color: #007bff;">Phí ship: <?php echo $order['pgh']; ?></p>
+                        <p>Địa chỉ: <?php echo $order['address']; ?></p>
                         <p style="font-weight: 600; color: #007bff;">Tổng giá trị: <?php echo $order['total_value']; ?></p>
                         <div class="meta">
-                            Trạng thái: <span class="status" style="color: #222;"><?php echo $order['status']; ?></span>
+                            Trạng thái: <span style="color: #333;" class="status"><?php echo $order['status']; ?></span>
                         </div>
                     </div>
-                    <div class="actions" style="display: flex;flex-direction: column;gap: 8px;">
-<<<<<<< HEAD:src/shipper/my_donhang.php
+                    <div class="actions">
                         <a href="chi_tiet_don.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xem chi tiết</a>
-                        <?php $status = $order['status']; ?>
-                        <?php if ($status === 'DangVanChuyen') { ?>
-=======
-                        <a href="chi_tiet_don.php?order=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xem chi tiết</a>
-                        <?php $status = $order['status']; ?>
-                        <?php if ($status === 'DangVanChuyen' or $status === 'ChoGiaoHang') { ?>
->>>>>>> origin/Trung/deli:my_donhang.php
-                            <a href="confirm_GH.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xác nhận Hoàn thành</a>
-                        <?php } ?>
-                        <?php if ($status === 'ChoGiaoHang' or $status === 'DangXuLy' or $status === 'DangVanChuyen') { ?>
-                            <a href="HuyGiaoHang.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Hủy Đơn</a>
-                        <?php } ?>
                     </div>
                 </div>
                 <?php endforeach; ?>
@@ -371,4 +356,3 @@ h2 {
 <?php  include "footer_deli.php"; ?>
 </body>
 </html>
-
