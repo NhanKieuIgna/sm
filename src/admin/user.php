@@ -69,13 +69,13 @@ $stmt->close();
 
     <!-- Flash message -->
     <?php if ($flash): ?>
-        <div class="alert alert-<?= $flash['type'] === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
-            <?= htmlspecialchars($flash['msg']) ?>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    <?php endif; ?>
+    <div class="alert alert-<?= $flash['type'] === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
+        <?= htmlspecialchars($flash['msg']) ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+<?php endif; ?>
 
     <!-- Form tìm kiếm -->
     <div class="card mb-4">
@@ -131,7 +131,7 @@ $stmt->close();
                                         </span>
                                     </td>
                                     <td>
-                                        <?php if ($u['TrangThaiHoatDong']): ?>
+                                       <?php if ($u['TrangThaiHoatDong']): ?>
                                             <span class="badge badge-success">Hoạt động</span>
                                         <?php else: ?>
                                             <span class="badge badge-danger">Bị khóa</span>
@@ -140,9 +140,9 @@ $stmt->close();
                                     <td>
                                         <?php if ($u['ID_NguoiDung'] != $_SESSION['user_id']): ?>
                                             <?php if ($u['TrangThaiHoatDong']): ?>
-                                                <a href="ban_user.php?id=<?= $u['ID_NguoiDung'] ?>&ban=0" class="btn btn-sm btn-warning">Khóa</a>
+                                                <a href="ban_users.php?id=<?= $u['ID_NguoiDung'] ?>&ban=0" class="btn btn-sm btn-warning">Khóa</a>
                                             <?php else: ?>
-                                                <a href="ban_user.php?id=<?= $u['ID_NguoiDung'] ?>&ban=1" class="btn btn-sm btn-info">Gỡ khóa</a>
+                                                <a href="ban_users.php?id=<?= $u['ID_NguoiDung'] ?>&ban=1" class="btn btn-sm btn-info">Gỡ khóa</a>
                                             <?php endif; ?>
                                             <a href="edit_user.php?id=<?= $u['ID_NguoiDung'] ?>" class="btn btn-sm btn-warning">Sửa</a>
                                             <a href="del_user.php?id=<?= $u['ID_NguoiDung'] ?>" class="btn btn-sm btn-danger"
