@@ -11,7 +11,7 @@ require_once __DIR__ . '/../../database/db.php';
 // --- KHAI BÁO BIẾN BAN ĐẦU ---
 $driver_id = $_SESSION['user_id'];
 $message = "";
-$target_dir = "sm/uploads/"; // Đảm bảo thư mục này tồn tại và có quyền ghi
+$target_dir = "../uploads/shipper_documents/"; // Đảm bảo thư mục này tồn tại và có quyền ghi
 
 // --- XỬ LÝ DỮ LIỆU GỬI ĐI (POST) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
