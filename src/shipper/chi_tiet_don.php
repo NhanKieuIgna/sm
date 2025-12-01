@@ -275,13 +275,13 @@ try {
                 </tr>
                 <tr class="total-row">
                     <td colspan="4" style="text-align: right;">Phí Giao Hàng</td>
-                    <td>₫<?php echo number_format($tong_tien_can_thu, 0, ',', '.'); ?></td>
+                    <td>₫<?php echo number_format($phi_giao_hang, 0, ',', '.'); ?></td>
                 </tr>
                 
                 <?php if ($order['PhuongThucThanhToan'] === 'COD'): ?>
                 <tr class="total-cod">
                     <td colspan="4" style="text-align: right;">**Tổng Số Tiền Cần Thu (COD)**</td>
-                    <td><strong>₫<?php echo number_format($tong_tien_can_thu, 0, ',', '.'); ?></strong></td>
+                    <td><strong>₫<?php echo number_format($order['TongGiaTriDonHang'], 0, ',', '.'); ?></strong></td>
                 </tr>
                 <?php endif; ?>
             </tbody>
