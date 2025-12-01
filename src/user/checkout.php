@@ -97,12 +97,18 @@ if (isset($_GET['buy_now']) && $_GET['buy_now'] == '1') {
 }
 
 // Xử lý mã giảm giá
-$coupon = $_POST['coupon'] ?? $_GET['coupon'] ?? '';
+if(isset($_POST['coupon']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
+    $_SESSION['coupon'] = trim($_POST['coupon']);
+  if ( $_SESSION['coupon'] == 'SM') {
+    $ship_price = 0; // Miễn phí ship
+}else{
+    $ship_price = 29999; // Phí ship mặc định
+}
+}
+
 $ship_price = 29999; // Phí ship mặc định
 
-if (strtoupper(trim($coupon)) == 'SM') {
-    $ship_price = 0; // Miễn phí ship
-}
+
 
 
 // Handle form submission - only when checkout form is submitted
@@ -132,9 +138,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'])) {
     } else {
         // Calculate total for products only (no shipping yet)
         $total_amount = 0;
+        $total_amount_ship = 0;
         foreach ($cart_items as $item) {
             if (isset($item['price']) && isset($item['quantity'])) {
-                $total_amount += floatval($item['price']) * intval($item['quantity'])+$ship_price;
+                if(isset($_SESSION['coupon']) && $_SESSION['coupon'] == 'SM'){
+                $total_amount += floatval($item['price']) * intval($item['quantity']);
+                } else {
+                $total_amount += floatval($item['price']) * intval($item['quantity']) + 29999;
+                }
             }
         }
         
@@ -352,11 +363,11 @@ $cart = $_SESSION['cart'] ?? [];
                         </label>
                         <input type="text" id="coupon" name="coupon" 
                                placeholder="Nhập mã giảm giá (VD: SM)" 
-                               value="<?php echo htmlspecialchars($coupon); ?>">
+                              >
                         <?php if (!empty($coupon) && strtoupper(trim($coupon)) == 'SM'): ?>
-                            <small style="color: #4CAF50; margin-top: 5px; display: block;">
-                                ✓ Mã giảm giá đã được áp dụng - Miễn phí vận chuyển!
-                            </small>
+                            <script>alert('Mã giảm giá đã được áp dụng');</script>
+                        <?php elseif (!empty($coupon)): ?>
+                            <script>alert('Mã giảm giá không hợp lệ');</script>
                         <?php endif; ?>
                     </div>
 
