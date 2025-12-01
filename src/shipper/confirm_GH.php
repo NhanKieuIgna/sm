@@ -31,7 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // --- Xử lý tải lên ảnh cho trường hợp 'DaGiao' ---
     if ($is_delivered_successfully) {
-        $upload_dir = "sm/uploads/";
+        // SỬA ĐƯỜNG DẪN LƯU ẢNH TẠI ĐÂY: "../uploads/shipper_documents/"
+        $upload_dir = "../uploads/shipper_documents/";
+        
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
@@ -46,7 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             if (in_array($file_ext, $allowed_types)) {
                 if (move_uploaded_file($file_tmp, $target_file)) {
-                    $image_path = $target_file;
+                    // Lưu đường dẫn tương đối để truy vấn từ CSDL
+                    // Lưu ý: CSDL nên lưu đường dẫn tương đối (vd: uploads/shipper_documents/...) 
+                    // hoặc chỉ tên file. Tôi sẽ lưu đường dẫn $target_file: ../uploads/shipper_documents/filename
+                    $image_path = $target_file; 
                     $upload_success = true;
                     $proceed_to_db_update = true;
                     $db_status = 'DaGiao'; 
