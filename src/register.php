@@ -321,7 +321,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                           
                            
                            // Insert vào bảng hosonguoigiaohang với ID_NguoiDung để liên kết với bảng nguoidung
-                           $shipper_query = "INSERT INTO `hosonguoigiaohang` (`ID_NguoiDung`, `GioiTinh`, `NamSinh`, `Anh_CCCD_Truoc`, `Anh_CCCD_Sau`, `Anh_BangLaiXe`, `BienSoXe`, `KhuVucHoatDong`, `AnhDaiDien`) VALUES ($userId, '$gender_escaped', '$birth_year_escaped', '$id_card_front_escaped', '$id_card_back_escaped', '$driver_license_escaped', '$vehicle_number_escaped', '$working_area_escaped', '$avatar_escaped')";
+                           $shipper_query = "INSERT INTO `hosonguoigiaohang` (`ID_NguoiDung`, `GioiTinh`, `NamSinh`, `Anh_CCCD_Truoc`, `Anh_CCCD_Sau`, `Anh_BangLaiXe`, `BienSoXe`, `KhuVucHoatDong`, `AnhDaiDien`, `LoaiXe`) VALUES ($userId, '$gender_escaped', '$birth_year_escaped', '$id_card_front_escaped', '$id_card_back_escaped', '$driver_license_escaped', '$vehicle_number_escaped', '$working_area_escaped', '$avatar_escaped', '$vehicle_type_escaped')";
                            
                            if (!mysqli_query($conn, $shipper_query)) {
                                $error_msg = mysqli_error($conn);
