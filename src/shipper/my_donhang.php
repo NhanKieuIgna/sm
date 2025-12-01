@@ -41,9 +41,10 @@ if ($result) {
             "total_value" => number_format($row['TongGiaTriDonHang'], 0, ',', '.') . '₫', 
             "status" => htmlspecialchars($row['TrangThaiDonHang']),
             "raw_id" => $row['ID_DonHang'] ,
+            // Số tiền cần thu (COD) đã format
             "pgh" => number_format($row['SoTienCanThu_COD'], 0, ',', '.') . '₫',
             
-            // Thêm giá trị Phí Giao Hàng đã format
+            // Phí Giao Hàng đã format
             "shipping_fee" => number_format($phi_giao_hang, 0, ',', '.') . '₫' 
         ];
     }
@@ -169,7 +170,6 @@ h2 {
     align-items: center;
     padding: 18px 20px;
     background-color: #f9f9f9;
-    border-radius: 10px;
     border-left: 5px solid #007bff; 
     transition: all 0.3s;
 }
@@ -341,8 +341,10 @@ h2 {
                         <div class="badge">Mã đơn: <?php echo $order['id']; ?></div>
                         <h4>Khách: <?php echo $order['customer']; ?></h4>
                         <p>Địa chỉ giao hàng: <?php echo $order['address']; ?></p>
-                        <p style="font-weight: 600; color: #007bff;">Phí Ship:  <?php echo $phi_giao_hang; ?> đ</p>
-                        <p style="font-weight: 600; color: #007bff;">Số tiền cần thu: <?php echo $order['pgh']; ?></p>
+                        
+                                                <p style="font-weight: 600; color: #007bff;">Phí Ship:  <?php echo $order['shipping_fee']; ?></p>
+                        <p style="font-weight: 600; color: #007bff;">Số tiền cần thu (COD): <?php echo $order['pgh']; ?></p>
+                        
                         <div class="meta">
                             Trạng thái: <span class="status" style="color: #222;"><?php echo $order['status']; ?></span>
                         </div>
