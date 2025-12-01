@@ -4,7 +4,7 @@
 <div class="header-container">
         <div class="logo" style="display: flex;">
             <a href="delivery_index.php">
-                <img src="sm/logo.jpg" alt="Logo" class="logo-img">
+                <img src="../shipper/logo.jpg" alt="Logo" class="logo-img">
             </a>
             <h2 style="padding-left: 5px;">Delivery-Secondhand Market</h2>
         </div>
@@ -17,16 +17,7 @@
         </nav>
     </div>
 <style>
-    header {
-        background-image: url(sm/uploads/anhnen3.0.jpg);
-        color: #fff;
-        padding: 18rem 0;
-        margin-bottom: 4rem;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        background-repeat: no-repeat; 
-        background-size: cover; 
-        background-position: center;
-    }
+
 .header-container {
     position: sticky; 
     top: 0; 
