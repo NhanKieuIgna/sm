@@ -7,6 +7,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $driverId = $_SESSION['user_id'];
+// Câu truy vấn SQL giữ nguyên
 $sql = "SELECT 
             dh.ID_DonHang AS MaDonHang,
             nd.HoTen AS TenNguoiNhan,
@@ -37,6 +38,7 @@ $result = $stmt->get_result();
 <meta charset="UTF-8">
 <title>Lịch sử giao hàng</title>
 <style>
+/* ... (CSS giữ nguyên) ... */
 body {
     font-family: Arial, sans-serif;
     background: #f5f6fa;
@@ -119,7 +121,14 @@ h2 {
         <?php 
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
-                // Định dạng lại trường thời gian nếu cần (ví dụ: loại bỏ giây)
+                
+                // *** BƯỚC MỚI: TÍNH PHÍ GIAO HÀNG BẰNG 5% TỔNG GIÁ TRỊ ***
+                $tongTien = (float)$row['TongTien'];
+                $phiShipMoi = $tongTien * 0.05;
+                // Gán lại vào biến row để hiển thị
+                $row['PhiShip'] = $phiShipMoi; 
+                
+                // Định dạng lại trường thời gian
                 $completionTime = $row['ThoiGianHoanThanh'] ? date("d/m/Y H:i", strtotime($row['ThoiGianHoanThanh'])) : 'Chưa hoàn thành';
 
                 echo "<tr>
@@ -142,4 +151,3 @@ h2 {
 
 </body>
 </html>
-
