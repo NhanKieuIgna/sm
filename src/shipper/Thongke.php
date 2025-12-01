@@ -13,6 +13,8 @@ $sql = "";
 $data = null;
 $error = "";
 $time_label = "";
+
+// --- XỬ LÝ KHOẢNG THỜI GIAN ---
 if ($filter === 'day') {
  
     $sql_time_condition = "AND DATE(ThoiGianHoanThanh) = CURDATE()";
@@ -32,11 +34,13 @@ if ($filter === 'day') {
 } else {
     $error = "Kiểu lọc không hợp lệ.";
 }
-if (empty($error)) {
 
+if (empty($error)) {
+    // --- CHỈNH SỬA TRUY VẤN SQL ---
     $sql = "SELECT 
                 $select_time, 
-                SUM(SoTienCanThu_COD) AS income, 
+                -- Thu nhập được tính bằng 5% tổng giá trị đơn hàng
+                SUM(TongGiaTriDonHang * 0.05) AS total_fee_income, 
                 COUNT(*) AS completed_orders,
                 IFNULL(SUM(SoTienCanThu_COD), 0) AS total_cod_collected
             FROM danhsachdonhang
@@ -44,13 +48,15 @@ if (empty($error)) {
             AND TrangThaiDonHang IN ('HoanThanh', 'DaGiao') 
             $sql_time_condition
             GROUP BY time";
+    // --- KẾT THÚC CHỈNH SỬA ---
 
     $res = mysqli_query($conn, $sql);
     if ($res) {
         $data = mysqli_fetch_assoc($res);
 
         if (!$data) {
-            $data = ['income' => 0, 'completed_orders' => 0, 'total_cod_collected' => 0, 'time' => $time_label];
+            // Cập nhật tên cột mặc định
+            $data = ['total_fee_income' => 0, 'completed_orders' => 0, 'total_cod_collected' => 0, 'time' => $time_label];
         }
     } else {
         $error = "Lỗi truy vấn CSDL: " . mysqli_error($conn);
@@ -222,12 +228,19 @@ if (empty($error)) {
         </p>
         
         <p>
-            <strong>Tổng thu nhập (Phí giao):</strong>
+            <strong>Tổng thu nhập (Phí giao - 5% GTĐH):</strong>
             <span class="stat-value income">
-                <?= number_format($data['income'], 0, ',', '.') ?>₫
+                <?= number_format($data['total_fee_income'], 0, ',', '.') ?>₫
             </span>
         </p>
         
+        <p>
+            <strong>Tổng COD đã thu:</strong> 
+            <span class="stat-value cod">
+                <?= number_format($data['total_cod_collected'], 0, ',', '.') ?>₫
+            </span>
+        </p>
+
         <p>
             <strong>Số đơn hàng đã hoàn thành:</strong> 
             <span class="stat-value orders">
