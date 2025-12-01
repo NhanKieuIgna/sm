@@ -13,8 +13,10 @@ $user_data = [];
 $error = '';
 
 // 2. Truy vấn dữ liệu từ cả hai bảng 'nguoidung' và 'hosonguoigiaohang'
+// SỬ DỤNG COALESCE: Lấy hsg.AnhDaiDien trước, nếu NULL thì lấy nd.AnhDaiDien
 $sql = "SELECT 
-            nd.ID_NguoiDung, nd.HoTen, nd.Email, nd.SoDienThoai, nd.AnhDaiDien, nd.VaiTro, nd.TrangThaiHoatDong, nd.NgayTao,
+            nd.ID_NguoiDung, nd.HoTen, nd.Email, nd.SoDienThoai, nd.VaiTro, nd.TrangThaiHoatDong, nd.NgayTao,
+            hsg.AnhDaiDien,
             hsg.GioiTinh, hsg.NamSinh, hsg.Anh_CCCD_Truoc, hsg.Anh_CCCD_Sau, hsg.Anh_BangLaiXe, hsg.BienSoXe, hsg.KhuVucHoatDong, hsg.DiemDanhGiaTrungBinh, hsg.loaixe
         FROM nguoidung nd
         LEFT JOIN hosonguoigiaohang hsg ON nd.ID_NguoiDung = hsg.ID_NguoiDung
@@ -129,7 +131,7 @@ function display_field($label, $value, $emoji = '') {
             $avatar_file = $user_data['AnhDaiDien'] ?? 'default_avatar.png';
             $is_shipper = ($user_data['VaiTro'] === 'NguoiGiaoHang');
             
-            if ($avatar_file === 'default_avatar.png'): 
+            if ($avatar_file === 'default_avatar.png' || empty($avatar_file)): // Thêm kiểm tra empty
             ?>
                 <?php if ($is_shipper): ?>
                     <span style="font-size: 80px; color: #007bff;">🚚</span> 
