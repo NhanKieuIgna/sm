@@ -4,7 +4,7 @@ $servername = "localhost";
 $username = "root";
 $password = ""; 
 $dbname = "secondhand_market";
-$order_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$order_id = isset($_GET['order']) ? (int)$_GET['order'] : 0;
 
 if ($order_id === 0) {
     header("Location: delivery_index.php");
@@ -34,12 +34,18 @@ try {
     if (!$order) {
         die("Lỗi: Đơn hàng không tồn tại.");
     }
-    $phi_giao_hang = $order['PhiGiaoHang'] ?? 0;
+    
+    // --- PHẦN TÍNH TOÁN PHÍ GIAO HÀNG (5% TỔNG GIÁ TRỊ) ---
+    $tong_gia_tri = (float)($order['TongGiaTriDonHang'] ?? 0); 
+    $phi_giao_hang = $tong_gia_tri * 0.05; // 5% Tổng Giá Trị
+    
     if ($order['PhuongThucThanhToan'] === 'COD') {
-        $tong_tien_can_thu = $order['TongGiaTriDonHang'] + $phi_giao_hang;
+        $tong_tien_can_thu = $tong_gia_tri + $phi_giao_hang;
     } else {
         $tong_tien_can_thu = 0; 
     }
+    // ---------------------------------------------------------
+    
     $sql_items = "
         SELECT
             ct.*,
@@ -55,6 +61,7 @@ try {
     $stmt_items->bindParam(':id', $order_id, PDO::PARAM_INT);
     $stmt_items->execute();
     $order_items = $stmt_items->fetchAll(PDO::FETCH_ASSOC);
+    
     $sql_history = "
         SELECT *
         FROM lichsutrangthai
@@ -253,7 +260,7 @@ try {
                 <?php foreach ($order_items as $item): ?>
                     <tr class="item-row">
                         <td>
-                            <img src="<?php echo htmlspecialchars($item['URL_HinhAnh'] ?? 'placeholder.jpg'); ?>" alt="Ảnh sản phẩm">
+                            <img src="../<?php echo htmlspecialchars($item['URL_HinhAnh'] ?? 'placeholder.jpg'); ?>" alt="Ảnh sản phẩm">
                         </td>
                         <td><?php echo htmlspecialchars($item['TenSanPham']); ?></td>
                         <td>₫<?php echo number_format($item['GiaTaiThoiDiemDat'], 0, ',', '.'); ?></td>
@@ -266,7 +273,6 @@ try {
                     <td colspan="4" style="text-align: right;">Tổng Giá Trị Sản Phẩm</td>
                     <td>₫<?php echo number_format($order['TongGiaTriDonHang'], 0, ',', '.'); ?></td>
                 </tr>
-                
                 <tr class="total-row">
                     <td colspan="4" style="text-align: right;">Phí Giao Hàng</td>
                     <td>₫<?php echo number_format($phi_giao_hang, 0, ',', '.'); ?></td>
@@ -313,7 +319,7 @@ try {
     </div>
 
     <p style="text-align: center;">
-        <a href="my_donhang.php" class="btn-back"> Quay lại trang Đơn hàng</a>
+        <a href="delivery_index.php" class="btn-back"> Quay lại trang Đơn hàng</a>
     </p>
 
 </div>
