@@ -275,7 +275,7 @@ try {
                 </tr>
                 <tr class="total-row">
                     <td colspan="4" style="text-align: right;">Phí Giao Hàng</td>
-                    <td>₫<?php echo number_format($phi_giao_hang, 0, ',', '.'); ?></td>
+                    <td>₫<?php echo number_format($tong_tien_can_thu, 0, ',', '.'); ?></td>
                 </tr>
                 
                 <?php if ($order['PhuongThucThanhToan'] === 'COD'): ?>

@@ -171,6 +171,7 @@ if ($result_categories) {
         </div>
     </footer>
     <script>
+
         function addToCart(productId) {
             const formData = new FormData();
             formData.append('product_id', productId);

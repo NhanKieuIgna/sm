@@ -18,7 +18,7 @@ $total_cod_amount = 0.00;
 $total_delivery_fee = 0.00; 
 
 $sql_profile = "SELECT 
-                    nd.HoTen, nd.AnhDaiDien, hgh.KhuVucHoatDong 
+                    nd.HoTen, hgh.AnhDaiDien, hgh.KhuVucHoatDong 
                 FROM nguoidung nd
                 JOIN hosonguoigiaohang hgh ON nd.ID_NguoiDung = hgh.ID_NguoiDung
                 WHERE nd.ID_NguoiDung = $driver_id";

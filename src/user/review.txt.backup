@@ -28,24 +28,11 @@ $order_query = "SELECT dh.*, sp.TenSanPham, sp.ID_SanPham, ha.URL_HinhAnh, nd.Ho
 
 $order_result = mysqli_query($conn, $order_query);
 $order = mysqli_fetch_assoc($order_result);
-$_SESSION['ID_NguoiBan'] = $order['ID_NguoiBan'];
+
 if (!$order) {
     header('Location: my-orders.php');
     exit();
 }
-
-// Get existing reviews for this product
-$reviews_query = "SELECT dg.*, nd.HoTen 
-                  FROM danhgia_nhanxet dg
-                  JOIN nguoidung nd ON dg.ID_NguoiDanhGia = nd.ID_NguoiDung
-                  WHERE dg.ID_DonHang = {$order['ID_SanPham']}
-                  ORDER BY dg.NgayDanhGia DESC";
-$reviews_result = mysqli_query($conn, $reviews_query);
-
-// Check if user already reviewed this product
-$user_review_query = "SELECT * FROM danhgia_nhanxet WHERE ID_DonHang = {$order['ID_SanPham']} AND ID_NguoiDanhgia = $user_id";
-$user_review_result = mysqli_query($conn, $user_review_query);
-$user_has_reviewed = mysqli_num_rows($user_review_result) > 0;
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -123,7 +110,7 @@ $user_has_reviewed = mysqli_num_rows($user_review_result) > 0;
         <section class="review-card">
             <div class="product-summary">
                 <?php if (!empty($order['URL_HinhAnh'])): ?>
-                    <div class="product-thumb" style="background-image: url('<?php echo '../' ?><?php echo htmlspecialchars($order['URL_HinhAnh']); ?>'); background-size: cover; background-position: center;"></div>
+                    <div class="product-thumb" style="background-image: url('<?php echo htmlspecialchars($order['URL_HinhAnh']); ?>'); background-size: cover; background-position: center;"></div>
                 <?php else: ?>
                     <div class="product-thumb" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center;">📦</div>
                 <?php endif; ?>
@@ -136,63 +123,37 @@ $user_has_reviewed = mysqli_num_rows($user_review_result) > 0;
 
             <div class="user-rating">
                 <h3>Đánh giá của bạn</h3>
-                <?php if ($user_has_reviewed): ?>
-                    <p style="color: #2d8659; font-weight: 500;">✓ Bạn đã đánh giá sản phẩm này</p>
-                <?php else: ?>
-                    <form id="reviewForm" action="process_review.php" method="POST">
-                        <input type="hidden" name="order_id" value="<?php echo $order_id; ?>">
-                        <input type="hidden" name="product_id" value="<?php echo $order['ID_SanPham']; ?>">
-                        <input type="hidden" name="rating" id="ratingValue" value="0">
-                        
-                        <div class="stars-input" id="starsInput">
-                            <span data-rating="1">☆</span>
-                            <span data-rating="2">☆</span>
-                            <span data-rating="3">☆</span>
-                            <span data-rating="4">☆</span>
-                            <span data-rating="5">☆</span>
-                        </div>
-                        <p id="ratingError" style="color: red; font-size: 13px; margin-top: 5px; display: none;">Vui lòng chọn số sao</p>
-                        
-                        <textarea name="comment" placeholder="Viết đánh giá..." rows="4"></textarea>
-                        
-                        <div class="review-actions">
-                            <a href="my-orders.php" class="btn-outline">Quay lại</a>
-                            <button type="submit" class="btn-primary">Gửi đánh giá</button>
-                        </div>
-                    </form>
-                <?php endif; ?>
+                <div class="stars-input">
+                    <span>☆</span><span>☆</span><span>☆</span><span>☆</span><span>☆</span>
+                </div>
+                <textarea placeholder="Viết đánh giá..."></textarea>
+                <div class="review-actions">
+                    <a href="my-orders.php" class="btn-outline">Quay lại</a>
+                    <button class="btn-primary" onclick="submitReview()">Gửi đánh giá</button>
+                </div>
             </div>
 
             <div class="existing-reviews">
-                <h3 style="margin-bottom: 15px;">Đánh giá từ khách hàng khác</h3>
-                <?php if (mysqli_num_rows($reviews_result) > 0): ?>
-                    <?php while ($review = mysqli_fetch_assoc($reviews_result)): ?>
-                        <div class="review-item">
-                            <div class="avatar-circle"><?php echo strtoupper(substr($review['HoTen'], 0, 2)); ?></div>
-                            <div style="flex: 1;">
-                                <div class="review-header">
-                                    <strong><?php echo htmlspecialchars($review['HoTen']); ?></strong>
-                                    <span class="stars">
-                                        <?php 
-                                        $rating = intval($review['SoSao']);
-                                        for ($i = 1; $i <= 5; $i++) {
-                                            echo ($i <= $rating) ? '★' : '☆';
-                                        }
-                                        ?>
-                                    </span>
-                                </div>
-                                <p style="margin: 5px 0; font-size: 13px; color: #666;">
-                                    <?php echo date('d/m/Y', strtotime($review['NgayDanhGia'])); ?>
-                                </p>
-                                <?php if (!empty($review['NoiDung'])): ?>
-                                    <p><?php echo htmlspecialchars($review['NoiDung']); ?></p>
-                                <?php endif; ?>
-                            </div>
+                <div class="review-item">
+                    <div class="avatar-circle">U1</div>
+                    <div>
+                        <div class="review-header">
+                            <strong>User1</strong>
+                            <span class="stars">★★★★★</span>
                         </div>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <p style="text-align: center; color: #999; padding: 20px;">Chưa có đánh giá nào cho sản phẩm này</p>
-                <?php endif; ?>
+                        <p>Sách đẹp, đóng gói kĩ và giao nhanh.</p>
+                    </div>
+                </div>
+                <div class="review-item">
+                    <div class="avatar-circle">U2</div>
+                    <div>
+                        <div class="review-header">
+                            <strong>User2</strong>
+                            <span class="stars">★★★★☆</span>
+                        </div>
+                        <p>Hài lòng với chất lượng, sẽ ủng hộ tiếp.</p>
+                    </div>
+                </div>
             </div>
 
             <div class="seller-message">
@@ -246,62 +207,6 @@ $user_has_reviewed = mysqli_num_rows($user_review_result) > 0;
             <p>&copy; 2024 SM. Tất cả quyền được bảo lưu.</p>
         </div>
     </footer>
-
-    <script>
-        // Star rating interaction
-        const starsInput = document.getElementById('starsInput');
-        const ratingValue = document.getElementById('ratingValue');
-        const ratingError = document.getElementById('ratingError');
-        
-        if (starsInput) {
-            const stars = starsInput.querySelectorAll('span');
-            let selectedRating = 0;
-            
-            stars.forEach((star, index) => {
-                // Hover effect
-                star.addEventListener('mouseenter', function() {
-                    const rating = parseInt(this.getAttribute('data-rating'));
-                    highlightStars(rating);
-                });
-                
-                // Click to select
-                star.addEventListener('click', function() {
-                    selectedRating = parseInt(this.getAttribute('data-rating'));
-                    ratingValue.value = selectedRating;
-                    highlightStars(selectedRating);
-                    ratingError.style.display = 'none';
-                });
-            });
-            
-            // Reset on mouse leave
-            starsInput.addEventListener('mouseleave', function() {
-                highlightStars(selectedRating);
-            });
-            
-            function highlightStars(count) {
-                stars.forEach((star, index) => {
-                    if (index < count) {
-                        star.textContent = '★';
-                    } else {
-                        star.textContent = '☆';
-                    }
-                });
-            }
-        }
-        
-        // Form validation
-        const reviewForm = document.getElementById('reviewForm');
-        if (reviewForm) {
-            reviewForm.addEventListener('submit', function(e) {
-                const rating = parseInt(ratingValue.value);
-                if (rating === 0) {
-                    e.preventDefault();
-                    ratingError.style.display = 'block';
-                    return false;
-                }
-            });
-        }
-    </script>
 </body>
 </html>
 

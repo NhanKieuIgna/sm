@@ -44,10 +44,21 @@
     margin-bottom: 10px;
 }
 
+.stars-input {
+    margin: 10px 0;
+}
+
 .stars-input span {
-    font-size: 28px;
+    font-size: 32px;
     color: #ffc107;
     cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-block;
+    margin-right: 4px;
+}
+
+.stars-input span:hover {
+    transform: scale(1.15);
 }
 
 .user-rating textarea,
