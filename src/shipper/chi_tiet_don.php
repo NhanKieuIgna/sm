@@ -34,9 +34,9 @@ try {
     if (!$order) {
         die("Lỗi: Đơn hàng không tồn tại.");
     }
-    $phi_giao_hang = $order['PhiGiaoHang'] ?? 0;
+   
     if ($order['PhuongThucThanhToan'] === 'COD') {
-        $tong_tien_can_thu = $order['TongGiaTriDonHang'] + $phi_giao_hang;
+        $tong_tien_can_thu = $order['SoTienCanThu_COD'];
     } else {
         $tong_tien_can_thu = 0; 
     }
@@ -253,7 +253,7 @@ try {
                 <?php foreach ($order_items as $item): ?>
                     <tr class="item-row">
                         <td>
-                            <img src="<?php echo htmlspecialchars($item['URL_HinhAnh'] ?? 'placeholder.jpg'); ?>" alt="Ảnh sản phẩm">
+                            <img src="<?php echo '../' ?><?php echo htmlspecialchars($item['URL_HinhAnh'] ?? 'placeholder.jpg'); ?>" alt="Ảnh sản phẩm">
                         </td>
                         <td><?php echo htmlspecialchars($item['TenSanPham']); ?></td>
                         <td>₫<?php echo number_format($item['GiaTaiThoiDiemDat'], 0, ',', '.'); ?></td>
@@ -269,7 +269,7 @@ try {
                 
                 <tr class="total-row">
                     <td colspan="4" style="text-align: right;">Phí Giao Hàng</td>
-                    <td>₫<?php echo number_format($phi_giao_hang, 0, ',', '.'); ?></td>
+                    <td>₫<?php echo number_format($tong_tien_can_thu, 0, ',', '.'); ?></td>
                 </tr>
                 
                 <?php if ($order['PhuongThucThanhToan'] === 'COD'): ?>
