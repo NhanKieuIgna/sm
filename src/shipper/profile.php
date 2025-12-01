@@ -2,16 +2,19 @@
 session_start();
 require_once __DIR__ . '/../../database/db.php';
 
-// Kiểm tra phiên đăng nhập nên được bật lại khi triển khai
-// if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
-//     header("Location: login.php");
-//     exit();
-// }
+// Kiểm tra phiên đăng nhập
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'NguoiGiaoHang') {
+    // Đảm bảo đường dẫn chuyển hướng chính xác đến file login
+    header("Location: ../login.php"); 
+    exit();
+}
 
 // --- KHAI BÁO BIẾN BAN ĐẦU ---
 $driver_id = $_SESSION['user_id'];
 $message = "";
-$target_dir = "../uploads/shipper_documents/"; // Đảm bảo thư mục này tồn tại và có quyền ghi
+// Thư mục upload ảnh (đảm bảo nó có quyền ghi)
+$target_dir = __DIR__ . "/../uploads/shipper_documents/"; 
+$target_url_dir = "../uploads/shipper_documents/";
 
 // --- XỬ LÝ DỮ LIỆU GỬI ĐI (POST) ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -27,59 +30,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $khu_vuc = $_POST['khu_vuc'];
     $loai_xe = $_POST['loai_xe'];
     $old_avatar = $_POST['old_avatar'];
-    $avatar_name = $old_avatar;
+    $avatar_name = $old_avatar; // Giữ nguyên tên ảnh cũ nếu không upload ảnh mới
+    $upload_success = true;
 
     // 2. Xử lý upload ảnh đại diện mới
-    if (!empty($_FILES['anh_dai_dien']['name'])) {
+    if (!empty($_FILES['anh_dai_dien']['name']) && $_FILES['anh_dai_dien']['error'] == 0) {
         $ext = pathinfo($_FILES['anh_dai_dien']['name'], PATHINFO_EXTENSION);
-        $avatar_name = $driver_id . "_avatar_" . time() . "." . $ext;
+        $avatar_name_new = $driver_id . "_avatar_" . time() . "." . $ext;
         
-        // Kiểm tra lỗi upload
-        if (!move_uploaded_file($_FILES['anh_dai_dien']['tmp_name'], $target_dir . $avatar_name)) {
-             $message = "<div class='msg msg-error'>Lỗi khi tải lên ảnh đại diện!</div>";
+        // Kiểm tra và thực hiện upload
+        if (move_uploaded_file($_FILES['anh_dai_dien']['tmp_name'], $target_dir . $avatar_name_new)) {
+             
+            // Xóa ảnh cũ nếu nó khác ảnh mặc định và không rỗng
+            if (!empty($old_avatar) && $old_avatar !== 'default_avatar.png' && file_exists($target_dir . $old_avatar)) {
+                // Kiểm tra xem ảnh cũ có khác ảnh vừa upload không trước khi xóa
+                if ($old_avatar !== $avatar_name_new) {
+                    unlink($target_dir . $old_avatar);
+                }
+            }
+            $avatar_name = $avatar_name_new;
+        } else {
+            $message = "<div class='msg msg-error'>Lỗi khi tải lên ảnh đại diện!</div>";
+            $upload_success = false;
         }
     }
-
-    // 3. Cập nhật bảng nguoidung (Thông tin cơ bản)
-    $sql1 = "UPDATE nguoidung SET HoTen=?, Email=?, SoDienThoai=?, DiaChiGiaoHangMacDinh=?, AnhDaiDien=? WHERE ID_NguoiDung=?";
-    $stmt1 = $conn->prepare($sql1);
     
-    // Thêm kiểm tra lỗi SQL cho UPDATE 1
-    if ($stmt1 === false) { die('Lỗi chuẩn bị SQL 1: ' . $conn->error); }
+    if ($upload_success) {
+        // 3. Cập nhật bảng nguoidung (Chỉ cập nhật thông tin cơ bản)
+        // Loại bỏ AnhDaiDien khỏi bảng nguoidung để ưu tiên hosonguoigiaohang
+        $sql1 = "UPDATE nguoidung SET HoTen=?, Email=?, SoDienThoai=?, DiaChiGiaoHangMacDinh=? WHERE ID_NguoiDung=?";
+        $stmt1 = $conn->prepare($sql1);
+        
+        if ($stmt1 === false) { die('Lỗi chuẩn bị SQL 1: ' . $conn->error); }
 
-    $stmt1->bind_param("sssssi", $ho_ten, $email, $sdt, $dia_chi, $avatar_name, $driver_id);
-    $stmt1->execute();
-    $stmt1->close();
+        $stmt1->bind_param("ssssi", $ho_ten, $email, $sdt, $dia_chi, $driver_id);
+        $stmt1->execute();
+        $stmt1->close();
 
+        // 4. Cập nhật/Thêm mới bảng hosonguoigiaohang (Thêm cột AnhDaiDien)
+        $sql2 = "INSERT INTO hosonguoigiaohang 
+                    (ID_NguoiDung, GioiTinh, NamSinh, BienSoXe, KhuVucHoatDong, LoaiXe, AnhDaiDien)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE 
+                    GioiTinh=VALUES(GioiTinh),
+                    NamSinh=VALUES(NamSinh),
+                    BienSoXe=VALUES(BienSoXe),
+                    KhuVucHoatDong=VALUES(KhuVucHoatDong),
+                    LoaiXe=VALUES(LoaiXe),
+                    AnhDaiDien=VALUES(AnhDaiDien)"; // Cập nhật ảnh đại diện tại đây
 
-    // 4. Cập nhật/Thêm mới bảng hosonguoigiaohang (Thông tin tài xế)
-    $sql2 = "INSERT INTO hosonguoigiaohang 
-             (ID_NguoiDung, GioiTinh, NamSinh, BienSoXe, KhuVucHoatDong, LoaiXe)
-             VALUES (?, ?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE 
-             GioiTinh=VALUES(GioiTinh),
-             NamSinh=VALUES(NamSinh),
-             BienSoXe=VALUES(BienSoXe),
-             KhuVucHoatDong=VALUES(KhuVucHoatDong),
-             LoaiXe=VALUES(LoaiXe)";
+        $stmt2 = $conn->prepare($sql2);
+        
+        if ($stmt2 === false) { die('Lỗi chuẩn bị SQL 2: ' . $conn->error); }
 
-    $stmt2 = $conn->prepare($sql2);
-    
-    // Thêm kiểm tra lỗi SQL cho UPDATE 2
-    if ($stmt2 === false) { die('Lỗi chuẩn bị SQL 2: ' . $conn->error); }
+        // Thêm $avatar_name vào bind_param
+        $stmt2->bind_param("issssss", $driver_id, $gioi_tinh, $nam_sinh, $bien_so, $khu_vuc, $loai_xe, $avatar_name);
+        $stmt2->execute();
+        $stmt2->close();
 
-    $stmt2->bind_param("isssss", $driver_id, $gioi_tinh, $nam_sinh, $bien_so, $khu_vuc, $loai_xe);
-    $stmt2->execute();
-    $stmt2->close();
-
-    // 5. Chuyển hướng sau khi xử lý POST thành công
-    header("Location: profile.php?update=success");
-    exit();
+        // 5. Chuyển hướng sau khi xử lý POST thành công (tránh gửi lại form)
+        header("Location: hoso.php?update=success");
+        exit();
+    }
 }
 
 // --- TRUY VẤN DỮ LIỆU ĐỂ HIỂN THỊ (GET) ---
 
-$sql = "SELECT n.HoTen, n.Email, n.SoDienThoai, n.DiaChiGiaoHangMacDinh, n.AnhDaiDien, 
+$sql = "SELECT n.HoTen, n.Email, n.SoDienThoai, n.DiaChiGiaoHangMacDinh, 
+                -- Ưu tiên lấy ảnh từ hosonguoigiaohang, nếu NULL thì lấy từ nguoidung
+                COALESCE(h.AnhDaiDien, n.AnhDaiDien) AS AnhDaiDien, 
                 h.GioiTinh, h.NamSinh, h.BienSoXe, h.KhuVucHoatDong, h.LoaiXe
         FROM nguoidung n
         LEFT JOIN hosonguoigiaohang h ON n.ID_NguoiDung = h.ID_NguoiDung
@@ -87,7 +106,6 @@ $sql = "SELECT n.HoTen, n.Email, n.SoDienThoai, n.DiaChiGiaoHangMacDinh, n.AnhDa
 
 $stmt = $conn->prepare($sql);
 
-// Thêm kiểm tra lỗi SQL cho SELECT
 if ($stmt === false) { die('Lỗi chuẩn bị SQL SELECT: ' . $conn->error); }
 
 $stmt->bind_param("i", $driver_id);
@@ -102,11 +120,6 @@ if (!$data) {
 // Xử lý thông báo thành công sau khi chuyển hướng POST
 if (isset($_GET['update']) && $_GET['update'] == 'success') {
     $message = "<div class='msg msg-success'>Cập nhật hồ sơ thành công!</div>";
-}
-
-if (isset($_GET['update']) && $_GET['update'] == 'success') {
-    header("location: hoso.php"); 
-    exit();
 }
 ?>
 
@@ -197,9 +210,15 @@ input, select, textarea {
         <div class="form-group">
             <label>Ảnh đại diện</label>
             <div class="avatar-box">
-                <img src="<?= $target_dir . ($data['AnhDaiDien'] ?: 'default_avatar.png') ?>">
+                <?php
+                // Kiểm tra đường dẫn ảnh đại diện để hiển thị
+                $avatar_to_display = $data['AnhDaiDien'] ?? 'default_avatar.png';
+                // Sử dụng đường dẫn URL cho trình duyệt
+                $display_path = $target_url_dir . htmlspecialchars($avatar_to_display);
+                ?>
+                <img src="<?= $display_path ?>" alt="Ảnh đại diện">
                 <input type="file" name="anh_dai_dien">
-                <input type="hidden" name="old_avatar" value="<?= $data['AnhDaiDien'] ?>">
+                <input type="hidden" name="old_avatar" value="<?= htmlspecialchars($data['AnhDaiDien'] ?? '') ?>">
             </div>
         </div>
         <div class="form-group">
@@ -268,3 +287,4 @@ input, select, textarea {
 
 </body>
 </html>
+
