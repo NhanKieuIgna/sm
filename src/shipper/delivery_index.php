@@ -16,9 +16,11 @@ $total_orders = 0;
 $total_cod_amount = 0.00;
 $total_delivery_fee = 0.00; 
 
-// 1. TRUY VẤN PROFILE (Lấy HoTen, KhuVucHoatDong và Ảnh Đại Diện)
+// 1. TRUY VẤN PROFILE (Lấy HoTen, KhuVucHoatDong và Ảnh Đại Diện - ĐÃ SỬA)
 $sql_profile = "SELECT 
-                    nd.HoTen, nd.AnhDaiDien, hgh.KhuVucHoatDong 
+                    nd.HoTen, 
+                    COALESCE(hgh.AnhDaiDien, nd.AnhDaiDien) AS AvatarFile, -- Ưu tiên lấy ảnh từ hồ sơ shipper
+                    hgh.KhuVucHoatDong 
                 FROM nguoidung nd
                 LEFT JOIN hosonguoigiaohang hgh ON nd.ID_NguoiDung = hgh.ID_NguoiDung
                 WHERE nd.ID_NguoiDung = ?";
@@ -30,7 +32,7 @@ $res_profile = mysqli_stmt_get_result($stmt_profile);
 if ($res_profile && mysqli_num_rows($res_profile) > 0) {
     $driver_data = mysqli_fetch_assoc($res_profile);
     $driver_name = $driver_data['HoTen'];
-    $driver_avatar = $driver_data['AnhDaiDien']; 
+    $driver_avatar = $driver_data['AvatarFile']; // SỬ DỤNG TÊN CỘT MỚI
     $driver_region = $driver_data['KhuVucHoatDong'] ?? ''; 
 } else {
     $driver_name = $_SESSION['ten'] ?? 'Tài xế ẩn danh';
@@ -217,10 +219,12 @@ endif;
             <div class="avatar">
                 <a href="hoso.php" style="color: inherit; text-decoration: none;">
                     <?php 
-                    // Kiểm tra xem file có tồn tại và đường dẫn có hợp lệ không
-                    $avatar_path = '../uploads/shipper_documents/' . $driver_avatar;
-                    if (!empty($driver_avatar) && file_exists($avatar_path)): ?>
-                        <img src="<?php echo htmlspecialchars($avatar_path); ?>" alt="Avatar">
+                    $avatar_filename = $driver_avatar ?: 'default_avatar.png';
+                    $avatar_path_url = '../uploads/shipper_documents/' . htmlspecialchars($avatar_filename);
+                    $avatar_path_physical = '../uploads/shipper_documents/' . $avatar_filename;
+                    
+                    if (!empty($driver_avatar) && file_exists($avatar_path_physical)): ?>
+                        <img src="<?php echo $avatar_path_url; ?>" alt="Avatar">
                     <?php else: ?>
                         <span class="avatar-initial"><?php echo strtoupper(substr($driver_name, 0, 1) ?: 'T'); ?></span>
                     <?php endif; ?>
@@ -315,4 +319,3 @@ endif;
 <?php  include "footer_deli.php"; ?>
 </body>
 </html>
-
