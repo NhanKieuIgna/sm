@@ -2,10 +2,10 @@
 session_start();
 require_once __DIR__ . '/../../database/db.php'; 
 
-// if (!isset($_SESSION['user_id']) || $_SESSION['vaitro'] !== 'NguoiGiaoHang') {
-//     header("Location: login.php"); 
-//     exit();
-// }
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'NguoiGiaoHang') {
+    header("Location: ../login.php"); 
+    exit();
+}
 
 $driver_id = $_SESSION['user_id'];
 $driver_name = "";
@@ -13,6 +13,10 @@ $driver_avatar = "";
 $driver_region = ""; 
 $total_orders = 0;
 $total_cod_amount = 0.00;
+
+// Khởi tạo biến mới
+$total_delivery_fee = 0.00; 
+
 $sql_profile = "SELECT 
                     nd.HoTen, nd.AnhDaiDien, hgh.KhuVucHoatDong 
                 FROM nguoidung nd
@@ -29,24 +33,35 @@ if ($res_profile && mysqli_num_rows($res_profile) > 0) {
     $driver_name = $_SESSION['ten'] ?? 'Tài xế ẩn danh';
     $driver_region = 'Chưa xác định'; 
 }
+
+// Bắt đầu sửa truy vấn sql_stats
 $sql_stats = "SELECT 
                 COUNT(ID_DonHang) AS total_orders,
-                SUM(SoTienCanThu_COD) AS total_cod_amount
-              FROM danhsachdonhang 
-              WHERE ID_NguoiGiaoHang = $driver_id 
-              AND TrangThaiDonHang IN ('DangVanChuyen')";
+                SUM(SoTienCanThu_COD) AS total_cod_amount,
+                -- THÊM CỘT TÍNH TỔNG PHÍ GIAO HÀNG (5% TỔNG GIÁ TRỊ)
+                SUM(TongGiaTriDonHang * 0.05) AS total_delivery_fee
+             FROM danhsachdonhang 
+             WHERE ID_NguoiGiaoHang = $driver_id 
+             AND TrangThaiDonHang IN ('DangVanChuyen')";
 $res_stats = mysqli_query($conn, $sql_stats);
 
 if ($res_stats && mysqli_num_rows($res_stats) > 0) {
     $stats = mysqli_fetch_assoc($res_stats);
     $total_orders = $stats['total_orders'];
     $total_cod_amount = $stats['total_cod_amount'];
+    // Lấy giá trị tổng phí giao hàng
+    $total_delivery_fee = $stats['total_delivery_fee']; 
 }
+
 $total_revenue = number_format($total_cod_amount ?: 0, 0, ',', '.');
+// Định dạng biến mới để hiển thị tổng phí giao hàng
+$formatted_total_fee = number_format($total_delivery_fee ?: 0, 0, ',', '.'); 
+
 $driver_region_safe = mysqli_real_escape_string($conn, $driver_region);
 
 $sql_orders = "SELECT 
     dh.ID_DonHang, dh.NgayDatHang, dh.DiaChiGiaoHang, dh.SoTienCanThu_COD, dh.TrangThaiDonHang,
+    dh.TongGiaTriDonHang, 
     ngm.HoTen AS TenNguoiMua, ngm.SoDienThoai AS SDTNguoiMua,
     (SELECT SUM(SoLuongMua) FROM chitietdonhang WHERE ID_DonHang = dh.ID_DonHang) AS SoMonHang,
     (SELECT sp.TenSanPham FROM chitietdonhang ct 
@@ -81,6 +96,7 @@ function getDistance($order_id) {
 <title>Trang Người Giao Hàng - <?php echo htmlspecialchars($driver_region); ?></title>
 <?php  include "header_deli.php"; ?>
 <style>
+/* ... (CSS giữ nguyên) ... */
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 body { background-color: #f0f2f5; color: #333; }
 
@@ -92,7 +108,19 @@ body { background-color: #f0f2f5; color: #333; }
 .profile { display: flex; gap: 15px; margin: 20px 0; flex-direction: column; align-items: center; text-align: center; } 
 .profile .avatar img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #007bff; padding: 3px; }
 .avatar-initial { display: flex; justify-content: center; align-items: center; width: 120px; height: 120px; border-radius: 50%; background-color: #007bff; color: white; font-size: 40px; font-weight: 700; }
-.stat-row { display: flex; justify-content: space-between; margin-bottom: 20px; }
+.stat-row { 
+    display: flex; 
+    justify-content: space-between; 
+    margin-bottom: 20px; 
+    /* Đảm bảo 3 cột thống kê hiển thị đều */
+    gap: 10px; 
+}
+.stat {
+    /* Chia đều không gian cho 3 cột */
+    flex: 1;
+    min-width: 0; 
+    text-align: center;
+}
 .pill { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 12px; background-color: #e9ecef; color: #495057; }
 .nav-item { display: block; text-decoration: none; color: #555; margin: 12px 0; padding: 10px 12px; border-radius: 8px; transition: all 0.3s; }
 .nav-item:hover { background-color: #f0f2f5; color: #007bff; }
@@ -157,8 +185,8 @@ endif;
             <div class="avatar">
                 <a href="hoso.php" style="color: inherit; text-decoration: none;">
                     <?php 
-                    if (!empty($driver_avatar) && file_exists('sm/uploads/' . $driver_avatar)): ?>
-                        <img src="sm/uploads/<?php echo htmlspecialchars($driver_avatar); ?>" alt="Avatar">
+                    if (!empty($driver_avatar) && file_exists('../uploads/shipper_documents/' . $driver_avatar)): ?>
+                        <img src="../uploads/shipper_documents/<?php echo htmlspecialchars($driver_avatar); ?>" alt="Avatar">
                     <?php else: ?>
                         <span class="avatar-initial"><?php echo strtoupper(substr($driver_name, 0, 1) ?: 'T'); ?></span>
                     <?php endif; ?>
@@ -184,6 +212,10 @@ endif;
                 <div class="small">COD cần thu</div>
                 <div style="font-weight:700;font-size:18px">₫<?php echo $total_revenue; ?></div>
             </div>
+            <div class="stat">
+                <div class="small">Phí giao hàng (Tạm tính)</div>
+                <div style="font-weight:700;font-size:18px">₫<?php echo $formatted_total_fee; ?></div>
+            </div>
         </div>
 
         <nav>
@@ -196,15 +228,7 @@ endif;
     </aside>
 
     <main class="main">
-        <!-- <div class="topbar">
-            <h2>Đơn hàng cần xử lý tại Khu vực: <?php echo htmlspecialchars($driver_region); ?></h2>
-            <form class="search" method="GET">
-                <input type="text" name="search_order" placeholder="Tìm đơn hàng...">
-                <button type="submit">Tìm</button>
-            </form>
-        </div> -->
-
-        <div class="card">
+                <div class="card">
             <div style="font-weight:700;margin-bottom:12px">Đơn hàng CHƯA CÓ NGƯỜI NHẬN (<?php echo count($orders_list); ?>)</div>
             <div class="orders">
                 <?php if (empty($orders_list)): ?>
@@ -213,6 +237,13 @@ endif;
                     </div>
                 <?php else: ?>
                     <?php foreach ($orders_list as $order): ?>
+                        
+                        <?php 
+                        // Tách biến theo yêu cầu của bạn
+                        $tong_gia_tri = (float)$order['TongGiaTriDonHang'];
+                        $phi_giao_hang = $tong_gia_tri * 0.05;
+                        ?>
+
                         <div class="order">
                             <div class="info-main">
                                 <div class="badge">#DH<?php echo htmlspecialchars($order['ID_DonHang']); ?></div>
@@ -221,7 +252,8 @@ endif;
                                     🛒 **<?php echo htmlspecialchars($order['TenSanPhamDauTien'] ?? 'Sản phẩm'); ?>** (<?php echo $order['SoMonHang']; ?> món) <br>
                                     ☎️ SĐT: <a href="tel:<?php echo htmlspecialchars($order['SDTNguoiMua']); ?>"><?php echo htmlspecialchars($order['SDTNguoiMua']); ?></a> <br>
                                     📍 Địa chỉ: <?php echo htmlspecialchars(substr($order['DiaChiGiaoHang'], 0, 50)) . '...'; ?> <br>
-                                    💵 **COD: ₫<?php echo number_format($order['SoTienCanThu_COD'], 0, ',', '.'); ?>** • Cách bạn: <?php echo getDistance($order['ID_DonHang']); ?> km
+                                    💵 **Phí Giao Hàng:** ₫<?php echo number_format($phi_giao_hang, 0, ',', '.'); ?> <br>
+                                    💵 **COD:** ₫<?php echo number_format($order['SoTienCanThu_COD'], 0, ',', '.'); ?> • Cách bạn: <?php echo getDistance($order['ID_DonHang']); ?> km
                                 </div>
                             </div>
                             <div class="actions">
