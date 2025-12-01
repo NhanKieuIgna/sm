@@ -137,7 +137,7 @@ function display_field($label, $value, $emoji = '') {
                     <span style="font-size: 80px; color: #ccc;">👤</span> 
                 <?php endif; ?>
             <?php else: ?>
-                <img src="sm/uploads/<?php echo htmlspecialchars($avatar_file); ?>" alt="Ảnh đại diện">
+                <img src="../uploads/shipper_documents/<?php echo htmlspecialchars($avatar_file); ?>" alt="Ảnh đại diện">
             <?php endif; ?>
             
             <p style="margin-top: 10px;">Vai trò: 
@@ -172,7 +172,7 @@ function display_field($label, $value, $emoji = '') {
                     <h4 style="margin-top: 20px; color: #007bff;">📄 Tài liệu xác minh:</h4>
                     <div class="document-link">
                         <?php 
-                        $upload_path = 'sm/uploads/';
+                        $upload_path = '../uploads/shipper_documents/';
                         if (!empty($user_data['Anh_CCCD_Truoc'])) {
                             echo '<a href="#" class="view-image-link" data-src="' . htmlspecialchars($upload_path . $user_data['Anh_CCCD_Truoc']) . '">Xem CCCD Mặt trước</a>';
                         }
