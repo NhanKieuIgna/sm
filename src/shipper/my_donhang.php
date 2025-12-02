@@ -352,10 +352,10 @@ h2 {
                     <div class="actions" style="display: flex;flex-direction: column;gap: 8px;">
                         <a href="chi_tiet_don.php?order=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xem chi tiết</a>
                         <?php $status = $order['status']; ?>
-                        <?php if ($status === 'DangVanChuyen' or $status === 'ChoGiaoHang') { ?>
+                        <?php if ($status === 'DangVanChuyen') { ?>
                             <a href="confirm_GH.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xác nhận Hoàn thành</a>
                         <?php } ?>
-                        <?php if ($status === 'ChoGiaoHang' or $status === 'DangXuLy' or $status === 'DangVanChuyen') { ?>
+                        <?php if ($status === 'DangVanChuyen') { ?>
                             <a href="HuyGiaoHang.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Hủy Đơn</a>
                         <?php } ?>
                     </div>
