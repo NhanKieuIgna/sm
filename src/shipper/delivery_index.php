@@ -88,7 +88,7 @@ $sql_orders = "SELECT
     FROM danhsachdonhang dh
     JOIN nguoidung ngm ON dh.ID_NguoiMua = ngm.ID_NguoiDung
     WHERE dh.ID_NguoiGiaoHang IS NULL 
-    AND dh.TrangThaiDonHang IN ('ChoGiaoHang') 
+    AND dh.TrangThaiDonHang IN ('ChoXacNhan') 
     " . $region_condition . " 
     ORDER BY dh.NgayDatHang DESC";
     
