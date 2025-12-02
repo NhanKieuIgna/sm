@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'])) {
     $address = mysqli_real_escape_string($conn, $_POST['address'] ?? '');
     $payment_method = mysqli_real_escape_string($conn, $_POST['payment_method'] ?? '');
     $note = mysqli_real_escape_string($conn, $_POST['note'] ?? '');
-    
+    $ship_price_nomarl = 29999;
     // Get cart items from session or POST
     $cart_items = $_POST['cart_items'] ?? $checkout_items;
     
@@ -139,16 +139,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'])) {
         // Calculate total for products only (no shipping yet)
         $total_amount = 0;
         $total_amount_ship = 0;
-        foreach ($cart_items as $item) {
+        // foreach ($cart_items as $item) {
+        //     if (isset($item['price']) && isset($item['quantity'])) {
+        //         if(isset($_SESSION['coupon']) && $_SESSION['coupon'] == 'SM'){
+        //         $total_amount += floatval($item['price']) * intval($item['quantity']);
+        //         } else {
+        //         $total_amount += floatval($item['price']) * intval($item['quantity']) + 29999;
+        //         }
+        //     }
+        // }
+         foreach ($cart_items as $item) {
             if (isset($item['price']) && isset($item['quantity'])) {
-                if(isset($_SESSION['coupon']) && $_SESSION['coupon'] == 'SM'){
+                
                 $total_amount += floatval($item['price']) * intval($item['quantity']);
-                } else {
-                $total_amount += floatval($item['price']) * intval($item['quantity']) + 29999;
-                }
+                
             }
         }
-        
         // Add shipping fee once for the entire order
         $total_amount_ship = $total_amount + 29999;
 
@@ -173,14 +179,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'])) {
             // Insert order
             $order_date = date('Y-m-d H:i:s');
             $order_status = 'ChoXacNhan';
-            
+             $ship_price_final = isset($_SESSION['coupon']) && $_SESSION['coupon'] == 'SM' ? 0 : $total_amount * 0.05 ;
+             $total_amount_final = $total_amount + $total_amount * 0.05 ;
+             $total_amount_apply_ship = $total_amount + $ship_price_final ;
             $insert_order = "INSERT INTO danhsachdonhang 
-                            (ID_NguoiMua, ID_NguoiBan, NgayDatHang, DiaChiGiaoHang, SoTienCanThu_COD, TrangThaiDonHang, TongGiaTriDonHang, GhiChu) 
+                            (ID_NguoiMua, ID_NguoiBan, NgayDatHang, DiaChiGiaoHang, SoTienCanThu_COD, TrangThaiDonHang, TongGiaTriDonHang, GhiChu, PhiGiaoHang) 
                             VALUES 
-                            ($user_id, $seller_id, '$order_date', '$address', $total_amount, '$order_status', '$total_amount_ship', '$note')";
-            
+                            ($user_id, $seller_id, '$order_date', '$address', '$total_amount_apply_ship', '$order_status', '$total_amount_final', '$note', $ship_price_final)";
+           
             if (mysqli_query($conn, $insert_order)) {
-                $order_id = mysqli_insert_id($conn);
+                
+              
+                $order_id = mysqli_insert_id($conn); // Lấy ID đơn hàng vừa tạo
             
             // Insert order details
             $all_success = true;
