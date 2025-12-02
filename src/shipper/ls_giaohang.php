@@ -123,7 +123,6 @@ h2 {
                 $tongTien = (float)$row['TongTien'];
                 $phiShipMoi = $tongTien * 0.05;
                 // Gán lại vào biến row để hiển thị
-                $row['PhiShip'] = $phiShipMoi; 
                 
                 // Định dạng lại trường thời gian
                 $completionTime = $row['ThoiGianHoanThanh'] ? date("d/m/Y H:i", strtotime($row['ThoiGianHoanThanh'])) : 'Chưa hoàn thành';
