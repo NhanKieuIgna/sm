@@ -14,7 +14,7 @@ $redirect_url = "my_donhang.php";
 // Kiểm tra ID đơn hàng
 if (empty($order_id)) {
     $_SESSION['error_message'] = "Thiếu ID đơn hàng để hủy.";
-    header("Location: " . $redirect_url);
+    header("Location: $redirect_url");
     exit();
 }
 
@@ -43,10 +43,10 @@ if (!$order) {
     $_SESSION['error_message'] = "Bạn không có quyền hủy đơn hàng này vì bạn không phải người phụ trách.";
 } else {
     // --- 3. CẬP NHẬT TRẠNG THÁI HỦY ĐƠN VÀO DB ---
-    $new_status = 'ChoGiaoHang'; // Đưa đơn hàng trở lại pool chờ Người Giao Hàng mới
+    $new_status = 'ChoXacNhan'; // Đưa đơn hàng trở lại pool chờ Người Giao Hàng mới
 
     $sql_update = "UPDATE danhsachdonhang 
-                   SET ID_NguoiGiaoHang = NULL, TrangThaiDonHang = ? 
+                   SET ID_NguoiGiaoHang = NULL, TrangThaiDonHang = ?
                    WHERE ID_DonHang = ? AND ID_NguoiGiaoHang = ?";
     
     $stmt_update = mysqli_prepare($conn, $sql_update);
