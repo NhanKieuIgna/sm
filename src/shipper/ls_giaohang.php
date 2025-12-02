@@ -24,7 +24,6 @@ $sql = "SELECT
           AND dh.TrangThaiDonHang IN ('DaGiao', 'DaHuy')
         GROUP BY dh.ID_DonHang, nd.HoTen, dh.DiaChiGiaoHang, dh.TongGiaTriDonHang, dh.TrangThaiDonHang, dh.ThoiGianHoanThanh
         ORDER BY dh.ThoiGianHoanThanh DESC";
-
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $driverId);
 $stmt->execute();

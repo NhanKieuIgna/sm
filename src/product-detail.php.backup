@@ -17,9 +17,12 @@ $sql = "SELECT sp.*, dm.TenDanhMuc, nd.HoTen as TenNguoiBan, nd.SoDienThoai
         FROM sanpham sp 
         LEFT JOIN danhmuc dm ON sp.ID_DanhMuc = dm.ID_DanhMuc 
         LEFT JOIN nguoidung nd ON sp.ID_NguoiBan = nd.ID_NguoiDung 
-        WHERE sp.ID_SanPham = $product_id AND sp.TrangThaiDangBan = 'DangBan'";
+        WHERE sp.ID_SanPham = ? AND sp.TrangThaiDangBan = 'DangBan'";
 
-$result = mysqli_query($conn, $sql);
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $product_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 $product = mysqli_fetch_assoc($result);
 // Lấy danh mục
 $sql_categories = "SELECT * FROM danhmuc ORDER BY TenDanhMuc";
@@ -36,8 +39,11 @@ if (!$product) {
 }
 
 // Lấy tất cả hình ảnh của sản phẩm
-$sql_images = "SELECT URL_HinhAnh FROM hinhanhsanpham WHERE ID_SanPham = $product_id";
-$result_images = mysqli_query($conn, $sql_images);
+$sql_images = "SELECT URL_HinhAnh FROM hinhanhsanpham WHERE ID_SanPham = ?";
+$stmt_images = mysqli_prepare($conn, $sql_images);
+mysqli_stmt_bind_param($stmt_images, "i", $product_id);
+mysqli_stmt_execute($stmt_images);
+$result_images = mysqli_stmt_get_result($stmt_images);
 $images = [];
 while ($row = mysqli_fetch_assoc($result_images)) {
     $images[] = $row['URL_HinhAnh'];
@@ -483,7 +489,7 @@ while ($row = mysqli_fetch_assoc($result_similar)) {
 
                 <div class="action-buttons">
                     <button class="btn-secondary" onclick="addToCartDetail()">Thêm vào giỏ</button>
-                    <button class="btn-primary" ><a href="user/checkout.php?buy_now=1&product_id=<?php echo $product_id; ?>">Mua ngay</a></button>
+                    <button class="btn-primary" onclick="buyNow()">Mua ngay</button>
                 </div>
 
                 <?php if (!empty($product['DiaChiLayHang'])): ?>

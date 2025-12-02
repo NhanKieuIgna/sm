@@ -22,106 +22,17 @@ if (!$user || $user['VaiTro'] !== 'NguoiMua' && $user['VaiTro'] !== 'NguoiBan') 
 $error = '';
 $success = '';
 
-// Determine checkout mode: buy_now or from cart
-$checkout_items = [];
-$is_buy_now = false;
-
-if (isset($_GET['buy_now']) && $_GET['buy_now'] == '1') {
-    // Buy now mode - single product
-    $is_buy_now = true;
-    $product_id = intval($_GET['product_id'] ?? 0);
-    $quantity = intval($_GET['quantity'] ?? 1);
-    
-    if ($product_id > 0 && $quantity > 0) {
-        // Fetch product details from database
-        $sql = "SELECT sp.*, ha.URL_HinhAnh 
-                FROM sanpham sp 
-                LEFT JOIN hinhanhsanpham ha ON sp.ID_SanPham = ha.ID_SanPham 
-                WHERE sp.ID_SanPham = $product_id AND sp.TrangThaiDangBan = 'DangBan'
-                LIMIT 1";
-        $result = mysqli_query($conn, $sql);
-        
-        if ($product = mysqli_fetch_assoc($result)) {
-            // Check if quantity is valid
-            if ($quantity <= $product['SoLuong']) {
-                $checkout_items[$product_id] = [
-                    'product_id' => $product_id,
-                    'name' => $product['TenSanPham'],
-                    'price' => $product['Gia'],
-                    'quantity' => $quantity,
-                    'image' => $product['URL_HinhAnh'] ?? '',
-                    'condition' => $product['TinhTrang'] ?? 'Mới'
-                ];
-            } else {
-                $error = 'Số lượng sản phẩm không đủ';
-            }
-        } else {
-            $error = 'Sản phẩm không tồn tại hoặc đã ngừng bán';
-        }
-    } else {
-        $error = 'Thông tin sản phẩm không hợp lệ';
-    }
-} else if (isset($_POST['selected']) && is_array($_POST['selected'])) {
-    // Cart checkout mode - get selected items from POST
-    $selected_items = $_POST['selected'];
-    
-    foreach ($selected_items as $item) {
-        $product_id = intval($item['product_id'] ?? 0);
-        $quantity = intval($item['quantity'] ?? 0);
-        $price = floatval($item['price'] ?? 0);
-        
-        if ($product_id > 0 && $quantity > 0 && $price > 0) {
-            // Get product details from database
-            $sql = "SELECT sp.TenSanPham, sp.TinhTrang, ha.URL_HinhAnh 
-                    FROM sanpham sp 
-                    LEFT JOIN hinhanhsanpham ha ON sp.ID_SanPham = ha.ID_SanPham 
-                    WHERE sp.ID_SanPham = $product_id 
-                    LIMIT 1";
-            $result = mysqli_query($conn, $sql);
-            
-            if ($product = mysqli_fetch_assoc($result)) {
-                $checkout_items[$product_id] = [
-                    'product_id' => $product_id,
-                    'name' => $product['TenSanPham'],
-                    'price' => $price,
-                    'quantity' => $quantity,
-                    'image' => $product['URL_HinhAnh'] ?? '',
-                    'condition' => $product['TinhTrang'] ?? 'Mới'
-                ];
-            }
-        }
-    }
-} else {
-    // Fallback to session cart
-    $checkout_items = $_SESSION['cart'] ?? [];
-}
-
-// Xử lý mã giảm giá
-if(isset($_POST['coupon']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
-    $_SESSION['coupon'] = trim($_POST['coupon']);
-  if ( $_SESSION['coupon'] == 'SM') {
-    $ship_price = 0; // Miễn phí ship
-}else{
-    $ship_price = 29999; // Phí ship mặc định
-}
-}
-
-$ship_price = 29999; // Phí ship mặc định
-
-
-
-
-// Handle form submission - only when checkout form is submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'])) {
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $full_name = mysqli_real_escape_string($conn, $_POST['full_name'] ?? '');
     $phone = mysqli_real_escape_string($conn, $_POST['phone'] ?? '');
     $email = mysqli_real_escape_string($conn, $_POST['email'] ?? '');
     $address = mysqli_real_escape_string($conn, $_POST['address'] ?? '');
     $payment_method = mysqli_real_escape_string($conn, $_POST['payment_method'] ?? '');
     $note = mysqli_real_escape_string($conn, $_POST['note'] ?? '');
-    $ship_price_nomarl = 29999;
+    
     // Get cart items from session or POST
-    $cart_items = $_POST['cart_items'] ?? $checkout_items;
+    $cart_items = $_POST['cart_items'] ?? [];
     
     if (empty($full_name)) {
         $error = 'Họ tên không được để trống';
@@ -136,28 +47,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'])) {
     } elseif (empty($cart_items) || !is_array($cart_items)) {
         $error = 'Giỏ hàng trống';
     } else {
-        // Calculate total for products only (no shipping yet)
+        // Calculate total
         $total_amount = 0;
-        $total_amount_ship = 0;
-        // foreach ($cart_items as $item) {
-        //     if (isset($item['price']) && isset($item['quantity'])) {
-        //         if(isset($_SESSION['coupon']) && $_SESSION['coupon'] == 'SM'){
-        //         $total_amount += floatval($item['price']) * intval($item['quantity']);
-        //         } else {
-        //         $total_amount += floatval($item['price']) * intval($item['quantity']) + 29999;
-        //         }
-        //     }
-        // }
-         foreach ($cart_items as $item) {
+        foreach ($cart_items as $item) {
             if (isset($item['price']) && isset($item['quantity'])) {
-                
                 $total_amount += floatval($item['price']) * intval($item['quantity']);
-                
             }
         }
-        // Add shipping fee once for the entire order
-        $total_amount_ship = $total_amount + 29999;
-
         
         // Get seller ID from first product (assuming all products from same seller for now)
         $seller_id = null;
@@ -179,18 +75,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'])) {
             // Insert order
             $order_date = date('Y-m-d H:i:s');
             $order_status = 'ChoXacNhan';
-             $ship_price_final = isset($_SESSION['coupon']) && $_SESSION['coupon'] == 'SM' ? 0 : $total_amount * 0.05 ;
-             $total_amount_final = $total_amount + $total_amount * 0.05 ;
-             $total_amount_apply_ship = $total_amount + $ship_price_final ;
+            
             $insert_order = "INSERT INTO danhsachdonhang 
-                            (ID_NguoiMua, ID_NguoiBan, NgayDatHang, DiaChiGiaoHang, SoTienCanThu_COD, TrangThaiDonHang, TongGiaTriDonHang, GhiChu, PhiGiaoHang) 
+                            (ID_NguoiMua, ID_NguoiBan, NgayDatHang, DiaChiGiaoHang, SoTienCanThu_COD, TrangThaiDonHang, TongGiaTriDonHang, GhiChu) 
                             VALUES 
-                            ($user_id, $seller_id, '$order_date', '$address', '$total_amount_apply_ship', '$order_status', '$total_amount_final', '$note', $ship_price_final)";
-           
+                            ($user_id, $seller_id, '$order_date', '$address', $total_amount, '$order_status', $total_amount, '$note')";
+            
             if (mysqli_query($conn, $insert_order)) {
-                
-              
-                $order_id = mysqli_insert_id($conn); // Lấy ID đơn hàng vừa tạo
+                $order_id = mysqli_insert_id($conn);
             
             // Insert order details
             $all_success = true;
@@ -213,10 +105,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'])) {
             }
             
             if ($all_success) {
-                // Clear cart only if not in buy_now mode
-                if (!$is_buy_now) {
-                    unset($_SESSION['cart']);
-                }
+                // Clear cart
+                unset($_SESSION['cart']);
                 $success = 'Đặt hàng thành công! Mã đơn hàng: #' . $order_id;
                 // Redirect after 3 seconds
                 header("refresh:3;url=my-orders.php");
@@ -277,11 +167,7 @@ $cart = $_SESSION['cart'] ?? [];
     <main class="checkout-page">
         <div class="breadcrumb">
             <a href="../index.php">Trang chủ</a> <span> > </span> 
-            <?php if ($is_buy_now): ?>
-                <a href="../index.php">Danh sách sản phẩm</a> <span> > </span> 
-            <?php else: ?>
-                <a href="cart.php">Giỏ hàng</a> <span> > </span> 
-            <?php endif; ?>
+            <a href="cart.html">Giỏ hàng</a> <span> > </span> 
             <strong>Thanh toán</strong>
         </div>
 
@@ -367,21 +253,6 @@ $cart = $_SESSION['cart'] ?? [];
                     </div>
 
                     <div class="form-group">
-                        <label for="coupon">
-                            <i class="fas fa-ticket-alt"></i>
-                            Mã giảm giá
-                        </label>
-                        <input type="text" id="coupon" name="coupon" 
-                               placeholder="Nhập mã giảm giá (VD: SM)" 
-                              >
-                        <?php if (!empty($coupon) && strtoupper(trim($coupon)) == 'SM'): ?>
-                            <script>alert('Mã giảm giá đã được áp dụng');</script>
-                        <?php elseif (!empty($coupon)): ?>
-                            <script>alert('Mã giảm giá không hợp lệ');</script>
-                        <?php endif; ?>
-                    </div>
-
-                    <div class="form-group">
                         <label for="note">
                             <i class="fas fa-sticky-note"></i>
                             Ghi chú cho người bán
@@ -391,17 +262,16 @@ $cart = $_SESSION['cart'] ?? [];
                     </div>
 
                     <!-- Hidden cart items -->
-                    <?php if (!empty($checkout_items)): ?>
-                        <?php foreach ($checkout_items as $product_id => $item): ?>
+                    <?php if (!empty($cart)): ?>
+                        <?php foreach ($cart as $product_id => $item): ?>
                             <input type="hidden" name="cart_items[<?php echo htmlspecialchars($product_id); ?>][product_id]" 
-                                   value="<?php echo htmlspecialchars($item['product_id'] ?? $product_id); ?>">
+                                   value="<?php echo htmlspecialchars($item['id'] ?? $product_id); ?>">
                             <input type="hidden" name="cart_items[<?php echo htmlspecialchars($product_id); ?>][quantity]" 
                                    value="<?php echo htmlspecialchars($item['quantity'] ?? 1); ?>">
                             <input type="hidden" name="cart_items[<?php echo htmlspecialchars($product_id); ?>][price]" 
                                    value="<?php echo htmlspecialchars($item['price'] ?? 0); ?>">
                         <?php endforeach; ?>
                     <?php endif; ?>
-
 
                     <div class="form-actions">
                         <a href="cart.html" class="btn btn-secondary">
@@ -421,13 +291,11 @@ $cart = $_SESSION['cart'] ?? [];
                     <h3>Đơn hàng của bạn</h3>
                     <div class="order-items">
                         <?php 
-                        $ship_price = 0;
                         $total = 0;
-                        if (!empty($checkout_items)): 
-                            foreach ($checkout_items as $item): 
+                        if (!empty($cart)): 
+                            foreach ($cart as $item): 
                                 $item_total = floatval($item['price'] ?? 0) * intval($item['quantity'] ?? 0);
                                 $total += $item_total;
-                                $ship_price += 29999;
                         ?>
                             <div class="order-item">
                                 <div class="item-name"><?php echo htmlspecialchars($item['name'] ?? 'Sản phẩm'); ?></div>
@@ -449,13 +317,11 @@ $cart = $_SESSION['cart'] ?? [];
                         </div>
                         <div class="summary-row">
                             <span>Phí vận chuyển</span>
-                            <span class="<?php echo ($ship_price == 0) ? 'free-ship' : ''; ?>">
-                                <?php echo ($ship_price == 0) ? 'Miễn phí' : number_format($ship_price, 0, ',', '.') . '₫'; ?>
-                            </span>
+                            <span class="free-ship">Miễn phí</span>
                         </div>
                         <div class="summary-row total">
                             <span>Tổng cộng</span>
-                            <span><?php echo number_format($total + $ship_price, 0, ',', '.'); ?>₫</span>
+                            <span><?php echo number_format($total, 0, ',', '.'); ?>₫</span>
                         </div>
                     </div>
                 </div>

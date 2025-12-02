@@ -5,21 +5,14 @@ session_start();
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
-$coupon = $_POST['coupon'] ?? '';
-//  $selected_items = $_POST['item-checkbox'];
+
 // Tính tổng tiền
 $total = 0;
-$ship_price = 29999;
 $cart_items = $_SESSION['cart'];
+foreach ($cart_items as $item) {
+    $total += $item['price'] * $item['quantity'];
+}
 
-
-// foreach ($cart_items as $item) {
-//         if($coupon == 'SM'){
-//             $ship_price = 0;
-//         }
-//         $total += $item['price'] * $item['quantity'] + $ship_price;
-    
-// }
 ?>
 
 <!DOCTYPE html>
@@ -131,23 +124,7 @@ $cart_items = $_SESSION['cart'];
                     <?php foreach ($cart_items as $product_id => $item): ?>
                     <div class="cart-item" data-product-id="<?php echo $product_id; ?>">
                         <div class="item-select">
-                            <input type="checkbox" 
-                                class="item-checkbox" 
-                                data-id="<?php echo $product_id; ?>"
-                                data-price="<?php echo $item['price']; ?>"
-                                data-qty="<?php echo $item['quantity']; ?>"
-                                data-ship="<?php echo $ship_price; ?>"
-                                data-total="<?php echo $item['price'] * $item['quantity']; ?>"
-                            >
-                            <script>
-                                // document.getElementById("item-checkbox").addEventListener("change", function() {
-                                //     if (this.checked) {
-                                //         this.value = "1";    // khi tick
-                                //     } else {
-                                //         this.value = "0";    // khi bỏ tick
-                                //     }
-                                // });
-                            </script>
+                            <input type="checkbox" class="item-checkbox">
                         </div>
                         <div class="item-thumb">
                             <?php if (!empty($item['image'])): ?>
@@ -184,19 +161,17 @@ $cart_items = $_SESSION['cart'];
                     </div>
                     <div class="summary-row">
                         <span>Phí vận chuyển</span>
-                        <span><?php echo number_format($ship_price, 0, ',', '.'); ?>₫</span>
+                        <span>Freeship</span>
                     </div>
                     <div class="summary-row total">
                         <span>Tổng thanh toán</span>
-                        <span id="final-total"><?php echo number_format($total + $ship_price, 0, ',', '.'); ?>₫</span>
+                        <span id="final-total"><?php echo number_format($total, 0, ',', '.'); ?>₫</span>
                     </div>
-                    <form action="" method="post">
-                        <div class="coupon">
-                            <label for="coupon">Nhập mã giảm giá</label>
-                            <input type="text" id="coupon" placeholder="VD: SM2024" name="coupon">
-                            <button class="btn-outline">Áp dụng</button>
-                        </div>
-                    </form>
+                    <div class="coupon">
+                        <label for="coupon">Nhập mã giảm giá</label>
+                        <input type="text" id="coupon" placeholder="VD: SM2024">
+                        <button class="btn-outline">Áp dụng</button>
+                    </div>
                     <div class="address-input">
                         <label for="address">Địa chỉ nhận hàng</label>
                         <input type="text" id="address" placeholder="Số nhà, phường/xã, quận/huyện, tỉnh/thành phố">
@@ -338,79 +313,17 @@ $cart_items = $_SESSION['cart'];
             });
         }
 
-       function checkout() {
-        const checked = document.querySelectorAll('.item-checkbox:checked');
-
-        if (checked.length === 0) {
-            alert("Vui lòng chọn ít nhất 1 sản phẩm!");
-            return;
+        function checkout() {
+            // Redirect to checkout page
+            window.location.href = 'checkout.php';
         }
 
-        // Tạo form gửi dữ liệu
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = "checkout.php";
-
-        checked.forEach((cb, index) => {
-            form.innerHTML += `
-                <input type="hidden" name="selected[${index}][product_id]" value="${cb.dataset.id}">
-                <input type="hidden" name="selected[${index}][quantity]" value="${cb.dataset.qty}">
-                <input type="hidden" name="selected[${index}][price]" value="${cb.dataset.price}">
-            `;
-        });
-
-        document.body.appendChild(form);
-        form.submit();
-    }
-
-        // select checkbox functionality
-        // document.querySelectorAll('.item-checkbox')?.forEach(cb => {
-        //     cb.addEventListener('change', function() {
-        //         const selectAll = document.getElementById('selectAll');
-        //         if (selectAll) {
-        //             selectAll.checked = document.querySelectorAll('.item-checkbox:checked').length === document.querySelectorAll('.item-checkbox').length;
-        //         }
-        //     });
-        // });
         // Select all checkbox functionality
-        // document.getElementById('selectAll')?.addEventListener('change', function() {
-        //     const checkboxes = document.querySelectorAll('.item-checkbox');
-        //     checkboxes.forEach(cb => cb.checked = this.checked);
-        // });
-        function updateSummary() {
-    const checkboxes = document.querySelectorAll('.item-checkbox');
-    let total = 0;
-
-    checkboxes.forEach(cb => {
-        if (cb.checked) {
-            const coupon = document.getElementById('coupon').value;
-            const price = parseFloat(cb.dataset.price);
-            const qty = parseInt(cb.dataset.qty);
-            const ship = parseFloat(cb.dataset.ship);
-          
-                total += price * qty + ship;
-            
-        }
-    });
-
-    // Cập nhật hiển thị
-    document.getElementById("total-price").textContent = total.toLocaleString('vi-VN') + "₫";
-    document.getElementById("final-total").textContent = total.toLocaleString('vi-VN') + "₫";
-}
-
-// Khi tick từng sản phẩm
-document.querySelectorAll('.item-checkbox').forEach(cb => {
-    cb.addEventListener('change', updateSummary);
-});
-
-// Khi tick chọn tất cả
-document.getElementById('selectAll')?.addEventListener('change', function () {
-    const checkboxes = document.querySelectorAll('.item-checkbox');
-    checkboxes.forEach(cb => cb.checked = this.checked);
-    updateSummary();
-});
+        document.getElementById('selectAll')?.addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.item-checkbox');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
     </script>
 </body>
 
 </html>
-            
