@@ -43,7 +43,7 @@ if (!$order) {
     $_SESSION['error_message'] = "Bạn không có quyền hủy đơn hàng này vì bạn không phải người phụ trách.";
 } else {
     // --- 3. CẬP NHẬT TRẠNG THÁI HỦY ĐƠN VÀO DB ---
-    $new_status = 'ChoXacNhan'; // Đưa đơn hàng trở lại pool chờ Người Giao Hàng mới
+    $new_status = 'ChoGiaoHang'; // Đưa đơn hàng trở lại pool chờ Người Giao Hàng mới
 
     $sql_update = "UPDATE danhsachdonhang 
                    SET ID_NguoiGiaoHang = NULL, TrangThaiDonHang = ?
