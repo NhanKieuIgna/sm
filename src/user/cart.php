@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+require_once __DIR__ . '/../../database/db.php';
 // Khởi tạo giỏ hàng nếu chưa có
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
@@ -9,17 +9,25 @@ $coupon = $_POST['coupon'] ?? '';
 //  $selected_items = $_POST['item-checkbox'];
 // Tính tổng tiền
 $total = 0;
-$ship_price = 29999;
+$ship_price = 0;
 $cart_items = $_SESSION['cart'];
 
 
-// foreach ($cart_items as $item) {
-//         if($coupon == 'SM'){
-//             $ship_price = 0;
-//         }
-//         $total += $item['price'] * $item['quantity'] + $ship_price;
+foreach ($cart_items as $item) {
+        
+        $total += $item['price'] * $item['quantity'];
     
-// }
+}
+$ship_price = $total * 0.05; // Phí vận chuyển cố định
+// Lấy danh mục
+$sql_categories = "SELECT * FROM danhmuc ORDER BY TenDanhMuc";
+$result_categories = mysqli_query($conn, $sql_categories);
+$categories = [];
+if ($result_categories) {
+    while ($row = mysqli_fetch_assoc($result_categories)) {
+        $categories[] = $row;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -69,7 +77,7 @@ $cart_items = $_SESSION['cart'];
                         src="https://cdn-icons-png.flaticon.com/128/3602/3602145.png" alt="bell"></a>
                 <span>|</span>
                 <?php if(isset($_SESSION['user_id'])): ?>
-                    <span><u><a href="../buyer/edit-profile.php"><?php echo $_SESSION['fullname']; ?></a></u></span>
+                    <span><u><a href="../user/edit-profile.php"><?php echo $_SESSION['fullname']; ?></a></u></span>
                     <span>|</span>
                     <a href="my-orders.php"><u>Đơn hàng của tôi</u></a>
                     <span>|</span>
@@ -84,14 +92,38 @@ $cart_items = $_SESSION['cart'];
                         src="https://cdn-icons-png.flaticon.com/128/1170/1170678.png" alt="cart"></a>
             </div>
         </div>
-        <div class="nav-categories">
-            <a href="../index.php">Trang chủ</a>
-            <a href="#">Sách</a>
-            <a href="#">Đồ cho nam</a>
-            <a href="#">Đồ cho nữ</a>
-            <a href="#">Đồ cho mẹ và bé</a>
-            <a href="#">Đồ gia dụng</a>
-            <a href="#">Đồ chơi</a>
+         <div class="nav-categories">
+        
+            <?php 
+            $displayed_categories = array_slice($categories, 0, 6); // 6 danh mục đầu tiên
+            $remaining_categories = array_slice($categories, 6); // Các danh mục còn lại
+            
+            if (!empty($displayed_categories)): 
+                foreach ($displayed_categories as $category): 
+            ?>
+                <a href="user/list-product.php?category=<?php echo $category['ID_DanhMuc']; ?>"><?php echo htmlspecialchars($category['TenDanhMuc']); ?></a>
+            <?php 
+                endforeach;
+                
+                // Hiển thị các danh mục còn lại (ẩn ban đầu)
+                if (!empty($remaining_categories)): 
+                    foreach ($remaining_categories as $category): 
+            ?>
+                <a href="user/list-product.php?category=<?php echo $category['ID_DanhMuc']; ?>" class="extra-category" style="display: none;"><?php echo htmlspecialchars($category['TenDanhMuc']); ?></a>
+            <?php 
+                    endforeach;
+                endif;
+                
+                // Nút "Tất cả danh mục" nếu có nhiều hơn 6 danh mục
+                if (!empty($remaining_categories)): 
+            ?>
+                <a href="#" id="toggleCategories" style="color: #ff6b6b; font-weight: 500;">Tất cả danh mục ▼</a>
+            <?php 
+                endif;
+            else: 
+            ?>
+                <a href="#">Chưa có danh mục</a>
+            <?php endif; ?>
         </div>
     </header>
 

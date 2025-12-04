@@ -55,6 +55,7 @@
                         <li><a href="#!"><?php echo $_SESSION['fullname']; ?></a>
                             <ul class="sub-menu">
                                 <li><a href="user/edit-profile.php">Chỉnh sửa hồ sơ</a></li>
+                                <li><a href="user/my-orders.php">Đơn hàng của tôi</a></li>
                             </ul>   
                         </li>
                     </ul>
