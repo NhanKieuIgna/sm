@@ -1,0 +1,55 @@
+
+.status-tabs {
+    display: flex;
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 0 10px;
+    margin-bottom: 15px;
+    overflow-x: auto; 
+}
+    
+.tab-item {
+    position: relative;
+    padding: 15px 20px;
+    color: #555;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    font-weight: 500;
+}
+.tab-item:hover { color: #f57224; }
+.tab-item.active { color: #f57224; border-bottom: 2px solid #f57224; }
+
+
+.badge-count {
+    position: absolute; top: 5px; right: 0px;
+    background-color: #ff424f; color: white;
+    font-size: 10px; padding: 1px 5px;
+    border-radius: 10px; min-width: 15px;
+    text-align: center;
+}
+
+
+.filter-section { background: #fff; padding: 15px; display: flex; gap: 15px; align-items: center; border-radius: 4px; }
+.search-input-group { position: relative; flex: 1; max-width: 300px; }
+.input-control { width: 100%; padding: 10px 35px 10px 15px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
+.search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #999; }
+.btn-search-blue { background: #00bfa5; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+
+.order-card { background: #fff; margin-top: 15px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.oc-header { padding: 15px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; }
+.oc-user { font-weight: bold; color: #333; }
+.oc-body { padding: 15px; }
+.oc-product-item { display: flex; gap: 15px; margin-bottom: 10px; border-bottom: 1px solid #fafafa; padding-bottom: 10px; }
+.oc-img { width: 80px; height: 80px; border: 1px solid #eee; object-fit: cover; }
+.oc-footer { padding: 15px; background: #fffcfb; border-top: 1px solid #f0f0f0; text-align: right; }
+
+.btn-orange { background: #f57224; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; }
+.btn-white { background: white; border: 1px solid #ddd; color: #555; padding: 8px 20px; border-radius: 4px; margin-right: 10px; cursor: pointer; }
+
+
+.custom-modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+.modal-content { background-color: #fff; margin: 15% auto; padding: 25px; border-radius: 8px; width: 400px; text-align: center; }

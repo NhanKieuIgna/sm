@@ -1,0 +1,64 @@
+
+    .main-content-area { flex: 1; padding: 20px 30px; background-color: #fff; }
+    .page-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #333; }
+    
+    /* Thanh Filter */
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid #eee; align-items: center; }
+    .form-control-custom {
+    padding: 8px 15px; /* Tăng padding 2 bên một chút cho đẹp */
+    border: 1px solid #ccc;
+    border-radius: 25px; /* <-- Tăng giá trị này để bo tròn nhiều hơn */
+    font-size: 14px;
+    outline: none;
+    height: 40px; /* Tăng chiều cao một chút cho cân đối */
+}
+
+/* Nút tìm kiếm và nút Đặt lại */
+.btn-search {
+    height: 40px; /* Chiều cao bằng với ô input */
+    padding: 0 25px;
+    background-color: #00bfa5;
+    color: white;
+    border: none;
+    border-radius: 25px; /* <-- Bo tròn nút bấm */
+    cursor: pointer;
+    font-weight: bold;
+    display: flex; /* Để canh giữa nội dung bên trong */
+    align-items: center;
+    justify-content: center;
+    text-decoration: none; /* Cho nút Đặt lại (thẻ a) */
+    transition: background-color 0.2s;
+}
+
+.btn-search:hover {
+    background-color: #00a690;
+}
+    
+    /* Độ rộng các ô input */
+    .input-keyword { flex: 2; min-width: 150px; }
+    .input-category { flex: 1; min-width: 130px; }
+    .input-date { flex: 1; min-width: 130px; } /* Ô ngày tháng */
+    .input-status { flex: 1; min-width: 130px; } /* Ô trạng thái */
+
+    .btn-search:hover { background-color: #00a690; }
+
+    /* Các phần khác giữ nguyên */
+    .product-count-label { font-weight: bold; margin-bottom: 15px; font-size: 16px; }
+    .product-list-container { background-color: #e3f2fd; padding: 20px; border-radius: 8px; border: 1px solid #bbdefb; }
+    .product-card { display: flex; background: #fff; padding: 15px; border: 2px solid #ddd; border-radius: 6px; margin-bottom: 15px; align-items: center; }
+    .prod-img-box { width: 100px; height: 100px; border: 2px solid #ccc; margin-right: 20px; display: flex; justify-content: center; align-items: center; background: #f9f9f9; overflow: hidden; }
+    .prod-img-box img { width: 100%; height: 100%; object-fit: cover; }
+    .no-image-placeholder { font-size: 40px; color: #ccc; font-weight: 100; }
+    .prod-info { flex: 1; }
+    .prod-info p { margin: 5px 0; color: #555; font-size: 14px; }
+    .prod-name { font-weight: bold; font-size: 16px; color: #333; }
+    .price-highlight { font-weight: bold; color: #d32f2f; }
+    .prod-actions { display: flex; gap: 10px; }
+    .btn-action { padding: 6px 12px; border: 2px solid #777; background: #fff; color: #555; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.2s; white-space: nowrap; }
+    .btn-action:hover { background: #f0f0f0; border-color: #333; color: #000; }
+    .btn-delete { border-color: #d32f2f; color: #d32f2f; }
+    .btn-delete:hover { background: #ffebee; border-color: #b71c1c; color: #b71c1c; }
+    .btn-action i {
+        margin-right: 5px; 
+    }
+
