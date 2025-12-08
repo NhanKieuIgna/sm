@@ -23,6 +23,12 @@ if ($result_categories) {
     <title>Thêm sản phẩm</title>
     <link rel="stylesheet" href="../css/add-product.css">
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/all-products.css">
+    <link rel="stylesheet" href="../css/edit-product.css">
+    <link rel="stylesheet" href="../css/order-list.css">
+    <link rel="stylesheet" href="../css/sales-summary.css">
+    <link rel="stylesheet" href="../css/order-detail.css">
+    <link rel="stylesheet" href="../css/shop-profile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
@@ -82,10 +88,10 @@ if ($result_categories) {
                         <li><a href="#!"><?php echo $_SESSION['fullname']; ?></a>
                             <ul class="sub-menu">
                                 <li><a href="add-product.php">Thêm sản phẩm</a></li>
-                                <li><a href="">Tất cả sản phẩm</a></li>
-                                <li><a href="">Đơn bán</a></li>
-                                <li><a href="">Doanh thu</a></li>
-                                <li><a href="">Hồ sơ shop</a></li>
+                                <li><a href="all-products.php">Tất cả sản phẩm</a></li>
+                                <li><a href="order-list.php">Đơn bán</a></li>
+                                <li><a href="sales-summary.php">Doanh thu</a></li>
+                                <li><a href="shop-profile.php">Hồ sơ shop</a></li>
                             </ul>   
                         </li>
                     </ul>
