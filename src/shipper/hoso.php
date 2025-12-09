@@ -38,16 +38,16 @@ if ($res_user && mysqli_num_rows($res_user) > 0) {
     $user['avatar'] = htmlspecialchars($user['AvatarFile'] ?: 'default_avatar.png'); // SỬ DỤNG AvatarFile
     $user['status'] = htmlspecialchars($user['TrangThaiHoatDong'] ?: 'Offline'); 
 } else {
-    header("Location: logout.php"); 
+    header("Location: ../logout.php"); 
     exit();
 }
 mysqli_stmt_close($stmt_user);
 $sql_stats = "SELECT 
                  COUNT(ID_DonHang) AS orders_count,
-                 SUM(CASE WHEN TrangThaiDonHang IN ('DaGiao', 'HoanThanh') 
+                 SUM(CASE WHEN TrangThaiDonHang IN ('HoanThanh') 
                         THEN TongGiaTriDonHang * 0.05 ELSE 0 END) AS total_revenue
               FROM danhsachdonhang 
-              WHERE ID_NguoiGiaoHang = ?"; 
+              WHERE ID_NguoiGiaoHang = ? and TrangThaiDonHang = 'HoanThanh'"; 
 
 $stmt_stats = mysqli_prepare($conn, $sql_stats);
 mysqli_stmt_bind_param($stmt_stats, "i", $driver_id);
