@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $image_path = $target_file; 
                     $upload_success = true;
                     $proceed_to_db_update = true;
-                    $db_status = 'DaGiao'; 
+                    $db_status = 'HoanThanh'; 
                 } else {
                     $message = "Lỗi không xác định khi tải lên ảnh.";
                     $message_class = 'error';
