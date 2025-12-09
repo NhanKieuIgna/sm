@@ -109,11 +109,15 @@
                         while($prod = mysqli_fetch_assoc($res_prod)):
                     ?>
                     <div class="prod-item">
-                        <?php if(!empty($prod['URL_HinhAnh'])): ?>
-                            <img src="<?php echo $prod['URL_HinhAnh']; ?>" class="prod-img">
-                        <?php else: ?>
-                            <div style="width:80px; height:80px; background:#eee; display:flex; align-items:center; justify-content:center;">No Img</div>
-                        <?php endif; ?>
+                        <?php 
+                            $real_img = '../' . $prod['URL_HinhAnh'];
+                            if(!empty($real_img)){
+                                echo '<img src="'.$real_img.'" class="prod-img">';
+                            }
+                            else {
+                                echo '<div style="width:80px; height:80px; background:#eee; display:flex; align-items:center; justify-content:center;">No Img</div>';
+                            }
+                       ?>
                         <div>
                             <div class="prod-name"><?php echo $prod['TenSanPham']; ?></div>
                             <div class="prod-attr">Phân loại: <?php echo $prod['MauSac']; ?>, Kích cỡ: <?php echo $prod['KichThuoc']; ?></div>
