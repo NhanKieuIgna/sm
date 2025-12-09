@@ -205,7 +205,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'])) {
                                     VALUES 
                                     ($order_id, $product_id, $quantity, $price)";
                     
-                    if (!mysqli_query($conn, $insert_detail)) {
+                    if (!mysqli_query($conn, $insert_detail)) { // kiem tra tung lan luu chi tiet don hang
                         $all_success = false;
                         break;
                     }
@@ -217,6 +217,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'])) {
                 if (!$is_buy_now) {
                     unset($_SESSION['cart']);
                 }
+                $select_query = "SELECT * FROM chitietdonhang WHERE ID_DonHang = $order_id"; // Lấy chi tiết đơn hàng vừa tạo
+                $select_result = mysqli_query($conn, $select_query);
+                $result_order_details = mysqli_fetch_assoc($select_result);
+                // lay cot soluong mua
+                $quantity_ordered = $result_order_details['SoLuongMua'] ?? 0;
+                $id_ordered_product = $result_order_details['ID_SanPham'] ?? 0;
+                // Cập nhật số lượng sản phẩm trong kho
+                $update_stock = "UPDATE sanpham 
+                                 SET SoLuong = SoLuong - $quantity_ordered 
+                                 WHERE ID_SanPham = $id_ordered_product AND SoLuong >= $quantity_ordered";
+                mysqli_query($conn, $update_stock);
+
                 $success = 'Đặt hàng thành công! Mã đơn hàng: #' . $order_id;
                 // Redirect after 3 seconds
                 header("refresh:3;url=my-orders.php");

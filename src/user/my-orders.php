@@ -22,8 +22,19 @@ if (!$user || $user['VaiTro'] !== 'NguoiMua' && $user['VaiTro'] !== 'NguoiBan') 
 // Handle cancel order
 if (isset($_GET['cancel']) && $_GET['cancel']) {
     $order_id = intval($_GET['cancel']);
+    
     $update_query = "UPDATE danhsachdonhang SET TrangThaiDonHang = 'DaHuy' WHERE ID_DonHang = $order_id AND ID_NguoiMua = $user_id";
     if (mysqli_query($conn, $update_query)) {
+        $select_query = "SELECT * FROM chitietdonhang WHERE ID_DonHang = $order_id";
+        // get quantity and product id to update stock
+        $result_details = mysqli_query($conn, $select_query);
+        while ($detail = mysqli_fetch_assoc($result_details)) {
+            $product_id = $detail['ID_SanPham'];
+            $quantity = $detail['SoLuongMua'];
+            // update stock
+            $update_stock_query = "UPDATE sanpham SET SoLuong = SoLuong + $quantity WHERE ID_SanPham = $product_id";
+            mysqli_query($conn, $update_stock_query);
+        }
         $success = 'Đã hủy đơn hàng thành công';
     } else {
         $error = 'Có lỗi xảy ra khi hủy đơn hàng';

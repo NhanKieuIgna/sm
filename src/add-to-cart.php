@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../database/db.php';
 
 // Kiểm tra và khởi tạo giỏ hàng trong session
 if (!isset($_SESSION['cart'])) {
@@ -38,6 +39,15 @@ $product = mysqli_fetch_assoc($result);
 if (!$product) {
     if (isset($_POST['ajax'])) {
         echo json_encode(['success' => false, 'message' => 'Sản phẩm không tồn tại']);
+        exit();
+    }
+    header('Location: index.php');
+    exit();
+}
+// Kiểm tra số lượng tồn kho
+if (!isset($product['SoLuong']) || $product['SoLuong'] < 1) {
+    if (isset($_POST['ajax'])) {
+        echo json_encode(['success' => false, 'message' => 'Sản phẩm đã hết hàng']);
         exit();
     }
     header('Location: index.php');

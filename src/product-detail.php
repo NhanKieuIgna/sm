@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../database/db.php';
 
 // Kết nối database
 require_once('../database/db.php');
@@ -471,20 +472,30 @@ while ($row = mysqli_fetch_assoc($result_similar)) {
                     </div>
                     <?php endif; ?>
                 </div>
-
-                <div class="product-quantity">
-                    <span>Số lượng:</span>
-                    <div class="quantity-control">
-                        <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
-                        <input type="number" id="quantity" class="quantity-input" value="1" min="1" max="<?php echo $product['SoLuong']; ?>">
-                        <button class="quantity-btn" onclick="increaseQuantity()">+</button>
+ <?php if (isset($product['SoLuong']) && $product['SoLuong'] >= 1): ?>
+                    <div class="product-quantity">
+                        <span>Số lượng:</span>
+                        <div class="quantity-control">
+                            <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
+                            <input type="number" id="quantity" class="quantity-input" value="1" min="1" max="<?php echo $product['SoLuong']; ?>">
+                            <button class="quantity-btn" onclick="increaseQuantity()">+</button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="action-buttons">
-                    <button class="btn-secondary" onclick="addToCartDetail()">Thêm vào giỏ</button>
-                    <button class="btn-primary" ><a href="user/checkout.php?buy_now=1&product_id=<?php echo $product_id; ?>">Mua ngay</a></button>
-                </div>
+                    <div class="action-buttons">
+                        <button class="btn-secondary" onclick="addToCartDetail()">Thêm vào giỏ</button>
+                        <button class="btn-primary" ><a href="user/checkout.php?buy_now=1&product_id=<?php echo $product_id; ?>">Mua ngay</a></button>
+                    </div>
+                <?php else: ?>
+                    <div class="product-quantity">
+                        <span style="color: #ff6b6b; font-weight: bold; font-size: 18px;">⚠ Sản phẩm đã hết hàng</span>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-secondary" disabled style="opacity: 0.5; cursor: not-allowed;">Hết hàng</button>
+                        <button class="btn-primary" disabled style="opacity: 0.5; cursor: not-allowed;">Không khả dụng</button>
+                    </div>
+                <?php endif; ?>
 
                 <?php if (!empty($product['DiaChiLayHang'])): ?>
                 <div class="product-meta">
