@@ -84,7 +84,7 @@ $status_classes = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chi tiết đơn hàng #DH<?php echo str_pad($order_id, 6, '0', STR_PAD_LEFT); ?> - SM</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="my-orders.css">
+    <link rel="stylesheet" href="../css/my-orders.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>

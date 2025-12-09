@@ -211,7 +211,7 @@ function build_pagination_url($page) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SM - <?php echo htmlspecialchars($category_name); ?></title>
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="list-product.css">
+    <link rel="stylesheet" href="../css/list-product.css">
 </head>
 <body>
     <div class="browser-bar">

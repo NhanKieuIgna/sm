@@ -54,7 +54,7 @@ $user_has_reviewed = mysqli_num_rows($user_review_result) > 0;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SM - Đánh giá sản phẩm</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="review.css">
+    <link rel="stylesheet" href="../css/review.css">
 </head>
 <body>
     <div class="browser-bar">

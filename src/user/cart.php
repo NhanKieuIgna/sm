@@ -38,7 +38,7 @@ if ($result_categories) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SM - Giỏ hàng của tôi</title>
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="cart.css">
+    <link rel="stylesheet" href="../css/cart.css">
 </head>
 
 <body>
