@@ -43,11 +43,11 @@ mysqli_stmt_close($stmt_profile);
 // 2. TRUY VẤN THỐNG KÊ 
 // Đã sửa lỗi SQL để tính tổng COD và Phí giao hàng chính xác hơn.
 $sql_stats = "SELECT 
-                COUNT(ID_DonHang) AS total_orders,
-                SUM(CASE WHEN TrangThaiDonHang IN ('DangVanChuyen', 'DaGiao') THEN SoTienCanThu_COD ELSE 0 END) AS total_cod_amount,
-                SUM(CASE WHEN TrangThaiDonHang IN ('HoanThanh', 'DaGiao') THEN TongGiaTriDonHang * 0.05 ELSE 0 END) AS total_delivery_fee
-            FROM danhsachdonhang 
-            WHERE ID_NguoiGiaoHang = ?"; 
+    COUNT(CASE WHEN TrangThaiDonHang = 'DangVanChuyen' THEN 1 END) AS total_orders,
+    SUM(CASE WHEN TrangThaiDonHang = 'DangVanChuyen' THEN SoTienCanThu_COD ELSE 0 END) AS total_cod_amount,
+    SUM(CASE WHEN TrangThaiDonHang = 'HoanThanh' THEN TongGiaTriDonHang * 0.05 ELSE 0 END) AS total_delivery_fee
+FROM danhsachdonhang
+WHERE ID_NguoiGiaoHang = ?;"; 
 $stmt_stats = mysqli_prepare($conn, $sql_stats);
 mysqli_stmt_bind_param($stmt_stats, "i", $driver_id);
 mysqli_stmt_execute($stmt_stats);
@@ -247,7 +247,7 @@ endif;
                 <div style="font-weight:700;font-size:18px"><?php echo $total_orders; ?></div>
             </div>
             <div class="stat">
-                <div class="small">COD </div>
+                <div class="small">Tổng COD </div>
                 <div style="font-weight:700;font-size:18px">₫<?php echo $total_revenue; ?></div>
             </div>
             <div class="stat">
