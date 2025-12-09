@@ -3,13 +3,14 @@
     $page = 'sales-summary'; 
 
     if (!isset($_SESSION['user_id'])) {
-        echo "<script>window.location.href='login.php';</script>"; exit();
+        echo "<script>window.location.href='../login.php';</script>"; exit();
     }
     $user_id = $_SESSION['user_id'];
 
     $current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'overview'; 
-    $from_date = isset($_GET['from_date']) ? $_GET['from_date'] : date('Y-m-01');
-    $to_date   = isset($_GET['to_date']) ? $_GET['to_date'] : date('Y-m-d');
+    
+    $from_date = isset($_GET['from_date']) && !empty($_GET['from_date']) ? $_GET['from_date'] : date('Y-m-01');
+    $to_date   = isset($_GET['to_date']) && !empty($_GET['to_date']) ? $_GET['to_date'] : date('Y-m-d');
 
     $finance = [
         'tong_doanh_thu' => 0,
@@ -26,21 +27,33 @@
     ];
 
     if ($current_tab == 'overview') {
+        
         $sql_finance = "SELECT 
-                            SUM(TongDoanhThu) as TotalRevenue,
-                            SUM(TienThucNhan) as NetRevenue,
-                            SUM(GiaTriMat_HuyHoan) as LostRevenue
-                        FROM thongkedoanhthu
-                        WHERE ID_NguoiBan = '$user_id'
-                          AND LoaiThoiGian = 'Ngay'
-                          AND GiaTriThoiGian BETWEEN '$from_date' AND '$to_date'";
+            SUM(CASE 
+                WHEN dh.TrangThaiDonHang = 'HoanThanh' THEN (
+                    SELECT COALESCE(SUM(ct.SoLuongMua * ct.GiaTaiThoiDiemDat), 0)
+                    FROM chitietdonhang ct WHERE ct.ID_DonHang = dh.ID_DonHang
+                ) ELSE 0 
+            END) as TotalRevenue,
+            
+            SUM(CASE 
+                WHEN dh.TrangThaiDonHang = 'DaHuy' THEN (
+                    SELECT COALESCE(SUM(ct.SoLuongMua * ct.GiaTaiThoiDiemDat), 0)
+                    FROM chitietdonhang ct WHERE ct.ID_DonHang = dh.ID_DonHang
+                ) ELSE 0 
+            END) as LostRevenue
+
+        FROM danhsachdonhang dh
+        WHERE dh.ID_NguoiBan = '$user_id' 
+        AND DATE(dh.NgayDatHang) BETWEEN '$from_date' AND '$to_date'";
         
         $res_finance = mysqli_query($conn, $sql_finance);
-        if ($row_fin = mysqli_fetch_assoc($res_finance)) {
-            $finance['tong_doanh_thu'] = $row_fin['TotalRevenue'] ?? 0;
-            $finance['tien_thuc_nhan'] = $row_fin['NetRevenue'] ?? 0;
-            $finance['tien_mat']       = $row_fin['LostRevenue'] ?? 0;
-        }
+        $row_fin = mysqli_fetch_assoc($res_finance);
+
+        $finance['tong_doanh_thu'] = $row_fin['TotalRevenue'] ?? 0;
+        $finance['tien_mat']       = $row_fin['LostRevenue'] ?? 0;
+        
+        $finance['tien_thuc_nhan'] = $finance['tong_doanh_thu'] - ($finance['tong_doanh_thu'] * 0.015);
 
         $sql_count = "SELECT TrangThaiDonHang, COUNT(*) as sl 
                       FROM danhsachdonhang 
@@ -185,8 +198,16 @@
                                 <td>
                                     <div class="prod-cell">
                                         <span class="rank-num <?php if($rank==1) echo 'top-1'; ?>">#<?php echo $rank++; ?></span>
-                                        <?php if(!empty($bs['URL_HinhAnh'])): ?>
-                                            <img src="<?php echo $bs['URL_HinhAnh']; ?>" style="width:50px; height:50px; object-fit:cover; border-radius:4px; border:1px solid #eee;">
+                                        <?php 
+                                            $img_url = $bs['URL_HinhAnh'];
+                                            if(!empty($img_url) && strpos($img_url, '../') !== 0) {
+                                                $img_url = '../' . $img_url;
+                                            }
+                                        ?>
+                                        <?php if(!empty($img_url)): ?>
+                                            <img src="<?php echo $img_url; ?>" style="width:50px; height:50px; object-fit:cover; border-radius:4px; border:1px solid #eee;" onerror="this.src='https://placehold.co/50x50?text=No+Img'">
+                                        <?php else: ?>
+                                            <div style="width:50px; height:50px; background:#eee; display:flex; align-items:center; justify-content:center; border-radius:4px; font-size:10px;">NoImg</div>
                                         <?php endif; ?>
                                         <strong><?php echo $bs['TenSanPham']; ?></strong>
                                     </div>

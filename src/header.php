@@ -38,10 +38,10 @@
                         <li><a href="#!"><?php echo $_SESSION['fullname']; ?></a>
                             <ul class="sub-menu">
                                 <li><a href="seller/add-product.php">Thêm sản phẩm</a></li>
-                                <li><a href="">Tất cả sản phẩm</a></li>
-                                <li><a href="">Đơn bán</a></li>
-                                <li><a href="">Doanh thu</a></li>
-                                <li><a href="">Hồ sơ shop</a></li>
+                                <li><a href="seller/all-products.php">Tất cả sản phẩm</a></li>
+                                <li><a href="seller/order-list.php">Đơn bán</a></li>
+                                <li><a href="seller/sales-summary.php">Doanh thu</a></li>
+                                <li><a href="seller/shop-profile.php">Hồ sơ shop</a></li>
                                 <li><a href="user/edit-profile.php">Chỉnh sửa hồ sơ</a></li>
                             </ul>   
                         </li>
