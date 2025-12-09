@@ -21,7 +21,7 @@ $sql = "SELECT
         JOIN chitietdonhang ctdh ON dh.ID_DonHang = ctdh.ID_DonHang
         JOIN sanpham sp ON ctdh.ID_SanPham = sp.ID_SanPham
         WHERE dh.ID_NguoiGiaoHang = ?
-          AND dh.TrangThaiDonHang IN ('DaGiao', 'DaHuy')
+          AND dh.TrangThaiDonHang IN ('HoanThanh', 'DaHuy')
         GROUP BY dh.ID_DonHang, nd.HoTen, dh.DiaChiGiaoHang, dh.TongGiaTriDonHang, dh.TrangThaiDonHang, dh.ThoiGianHoanThanh
         ORDER BY dh.ThoiGianHoanThanh DESC";
 $stmt = $conn->prepare($sql);
