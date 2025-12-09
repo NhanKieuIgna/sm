@@ -1,6 +1,6 @@
 <?php
     require_once 'header.php'; 
-
+require_once __DIR__ . '/../../database/db.php';
     if(isset($_POST['a-product'])) {
         $id_nguoiban = $_SESSION['user_id'];
         $ten_sp      = mysqli_real_escape_string($conn, $_POST['name']);

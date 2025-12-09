@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once '../../database/db.php'; 
-
+require_once __DIR__ . '/../../database/db.php';
 if (isset($_GET['action']) && isset($_GET['id']) && isset($_SESSION['user_id'])) {
     
     $id_donhang = $_GET['id'];

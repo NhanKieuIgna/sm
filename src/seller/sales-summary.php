@@ -1,5 +1,6 @@
 <?php 
-    require_once 'header.php'; 
+    require_once 'header.php';
+    require_once __DIR__ . '/../../database/db.php'; 
     $page = 'sales-summary'; 
 
     if (!isset($_SESSION['user_id'])) {

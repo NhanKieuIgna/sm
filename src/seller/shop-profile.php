@@ -1,6 +1,7 @@
 
 <?php 
-    require_once 'header.php'; 
+    require_once 'header.php';
+    require_once __DIR__ . '/../../database/db.php'; 
     $page = 'shop-profile';
 
     if (!isset($_SESSION['user_id'])) {

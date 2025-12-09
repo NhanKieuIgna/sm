@@ -1,6 +1,7 @@
 <?php
 session_start();
 // Kết nối db
+require_once __DIR__ . '/../../database/db.php';
 require_once('../../database/db.php');
 // Lấy danh mục
 $sql_categories = "SELECT * FROM danhmuc ORDER BY TenDanhMuc";
