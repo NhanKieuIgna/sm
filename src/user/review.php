@@ -46,6 +46,16 @@ $reviews_result = mysqli_query($conn, $reviews_query);
 $user_review_query = "SELECT * FROM danhgia_nhanxet WHERE ID_DonHang = {$order['ID_SanPham']} AND ID_NguoiDanhgia = $user_id";
 $user_review_result = mysqli_query($conn, $user_review_query);
 $user_has_reviewed = mysqli_num_rows($user_review_result) > 0;
+
+// Lấy danh mục
+$sql_categories = "SELECT * FROM danhmuc ORDER BY TenDanhMuc";
+$result_categories = mysqli_query($conn, $sql_categories);
+$categories = [];
+if ($result_categories) {
+    while ($row = mysqli_fetch_assoc($result_categories)) {
+        $categories[] = $row;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -69,49 +79,7 @@ $user_has_reviewed = mysqli_num_rows($user_review_result) > 0;
         <p>Cam kết hoàn tiền 100% nếu sản phẩm không đúng mô tả!</p>
     </div>
 
-    <header class="header">
-        <div class="header-top">
-            <a href="../index.php" class="logo">
-                <div class="logo-icon"><img src="../img/logo.jpg" alt="logo"></div>
-            </a>
-            <div class="category-dropdown">
-                <button class="category-btn">Tất cả danh mục</button>
-                <div class="category-menu">
-                    <a href="list-product.html">Sách</a>
-                    <a href="#">Thiết bị</a>
-                    <a href="#">Đồ gia dụng</a>
-                    <a href="#">Đồ chơi</a>
-                </div>
-            </div>
-            <div class="search-container">
-                <input type="text" class="search-bar" placeholder=" Tìm kiếm">
-                <span class="search-icon">&#x1F50E;&#xFE0E;</span>
-            </div>
-            <div class="user-actions">
-                <a href="#" class="bell-icon"><img class="bell-icon-img" src="https://cdn-icons-png.flaticon.com/128/3602/3602145.png" alt="bell"></a>
-                <span>|</span>
-                <?php if(isset($_SESSION['user_id'])): ?>
-                    <span><u><?php echo htmlspecialchars($_SESSION['fullname']); ?></u></span>
-                    <span>|</span>
-                    <a href="../logout.php"><u>Đăng Xuất</u></a>
-                <?php else: ?>
-                    <a href="../login.php"><u>Đăng nhập</u></a>
-                    <span>|</span>
-                    <a href="../register.php"><u>Đăng ký</u></a>
-                <?php endif; ?>
-                <span>|</span>
-                <a href="cart.php" class="cart-icon"><img class="cart-icon-img" src="https://cdn-icons-png.flaticon.com/128/1170/1170678.png" alt="cart"></a>
-            </div>
-        </div>
-        <div class="nav-categories">
-            <a href="../index.php">Trang chủ</a>
-            <a href="#">Đồ cho nam</a>
-            <a href="#">Đồ cho nữ</a>
-            <a href="#">Đồ cho mẹ và bé</a>
-            <a href="#">Đồ gia dụng</a>
-            <a href="#">Đồ chơi</a>
-        </div>
-    </header>
+   <?php include 'header.php'; ?>
 
     <main class="review-page">
         <div class="breadcrumb">
@@ -199,7 +167,7 @@ $user_has_reviewed = mysqli_num_rows($user_review_result) > 0;
                 <h3>Gửi tin nhắn cho người bán</h3>
                 <textarea placeholder="Viết tin nhắn..."></textarea>
                 <div class="review-actions">
-                    <button class="btn-outline">Quay lại</button>
+                    <button class="btn-outline"><a href="my-orders.php">Quay lại</a></button>
                     <button class="btn-primary">Gửi tin nhắn</button>
                 </div>
             </div>

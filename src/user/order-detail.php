@@ -76,6 +76,15 @@ $status_classes = [
     'HoanThanh' => 'status-completed',
     'DaHuy' => 'status-cancelled'
 ];
+// Lấy danh mục
+$sql_categories = "SELECT * FROM danhmuc ORDER BY TenDanhMuc";
+$result_categories = mysqli_query($conn, $sql_categories);
+$categories = [];
+if ($result_categories) {
+    while ($row = mysqli_fetch_assoc($result_categories)) {
+        $categories[] = $row;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -89,29 +98,7 @@ $status_classes = [
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
-        <div class="header-top">
-            <a href="../index.php" class="logo">
-                <div class="logo-icon"><img src="../img/logo.jpg" alt="logo"></div>
-            </a>
-            <div class="search-container">
-                <input type="text" class="search-bar" placeholder=" Tìm kiếm">
-                <span class="search-icon">&#x1F50E;&#xFE0E;</span>
-            </div>
-            <div class="user-actions">
-                <?php if(isset($_SESSION['user_id'])): ?>
-                    <span><u><?php echo $_SESSION['fullname']; ?></u></span>
-                    <span>|</span>
-                    <a href="../logout.php"><u>Đăng Xuất</u></a>
-                <?php else: ?>    
-                    <a href="../login.php"><u>Đăng nhập</u></a>
-                    <span>|</span>
-                    <a href="../register.php"><u>Đăng ký</u></a>
-                <?php endif; ?>
-            </div>
-        </div>
-    </header>
-
+ <?php include 'header.php'; ?>
     <main class="order-detail-page">
         <div class="breadcrumb">
             <a href="../index.php">Trang chủ</a> <span> > </span> 
