@@ -103,8 +103,9 @@
                         <div class="prod-img-box">
                             <?php 
                                 $img_url = $row['URL_HinhAnh'];
-                                if (!empty($img_url) && file_exists($img_url)) {
-                                    echo '<img src="'.$img_url.'" alt="Ảnh SP">';
+                                $real_path = '../' . $img_url;
+                                if (!empty($real_path)) {
+                                    echo '<img src="'.$real_path.'" alt="Ảnh SP">';
                                 } else {
                                     echo '<span class="no-image-placeholder">×</span>';
                                 }
