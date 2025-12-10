@@ -340,16 +340,20 @@ function build_pagination_url($page) {
                                 <div class="product-name"><?php echo htmlspecialchars($product['TenSanPham']); ?></div>
                                 <div class="product-price"><?php echo number_format($product['Gia'], 0, ',', '.'); ?>đ</div>
                                 <div class="product-actions" onclick="event.stopPropagation()" style="display: flex; justify-content: center; gap: 10px;">
-                                    <form method="POST" action="../add-to-cart.php" style="display: inline;">
-                                        <input type="hidden" name="product_id" value="<?php echo $product['ID_SanPham']; ?>">
-                                        <input type="hidden" name="quantity" value="1">
-                                        <input type="hidden" name="action" value="add">
-                                        <input type="hidden" name="redirect" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
-                                        <button type="submit" class="btn-add-cart">thêm vào</button>
-                                    </form>
-                                    <a href="../product-detail.php?id=<?php echo $product['ID_SanPham']; ?>">
-                                        <button class="btn-buy-now">mua ngay</button>
-                                    </a>
+                                     <?php if (isset($product['SoLuong']) && $product['SoLuong'] >= 1): ?>
+                                        <form method="POST" action="../add-to-cart.php" style="display: inline;">
+                                            <input type="hidden" name="product_id" value="<?php echo $product['ID_SanPham']; ?>">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <input type="hidden" name="action" value="add">
+                                            <input type="hidden" name="redirect" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
+                                            <button type="submit" class="btn-add-cart">thêm vào</button>
+                                        </form>
+                                       <?php else: ?>
+                                            <button class="btn-add-cart" disabled style="opacity: 0.5; cursor: not-allowed;">Hết hàng</button>
+                                        <?php endif; ?>
+                                        <a href="../product-detail.php?id=<?php echo $product['ID_SanPham']; ?>">
+                                            <button class="btn-buy-now">mua ngay</button>
+                                        </a>
                                 </div>
                             </div>
                         </a>
