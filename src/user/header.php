@@ -62,7 +62,7 @@
 
                    
                     <span>|</span>
-                    <a href="logout.php"><u>Đăng Xuất</u></a>
+                    <a href="../logout.php"><u>Đăng Xuất</u></a>
                 <?php else: ?>    
                 <a href="../login.php"><u>Đăng nhập</u></a>
                 <span>|</span>
