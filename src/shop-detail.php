@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+require_once __DIR__ . '/../database/db.php';
 // Kết nối database
 require_once('../database/db.php');
 

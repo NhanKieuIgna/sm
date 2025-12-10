@@ -403,9 +403,13 @@ if ($result_categories) {
 
 
                     <div class="form-actions">
-                        <a href="cart.html" class="btn btn-secondary">
+                        <a href="cart.php" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i>
                             Quay lại giỏ hàng
+                        </a>
+                        <a href="../index.php" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            Quay lại trang chủ
                         </a>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-check"></i>
