@@ -75,7 +75,7 @@
                 }
             }
 
-            echo "<script>alert('Cập nhật sản phẩm thành công!'); window.location.href='all-product.php';</script>";
+            echo "<script>alert('Cập nhật sản phẩm thành công!'); window.location.href='all-products.php';</script>";
         } else {
             echo "<script>alert('Lỗi SQL: " . mysqli_error($conn) . "');</script>";
         }
