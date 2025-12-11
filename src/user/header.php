@@ -7,7 +7,7 @@
             </a>
             
             <div class="category-dropdown">
-                <button class="category-btn">Tất cả danh mục</button>
+                <button class="category-btn"><a href="list-product.php">Tất cả danh mục</a></button>
                 <div class="category-menu">
                     <?php if (!empty($categories)): ?>
                         <?php foreach ($categories as $category): ?>
