@@ -484,7 +484,7 @@ while ($row = mysqli_fetch_assoc($result_similar)) {
 
                     <div class="action-buttons">
                         <button class="btn-secondary" onclick="addToCartDetail()">Thêm vào giỏ</button>
-                        <button class="btn-primary" ><a href="user/checkout.php?buy_now=1&product_id=<?php echo $product_id; ?>">Mua ngay</a></button>
+                        <button class="btn-primary" onclick="buyNowRedirect()">Mua ngay</button>
                     </div>
                 <?php else: ?>
                     <div class="product-quantity">
@@ -687,6 +687,14 @@ while ($row = mysqli_fetch_assoc($result_similar)) {
                 console.error('Error:', error);
                 alert('Có lỗi xảy ra');
             });
+        }
+
+        // Redirect to checkout with quantity included
+        function buyNowRedirect() {
+            const quantity = document.getElementById('quantity').value;
+            const productId = <?php echo $product_id; ?>;
+            const url = 'user/checkout.php?buy_now=1&product_id=' + encodeURIComponent(productId) + '&quantity=' + encodeURIComponent(quantity);
+            window.location.href = url;
         }
     </script>
 </body>
