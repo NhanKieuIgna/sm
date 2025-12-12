@@ -2,8 +2,8 @@
 session_start();
 
 // Kết nối DB và header
-require_once 'C:\wamp64\www\SM\database\db.php';
-include 'C:\wamp64\www\SM\src\admin\header.php';
+require_once __DIR__ . '/../../database/db.php';
+include __DIR__ . '/header.php';
 
 // Flash
 $flash = $_SESSION['flash'] ?? null;

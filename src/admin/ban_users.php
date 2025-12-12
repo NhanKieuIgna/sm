@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once 'C:\wamp64\www\SM\database\db.php';
+require_once __DIR__ . '/../../database/db.php';
 
 // Lấy tham số từ URL
 $userId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
