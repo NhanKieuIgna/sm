@@ -11,18 +11,23 @@ if(isset($_POST['login'])){
     $row = mysqli_fetch_array($res);
     
     if($row){
-        $_SESSION['user_id'] = $row['ID_NguoiDung'];
-        $_SESSION['username'] = $row['TenDangNhap'];
-        $_SESSION['role'] = $row['VaiTro'];
-        $_SESSION['fullname'] = $row['HoTen'];
-         if($_SESSION['role'] == 'NguoiGiaoHang'){
-            header('location: shipper/delivery_index.php');
-        }elseif($_SESSION['role'] == 'QuanTriVien'){
-            header('location: admin/user.php');
+        // Kiểm tra tài khoản có bị khóa không
+        if($row['TrangThaiHoatDong'] == 0){
+            $error = 'Tài khoản của bạn đã bị khóa.';
         } else {
-            header('location: index.php');
+            $_SESSION['user_id'] = $row['ID_NguoiDung'];
+            $_SESSION['username'] = $row['TenDangNhap'];
+            $_SESSION['role'] = $row['VaiTro'];
+            $_SESSION['fullname'] = $row['HoTen'];
+             if($_SESSION['role'] == 'NguoiGiaoHang'){
+                header('location: shipper/delivery_index.php');
+            }elseif($_SESSION['role'] == 'QuanTriVien'){
+                header('location: admin/user.php');
+            } else {
+                header('location: index.php');
+            }
+            exit();
         }
-        exit();
     } else {
         $error = 'Tên đăng nhập hoặc mật khẩu không chính xác';
     }
