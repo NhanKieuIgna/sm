@@ -1,4 +1,5 @@
 <?php 
+require_once __DIR__ . '/../../database/db.php';
     require_once 'header.php'; 
     $page = 'order-list'; 
 
