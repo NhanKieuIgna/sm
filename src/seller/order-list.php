@@ -1,5 +1,4 @@
 <?php 
-     require_once __DIR__ . '/../../database/db.php';
     require_once 'header.php'; 
     $page = 'order-list'; 
 
@@ -10,7 +9,7 @@
 
     $current_status = isset($_GET['status']) ? $_GET['status'] : 'all';
     
-    // Đếm số lượng
+    // Cho biết số lượng đơn hàng
     $count_sql = "SELECT TrangThaiDonHang, COUNT(*) as sl FROM danhsachdonhang WHERE ID_NguoiBan = '$user_id' GROUP BY TrangThaiDonHang";
     $count_res = mysqli_query($conn, $count_sql);
     $counts = [];
