@@ -472,7 +472,7 @@ while ($row = mysqli_fetch_assoc($result_similar)) {
                     </div>
                     <?php endif; ?>
                 </div>
- <?php if (isset($product['SoLuong']) && $product['SoLuong'] >= 1): ?>
+     <?php if (isset($product['SoLuong']) && $product['SoLuong'] >= 1): ?>
                     <div class="product-quantity">
                         <span>Số lượng:</span>
                         <div class="quantity-control">
@@ -695,6 +695,7 @@ while ($row = mysqli_fetch_assoc($result_similar)) {
             const productId = <?php echo $product_id; ?>;
             const url = 'user/checkout.php?buy_now=1&product_id=' + encodeURIComponent(productId) + '&quantity=' + encodeURIComponent(quantity);
             window.location.href = url;
+            
         }
     </script>
 </body>
