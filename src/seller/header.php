@@ -62,7 +62,7 @@ if ($result_categories) {
                 <div class="category-menu">
                     <?php if (!empty($categories)): ?>
                         <?php foreach ($categories as $category): ?>
-                            <a href="user/list-product.php?category=<?php echo $category['ID_DanhMuc']; ?>"><?php echo htmlspecialchars($category['TenDanhMuc']); ?></a>
+                            <a href="../user/list-product.php?category=<?php echo $category['ID_DanhMuc']; ?>"><?php echo htmlspecialchars($category['TenDanhMuc']); ?></a>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <a href="#">Chưa có danh mục</a>
