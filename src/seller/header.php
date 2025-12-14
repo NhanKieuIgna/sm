@@ -71,7 +71,7 @@ if ($result_categories) {
             </div>
 
             <div class="search-container">
-                <form action="user/list-product.php" method="GET" style="display: flex; align-items: center; width: 100%;">
+                <form action="../user/list-product.php" method="GET" style="display: flex; align-items: center; width: 100%;">
                     <input type="text" name="search" class="search-bar" placeholder=" Tìm kiếm" id="searchInput" autocomplete="off">
                     <button type="submit" style="background: none; border: none; cursor: pointer;">
                         <span class="search-icon">&#x1F50E;&#xFE0E;</span>
