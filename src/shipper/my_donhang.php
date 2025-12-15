@@ -13,7 +13,7 @@ $orders = [];
 $sql = "SELECT 
             DH.ID_DonHang, DH.DiaChiGiaoHang, DH.TrangThaiDonHang,
             N.HoTen AS TenKhachHang, 
-            DH.TongGiaTriDonHang, DH.SoTienCanThu_COD
+            DH.TongGiaTriDonHang, DH.SoTienCanThu_COD,N.SoDienThoai
         FROM danhsachdonhang AS DH
         LEFT JOIN nguoidung AS N ON DH.ID_NguoiMua = N.ID_NguoiDung
         WHERE DH.ID_NguoiGiaoHang = ?
@@ -41,6 +41,7 @@ if ($result) {
             "total_value" => number_format($row['TongGiaTriDonHang'], 0, ',', '.') . '₫', 
             "status" => htmlspecialchars($row['TrangThaiDonHang']),
             "raw_id" => $row['ID_DonHang'] ,
+            "sdt" => htmlspecialchars($row['SoDienThoai']) ,
             // Số tiền cần thu (COD) đã format
             "pgh" => number_format($row['SoTienCanThu_COD'], 0, ',', '.') . '₫',
             
@@ -340,6 +341,9 @@ h2 {
                     <div class="info">
                         <div class="badge">Mã đơn: <?php echo $order['id']; ?></div>
                         <h4>Khách: <?php echo $order['customer']; ?></h4>
+                        <div class="meta">
+                            Số điện thoại: <span class="status" style="color: #222;"><?php echo $order['sdt']; ?></span>
+                        </div>
                         <p>Địa chỉ giao hàng: <?php echo $order['address']; ?></p>
                         
                                                 <p style="font-weight: 600; color: #007bff;">Phí Ship:  <?php echo $order['shipping_fee']; ?></p>
@@ -355,10 +359,14 @@ h2 {
                         <?php if ($status === 'DangVanChuyen') { ?>
                             <a href="confirm_GH.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Xác nhận Hoàn thành</a>
                         <?php } ?>
-                        <?php if ($status === 'DangVanChuyen') { ?>
-                            <a href="HuyGiaoHang.php?id=<?php echo $order['raw_id']; ?>" class="btn btn-ghost">Hủy Đơn</a>
+                         <?php if ($status === 'DangVanChuyen') { ?>
+                            <a href="HuyGiaoHang.php?id=<?php echo $order['raw_id']; ?>"
+                            class="btn btn-ghost"
+                            onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?');">
+                            Hủy Đơn
+                            </a>
                         <?php } ?>
-                    </div>
+                                            </div>
                 </div>
                 <?php endforeach; ?>
             </div>
