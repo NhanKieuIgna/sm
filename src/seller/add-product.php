@@ -1,13 +1,33 @@
 <?php
     require_once 'header.php'; 
-require_once __DIR__ . '/../../database/db.php';
+    require_once __DIR__ . '/../../database/db.php';
     if(isset($_POST['a-product'])) {
+        if (empty($_POST['category'])) {
+            echo "<script>alert('Vui lòng chọn danh mục!'); window.history.back();</script>";
+            exit();
+        }
         $id_nguoiban = $_SESSION['user_id'];
         $ten_sp      = mysqli_real_escape_string($conn, $_POST['name']);
         $id_danhmuc  = $_POST['category'];
         $soluong     = $_POST['quantity'];
         $gia         = $_POST['price']; 
         $tinhtrang   = $_POST['condition'];
+
+        // Báo lỗi nếu trường nào bị bỏ trống
+        if (empty($id_danhmuc) || empty($ten_sp) || empty($gia) || empty($soluong) || 
+            empty($mota) || empty($mausac) || empty($thuonghieu) || 
+            empty($kichthuoc) || empty($diachi)) {
+            
+            echo "<script>alert('Vui lòng nhập đầy đủ tất cả các thông tin bắt buộc!'); window.history.back();</script>";
+            exit(); 
+        }
+
+        // Bắt buộc phải có ít nhất 1 ảnh
+        if (empty($_FILES['product_images']['name'][0])) {
+            echo "<script>alert('Vui lòng chọn ít nhất một ảnh cho sản phẩm!'); window.history.back();</script>";
+            exit();
+        }
+
         $mota        = mysqli_real_escape_string($conn, $_POST['description']);
         $mausac      = mysqli_real_escape_string($conn, $_POST['color']);
         $thuonghieu  = mysqli_real_escape_string($conn, $_POST['brand']);
@@ -87,7 +107,7 @@ require_once __DIR__ . '/../../database/db.php';
                 <div class="input-half">
                     <label for="category" class="required">Danh mục</label>
                     <select id="category" name="category">
-                        <option>Danh mục</option>
+                        <option value="">Danh mục</option>
                         <?php 
                         if (!empty($categories)) {
                             foreach ($categories as $cat) {
@@ -114,7 +134,7 @@ require_once __DIR__ . '/../../database/db.php';
                 </div>
                 <div class="input-half">
                     <label for="price" class="required">Giá bán</label>
-                    <input type="number" id="price" name="price" value="20000">
+                    <input type="number" id="price" name="price" value="20000" min="20000">
                 </div>
             </div>
             
@@ -201,8 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // 3. CẬP NHẬT LẠI INPUT BẰNG DANH SÁCH FILE TRONG THÙNG CHỨA
-        // Đây là bước quan trọng nhất để PHP nhận được tất cả ảnh
+
         fileInput.files = dataTransfer.files;
     }
     
@@ -225,7 +244,6 @@ document.addEventListener('DOMContentLoaded', function() {
             imageItem.remove(); 
             updateContainerState();
 
-            // XỬ LÝ XÓA FILE KHỎI THÙNG CHỨA ẢO
             // Tạo một thùng mới
             const newDataTransfer = new DataTransfer();
             
