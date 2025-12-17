@@ -12,6 +12,17 @@
         $soluong     = $_POST['quantity'];
         $gia         = $_POST['price']; 
         $tinhtrang   = $_POST['condition'];
+        $mota        = mysqli_real_escape_string($conn, $_POST['description']);
+        $mausac      = mysqli_real_escape_string($conn, $_POST['color']);
+        $thuonghieu  = mysqli_real_escape_string($conn, $_POST['brand']);
+        $kichthuoc   = mysqli_real_escape_string($conn, $_POST['size']);
+        $diachi      = mysqli_real_escape_string($conn, $_POST['pickup_address']);
+
+        // Bắt buộc phải có ít nhất 1 ảnh
+        if (empty($_FILES['product_images']['name'][0])) {
+            echo "<script>alert('Vui lòng chọn ít nhất một ảnh cho sản phẩm!'); window.history.back();</script>";
+            exit();
+        }
 
         // Báo lỗi nếu trường nào bị bỏ trống
         if (empty($id_danhmuc) || empty($ten_sp) || empty($gia) || empty($soluong) || 
@@ -22,17 +33,6 @@
             exit(); 
         }
 
-        // Bắt buộc phải có ít nhất 1 ảnh
-        if (empty($_FILES['product_images']['name'][0])) {
-            echo "<script>alert('Vui lòng chọn ít nhất một ảnh cho sản phẩm!'); window.history.back();</script>";
-            exit();
-        }
-
-        $mota        = mysqli_real_escape_string($conn, $_POST['description']);
-        $mausac      = mysqli_real_escape_string($conn, $_POST['color']);
-        $thuonghieu  = mysqli_real_escape_string($conn, $_POST['brand']);
-        $kichthuoc   = mysqli_real_escape_string($conn, $_POST['size']);
-        $diachi      = mysqli_real_escape_string($conn, $_POST['pickup_address']);
         
         $sql = "INSERT INTO sanpham (ID_NguoiBan, TenSanPham, MoTa, Gia, TinhTrang, SoLuong, DiaChiLayHang, KichThuoc, ID_DanhMuc, TrangThaiDangBan, MauSac, ThuongHieu, NgayTao) 
                 VALUES ('$id_nguoiban', '$ten_sp', '$mota', '$gia', '$tinhtrang', '$soluong', '$diachi', '$kichthuoc', '$id_danhmuc', 'ChoDuyet', '$mausac', '$thuonghieu', NOW())";
