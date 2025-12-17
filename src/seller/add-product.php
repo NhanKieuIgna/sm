@@ -41,7 +41,7 @@
             $id_sp = mysqli_insert_id($conn); // Lấy ID vừa tạo
 
             $target_dir = "../img/";
-            // Kiểm tra và tạo thư mục nếu chưa có(tránh lỗi nếu lỡ tay xóa thư mục)
+            // Kiểm tra và tạo thư mục nếu chưa có
             if (!file_exists($target_dir)) {
                 mkdir($target_dir, 0777, true);
             }
@@ -55,7 +55,7 @@
                     // Kiểm tra có tên file và không có lỗi upload
                     if (!empty($files['name'][$i]) && $files['error'][$i] == 0) {
                         
-                        // Đặt tên file: time_sốthứtự_tênfile (thêm $i để tránh trùng nếu up nhiều ảnh cùng lúc)
+                        // Đặt tên file: time_sốthứtự_tênfile 
                         $filename = time() . "_" . $i . "_" . basename($files['name'][$i]);
                         $target_file = $target_dir . $filename;
                         
@@ -63,7 +63,7 @@
                         if (move_uploaded_file($files['tmp_name'][$i], $target_file)) {
                             
                             // Lưu đường dẫn vào DB
-                            $db_url = "../img/" . $filename;
+                            $db_url = "img/" . $filename;
                             
                             // Insert vào bảng hinhanhsanpham
                             $sql_img = "INSERT INTO hinhanhsanpham (ID_SanPham, URL_HinhAnh) VALUES ('$id_sp', '$db_url')";
@@ -120,9 +120,7 @@
                 <div class="input-half quantity-control">
                     <label for="quantity" class="required">Số lượng</label>
                     <div class="quantity-input-group">
-                        <button type="button" class="btn-qty">-</button>
                         <input type="number" id="quantity" name="quantity" value="1" min="1">
-                        <button type="button" class="btn-qty">+</button>
                     </div>
                 </div>
             </div>
@@ -237,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const removeBtn = document.createElement('button');
         removeBtn.classList.add('remove-image-btn');
         removeBtn.innerHTML = '&times;'; 
-        removeBtn.type = "button"; // Quan trọng: chặn submit form
+        removeBtn.type = "button"; 
 
         removeBtn.addEventListener('click', function() {
             // Xóa giao diện
